@@ -1,0 +1,7 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<SchemaObject class="oracle.dbtools.crest.model.design.relational.SchemaObject" name="UIM_DI01" directorySegmentName="seg_0" id="CF857C5F-7F93-32AB-A377-8FAFCA79F053">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:15:50 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+</SchemaObject>

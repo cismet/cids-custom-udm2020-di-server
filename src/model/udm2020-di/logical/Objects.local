@@ -1,0 +1,70 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<oracle.dbtools.crest.model.design.logical.LogicalDesign>
+   <object objectType="Entity" objectID="6E5AF496-7250-9EE4-1D50-B34CA3185FD7" name="CS ALL ATTR MAPPING" seqName="seg_0"/>
+   <object objectType="Entity" objectID="6FC91670-C8E5-8514-9381-F6C74B58170C" name="CS ATTR" seqName="seg_0"/>
+   <object objectType="Entity" objectID="109BD587-DD46-75F2-3E86-7BBDC35B07A2" name="CS ATTR OBJECT" seqName="seg_0"/>
+   <object objectType="Entity" objectID="F620990B-AEB6-AF87-82B3-3EE537E8CF30" name="CS ATTR OBJECT DERIVED" seqName="seg_0"/>
+   <object objectType="Entity" objectID="AB5B15B2-799A-0B1E-913B-9A4DD531174E" name="CS ATTR OBJECT DERIVED TEMP" seqName="seg_0"/>
+   <object objectType="Entity" objectID="4C7311C8-B587-F475-428E-1B28BBFBD849" name="CS ATTR OBJECT TEMP" seqName="seg_0"/>
+   <object objectType="Entity" objectID="D5126604-06B4-8CC6-28CA-0A7561E2066C" name="CS ATTR STRING" seqName="seg_0"/>
+   <object objectType="Entity" objectID="87095B3D-B294-3722-F0CB-7D7E7D382DD5" name="CS ATTR STRING TEMP" seqName="seg_0"/>
+   <object objectType="Entity" objectID="BAD1FCA2-E942-B675-66E4-44C85F8168D3" name="CS CAT LINK" seqName="seg_0"/>
+   <object objectType="Entity" objectID="EB83DB88-35FD-3E88-A4AE-DAF6F3691BE7" name="CS CAT NODE" seqName="seg_0"/>
+   <object objectType="Entity" objectID="7A2812FD-CB49-E652-7816-B1122FE221C8" name="CS CLASS" seqName="seg_0"/>
+   <object objectType="Entity" objectID="1A542886-F7DB-D471-C66B-047F59626F3F" name="CS CLASS ATTR" seqName="seg_0"/>
+   <object objectType="Entity" objectID="3A732A4A-FC28-DE53-1687-FDEE92EEB046" name="CS CONFIG ATTR EXEMPT" seqName="seg_0"/>
+   <object objectType="Entity" objectID="33AE31C5-0A2B-ED19-F023-BC6648F918AC" name="CS CONFIG ATTR JT" seqName="seg_0"/>
+   <object objectType="Entity" objectID="1CA25F92-5BC6-F2D0-0B37-B6BEEE9AED4A" name="CS CONFIG ATTR KEY" seqName="seg_0"/>
+   <object objectType="Entity" objectID="4687A364-8247-A875-5752-8C8B25EF7F0F" name="CS CONFIG ATTR TYPE" seqName="seg_0"/>
+   <object objectType="Entity" objectID="5E1BBF9C-60EF-5B36-FDBE-1D92AE0605A6" name="CS CONFIG ATTR VALUE" seqName="seg_0"/>
+   <object objectType="Entity" objectID="B928C52A-0DB0-5B13-14CD-E614CB58B26A" name="CS DOMAIN" seqName="seg_0"/>
+   <object objectType="Entity" objectID="012FE6C7-27DD-CEEA-F285-0B491BFC3AD2" name="CS HISTORY" seqName="seg_0"/>
+   <object objectType="Entity" objectID="38054722-3AF8-01C0-3752-75C1BF036B54" name="CS ICON" seqName="seg_0"/>
+   <object objectType="Entity" objectID="9F6AC113-BC05-595A-4A2E-41241EFC851C" name="CS JAVA CLASS" seqName="seg_0"/>
+   <object objectType="Entity" objectID="362A99A4-6480-1DF2-0CB9-22EEE5FD7EBF" name="CS LOCKS" seqName="seg_0"/>
+   <object objectType="Entity" objectID="7EF47B6B-150B-7A43-E880-6FBE9DE65796" name="CS METHOD" seqName="seg_0"/>
+   <object objectType="Entity" objectID="31992B15-CA3D-B05A-C774-2879C8A3E570" name="CS METHOD CLASS ASSOC" seqName="seg_0"/>
+   <object objectType="Entity" objectID="24A5AC4A-A1F9-CD88-4558-0880463D5B71" name="CS PERMISSION" seqName="seg_0"/>
+   <object objectType="Entity" objectID="DB6096F7-6DCF-19B9-444F-7D9D765DB5DB" name="CS POLICY" seqName="seg_0"/>
+   <object objectType="Entity" objectID="293080C6-DC47-29F9-75B5-8C5E7815C886" name="CS POLICY RULE" seqName="seg_0"/>
+   <object objectType="Entity" objectID="D3814702-C22D-C866-B553-2B3BEBDA482F" name="CS QUERY" seqName="seg_0"/>
+   <object objectType="Entity" objectID="6FAE2439-A0C9-4982-E650-E42AB5AF2970" name="CS QUERY CLASS ASSOC" seqName="seg_0"/>
+   <object objectType="Entity" objectID="6A33DE16-EBE4-87A0-DEA2-49B346C4CF2B" name="CS QUERY LINK" seqName="seg_0"/>
+   <object objectType="Entity" objectID="E97DF08B-2053-AEE0-3A0C-2816F23ED669" name="CS QUERY PARAMETER" seqName="seg_0"/>
+   <object objectType="Entity" objectID="0EB84D65-F955-82CE-32F8-4043992D662F" name="CS QUERY STORE" seqName="seg_0"/>
+   <object objectType="Entity" objectID="3C4E5A46-47A7-ECC4-F85B-AB874AF09811" name="CS QUERY STORE UG ASSOC" seqName="seg_0"/>
+   <object objectType="Entity" objectID="FC9A1FB7-2574-2196-B00A-FB4BDF44F7B8" name="CS QUERY UG ASSOC" seqName="seg_0"/>
+   <object objectType="Entity" objectID="C40BF707-A6AA-2F2C-995A-116CCF30D324" name="CS STRINGREPCACHE" seqName="seg_0"/>
+   <object objectType="Entity" objectID="146D4F21-F350-21C2-F9A4-EFC064AB0A70" name="CS TYPE" seqName="seg_0"/>
+   <object objectType="Entity" objectID="FD8A2CE1-2EE1-9F5B-C196-D1E59911CC5D" name="CS UG" seqName="seg_0"/>
+   <object objectType="Entity" objectID="AAC32326-CD57-CF43-4223-6F8EB3FF0E37" name="CS UG ATTR PERM" seqName="seg_0"/>
+   <object objectType="Entity" objectID="9CB38250-6B24-DFC5-4739-C5A0E6DB8F13" name="CS UG CAT NODE PERM" seqName="seg_0"/>
+   <object objectType="Entity" objectID="3DE32C49-A05F-BAB4-965C-D76E7743DD13" name="CS UG CLASS PERM" seqName="seg_0"/>
+   <object objectType="Entity" objectID="2278C345-94E7-3A87-6342-13EE1831FCC9" name="CS UG MEMBERSHIP" seqName="seg_0"/>
+   <object objectType="Entity" objectID="C9C5736B-9BF4-B51D-191B-12E1008BF888" name="CS UG METHOD PERM" seqName="seg_0"/>
+   <object objectType="Entity" objectID="CB91AF13-F8C7-3E12-D75A-B6A9BA35911A" name="CS USR" seqName="seg_0"/>
+   <object objectType="Entity" objectID="2C75BD6D-91B1-B312-A4FA-0AB75EEDC6DD" name="GEOM" seqName="seg_0"/>
+   <object objectType="Entity" objectID="911438CD-12F5-BCD0-F4FB-D2C9C34135AE" name="MOSS" seqName="seg_0"/>
+   <object objectType="Entity" objectID="19B58C05-656B-0C49-7F72-395B9C012184" name="MOSS TYPE" seqName="seg_0"/>
+   <object objectType="Entity" objectID="07D48C8B-6C33-222D-3F3D-7DA03DBA75B3" name="NAMED AREA" seqName="seg_0"/>
+   <object objectType="Entity" objectID="75A0E856-291E-2710-373B-C4A86163008F" name="URL" seqName="seg_0"/>
+   <object objectType="Entity" objectID="09EE9573-EAD1-A753-3068-B0022517C952" name="URL BASE" seqName="seg_0"/>
+   <object objectType="EntityView" objectID="91719516-40A0-417F-5FD1-E72EC4A5FEC9" name="CS CLASS HIERARCHY" seqName="seg_0"/>
+   <object objectType="EntityView" objectID="D9302634-EDEA-D8A8-8EC7-F80A4F4E65C8" name="GEOSUCHE" seqName="seg_0"/>
+   <object objectType="EntityView" objectID="5E6DF85B-A299-B8CB-FFE1-68B25BA9DBEB" name="TEXTSEARCH" seqName="seg_0"/>
+   <object objectType="Relation" objectID="4BCA462A-D678-28D2-AB92-6CFAF2598897" name="SYS_C003624485" seqName="seg_0"/>
+   <object objectType="Relation" objectID="DA283C4A-307D-667B-CD9F-27F9DE9D8960" name="SYS_C003624486" seqName="seg_0"/>
+   <object objectType="Relation" objectID="EBB9EACF-BDE2-2AF3-5A7A-E7268B3E7A07" name="SYS_C003624487" seqName="seg_0"/>
+   <object objectType="Relation" objectID="14F46FE1-41BF-A400-DDFD-A843A3E03BF2" name="SYS_C003624488" seqName="seg_0"/>
+   <object objectType="Relation" objectID="C0BD2359-DD13-D5E1-11E8-D22158D3145A" name="SYS_C003624489" seqName="seg_0"/>
+   <object objectType="Relation" objectID="0D01D6E6-B4A1-6EDB-CEFB-0B3067967BAB" name="SYS_C003624490" seqName="seg_0"/>
+   <object objectType="Relation" objectID="0C918565-39DE-B2EB-F239-993E3EFB3779" name="SYS_C003624491" seqName="seg_0"/>
+   <object objectType="Relation" objectID="72E78FBD-9744-8B99-119D-1C5DE22EC3A5" name="SYS_C003624492" seqName="seg_0"/>
+   <object objectType="Relation" objectID="DA3F0FFD-E1D5-78EA-F946-DC59D3D594A4" name="SYS_C003624493" seqName="seg_0"/>
+   <object objectType="Relation" objectID="E358A9E3-51CD-305D-CD75-C991E2E019B5" name="SYS_C003624494" seqName="seg_0"/>
+   <object objectType="Relation" objectID="8915E66D-C63E-2B93-1BFD-2253EA3DA0C8" name="SYS_C003624495" seqName="seg_0"/>
+   <object objectType="Relation" objectID="6CE31D27-9379-5CB3-B416-EE77A26FD016" name="SYS_C003624496" seqName="seg_0"/>
+   <object objectType="Relation" objectID="CBAA3B87-4359-9235-4954-37AB0A2B983C" name="SYS_C003624498" seqName="seg_0"/>
+   <object objectType="Relation" objectID="D4BFEA61-24E5-0E09-9726-CC7FC9AB4705" name="SYS_C003624499" seqName="seg_0"/>
+   <object objectType="Relation" objectID="3632CAE8-C3B5-A9FD-9258-230CE3D64929" name="SYS_C003624500" seqName="seg_0"/>
+</oracle.dbtools.crest.model.design.logical.LogicalDesign>

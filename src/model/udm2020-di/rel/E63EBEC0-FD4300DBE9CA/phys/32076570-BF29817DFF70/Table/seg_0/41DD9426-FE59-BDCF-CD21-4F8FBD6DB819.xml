@@ -1,0 +1,91 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev11g class="oracle.dbtools.crest.model.design.storage.oracle.v11g.TableProxyOraclev11g" name="URL_BASE" directorySegmentName="seg_0" id="41DD9426-FE59-BDCF-CD21-4F8FBD6DB819">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:18 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<schemaObject>CF857C5F-7F93-32AB-A377-8FAFCA79F053</schemaObject>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<segment>4C1C564A-93AD-3BA7-F7F3-B9617CA73B7A</segment>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="SERVER" id="4DFDE820-89BE-04EC-477B-A8FCF5FE9B7F">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:46 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="PATH" id="5993166D-D5DD-C0B5-5C31-DE9AD61C0EAD">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:46 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="PROT_PREFIX" id="A849818A-DE8A-95C8-CADA-3F5E743566EB">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:46 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="ID" id="DD4C3CC9-D0BD-1FA0-BDE3-2F1794D0AFEB">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:46 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<autoIncrementDDL>TRIGGER</autoIncrementDDL>
+</ColumnProxy>
+</columnProxies>
+<indexProxies>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="SYS_C00486505" id="FB142D78-971E-D8DF-D1E7-3323D64C9F49">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:04 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<schemaObject>CF857C5F-7F93-32AB-A377-8FAFCA79F053</schemaObject>
+<segment>03C47428-2BC0-4B4F-F2C0-0306E4AFDCC3</segment>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+</IndexProxy>
+</indexProxies>
+<lobStorages>
+<LobStorage class="oracle.dbtools.crest.model.design.storage.oracle.v11g.LobStorageOraclev11g" name="SYS_LOB0002498343C00003$$" id="46AC3C67-6D84-E7DE-70E3-79651163194D">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:37 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<cache>NOCACHE</cache>
+<chunk>8192</chunk>
+<column>PATH</column>
+<logging>YES</logging>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+</LobStorage>
+<LobStorage class="oracle.dbtools.crest.model.design.storage.oracle.v11g.LobStorageOraclev11g" name="SYS_LOB0002498343C00004$$" id="9C4DEB38-A8DC-BAE3-E611-54CF2B8BFCD4">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:37 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<cache>NOCACHE</cache>
+<chunk>8192</chunk>
+<column>SERVER</column>
+<logging>YES</logging>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+</LobStorage>
+</lobStorages>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="URL_BASE_PK" id="94EE44AF-3DEA-75E1-0B64-20B3EA67AC7A">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:29 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<segment>03C47428-2BC0-4B4F-F2C0-0306E4AFDCC3</segment>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+<existingIndex>FB142D78-971E-D8DF-D1E7-3323D64C9F49</existingIndex>
+<indexSegment>03C47428-2BC0-4B4F-F2C0-0306E4AFDCC3</indexSegment>
+<indexSort>SORTED</indexSort>
+<usingIndex>BY INDEX NAME</usingIndex>
+</PrimaryKey>
+</primaryKeys>
+</TableProxyOraclev11g>

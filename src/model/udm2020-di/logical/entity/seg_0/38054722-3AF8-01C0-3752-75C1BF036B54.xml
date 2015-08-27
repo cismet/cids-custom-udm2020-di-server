@@ -1,0 +1,79 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="38054722-3AF8-01C0-3752-75C1BF036B54" name="CS ICON">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>30966A69-85CC-4988-8647-81F355B4D8B5</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="ID" id="F746CA26-82D5-82F4-762F-91388ECA76B8">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>6E360DF4-7A83-F261-374D-13902D20EB93</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>*</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,*,0</ownDataTypeParameters>
+</Attribute>
+<Attribute name="NAME" id="41A08D85-EF4B-4820-C167-DC14A6B389F6">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>A135EBDF-83B6-D62B-3D23-B65555082D95</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>32 BYTE</dataTypeSize>
+<ownDataTypeParameters>32 BYTE,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="FILE NAME" id="60209EC8-9E82-879E-248E-000D3CE5CE20">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>6608FC37-4272-581E-E00B-E6EB2609CAC8</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 BYTE</dataTypeSize>
+<defaultValue>&apos;default_icon.gif&apos;</defaultValue>
+<ownDataTypeParameters>100 BYTE,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="D296B961-0989-07DF-511A-18BB3854EBD8" name="CS ICON PK">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>FFCE12EF-1489-536F-406D-287613182147</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>F746CA26-82D5-82F4-762F-91388ECA76B8</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

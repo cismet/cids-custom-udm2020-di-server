@@ -1,0 +1,83 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="87095B3D-B294-3722-F0CB-7D7E7D382DD5" name="CS ATTR STRING TEMP">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>342FFBC5-3D73-4433-5EDD-A4A25AB076D7</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="CLASS ID" id="F865543F-3987-FAD0-1DBB-32C6FBEFE321">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>00D89DB4-FE7F-7BDE-5EAD-B57137D034DB</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>*</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,*,0</ownDataTypeParameters>
+</Attribute>
+<Attribute name="ATTR ID" id="5B90819F-947D-1CDC-8EFD-E774A6CFD1AE">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>2068941E-CDA3-0322-4C95-F35B07529F5A</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>*</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,*,0</ownDataTypeParameters>
+</Attribute>
+<Attribute name="OBJECT ID" id="51BDCF90-7AD7-841C-41B9-A4BC408AABBE">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>86E270E2-2A7C-BEBB-A871-C5BE409BE82E</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>*</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,*,0</ownDataTypeParameters>
+</Attribute>
+<Attribute name="STRING VAL" id="FFDBB6E7-5AF3-6162-27BB-F7B40D82BE68">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>83111466-BD7C-A000-3578-391D4E3FBC53</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<dataTypeSize>4000</dataTypeSize>
+<ownDataTypeParameters>4000,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+</Entity>

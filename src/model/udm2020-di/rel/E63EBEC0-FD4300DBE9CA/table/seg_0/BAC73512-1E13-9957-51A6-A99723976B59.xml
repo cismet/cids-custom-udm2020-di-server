@@ -1,0 +1,128 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="BAC73512-1E13-9957-51A6-A99723976B59" schemaObject="CF857C5F-7F93-32AB-A377-8FAFCA79F053" name="CS_CLASS_ATTR">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>UIM_DI01</sourceObjSchema>
+<sourceObjName>CS_CLASS_ATTR</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:15:57 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="ID" id="D844E9C7-316B-BDE1-CF7D-E6DC183745EF">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>CS_CLASS_ATTR</sourceObjSchema>
+<sourceObjName>ID</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:47 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>*</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,*,0</ownDataTypeParameters>
+<autoIncrementColumn>true</autoIncrementColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<autoIncrementSequenceName>cs_class_attr_sequence</autoIncrementSequenceName>
+<autoIncrementTriggerName>CS_CLASS_ATTR_ID_TRIGGER</autoIncrementTriggerName>
+</Column>
+<Column name="CLASS_ID" id="E740150F-E021-7FCF-88DD-15B74E8F34CC">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>CS_CLASS_ATTR</sourceObjSchema>
+<sourceObjName>CLASS_ID</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:47 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>*</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,*,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="TYPE_ID" id="8162B925-516A-816C-C272-38D4CC05532E">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>CS_CLASS_ATTR</sourceObjSchema>
+<sourceObjName>TYPE_ID</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:47 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>*</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,*,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="ATTR_KEY" id="BDA970F5-E1C7-C751-DFE5-EB420814C29C">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>CS_CLASS_ATTR</sourceObjSchema>
+<sourceObjName>ATTR_KEY</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:47 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 BYTE</dataTypeSize>
+<ownDataTypeParameters>100 BYTE,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="ATTR_VALUE" id="E688B171-5722-1732-58F7-27D90B650BE5">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>CS_CLASS_ATTR</sourceObjSchema>
+<sourceObjName>ATTR_VALUE</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:48 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<dataTypeSize>4000</dataTypeSize>
+<ownDataTypeParameters>4000,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="F95E1899-423E-23D9-F2AE-503E23EDF96D" name="CS_CLASS_ATTR_PK">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>UIM_DI01</sourceObjSchema>
+<sourceObjName>SYS_C003624298</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:10 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D844E9C7-316B-BDE1-CF7D-E6DC183745EF"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="83EC21B1-9984-B1B1-032A-6E6424C86623" schemaObject="CF857C5F-7F93-32AB-A377-8FAFCA79F053" name="SYS_C00486377">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>UIM_DI01</sourceObjSchema>
+<sourceObjName>SYS_C00486377</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:56 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D844E9C7-316B-BDE1-CF7D-E6DC183745EF"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

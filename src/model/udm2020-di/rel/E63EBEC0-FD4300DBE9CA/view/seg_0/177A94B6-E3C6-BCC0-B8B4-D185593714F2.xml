@@ -1,0 +1,74 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableView class="oracle.dbtools.crest.model.design.relational.TableView" directorySegmentName="seg_0" id="177A94B6-E3C6-BCC0-B8B4-D185593714F2" schemaObject="CF857C5F-7F93-32AB-A377-8FAFCA79F053" name="GEOSUCHE">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>UIM_DI01</sourceObjSchema>
+<sourceObjName>GEOSUCHE</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:42 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<userDefined>true</userDefined>
+<userDefinedSQL>CREATE OR REPLACE VIEW GEOSUCHE&lt;br/&gt;AS &lt;br/&gt;SELECT DISTINCT x.class_id,&lt;br/&gt;                  x.object_id,&lt;br/&gt;                  c.name,&lt;br/&gt;                  x.geo_field&lt;br/&gt;  FROM   ( (SELECT DISTINCT cs_attr_object.class_id,&lt;br/&gt;                          cs_attr_object.object_id,&lt;br/&gt;                          geom.geo_field&lt;br/&gt;          FROM   geom,&lt;br/&gt;                 cs_attr_object&lt;br/&gt;          WHERE  ( ( cs_attr_object.attr_class_id = (SELECT id&lt;br/&gt;                                                     FROM   cs_class&lt;br/&gt;                                                     WHERE  table_name = &apos;GEOM&apos;)&lt;br/&gt;                   )&lt;br/&gt;                   AND ( cs_attr_object.attr_object_id = geom.id ) )&lt;br/&gt;          ORDER  BY cs_attr_object.class_id,&lt;br/&gt;                    cs_attr_object.object_id,&lt;br/&gt;                    geom.geo_field) x&lt;br/&gt;           left join cs_cat_node c&lt;br/&gt;                  ON (( ( x.class_id = c.class_id )&lt;br/&gt;                        AND ( x.object_id = c.object_id ) )) )&lt;br/&gt;  ORDER  BY x.class_id,&lt;br/&gt;            x.object_id,&lt;br/&gt;            c.name,&lt;br/&gt;            x.geo_field</userDefinedSQL>
+<viewElements>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="CLASS_ID" id="29A95551-DE94-B88F-0C2D-2A588757D48E">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>GEOSUCHE</sourceObjSchema>
+<sourceObjName>CLASS_ID</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:42 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<alias>CLASS_ID</alias>
+<dataType>NUMBER</dataType>
+<headerAlias>CLASS_ID</headerAlias>
+<reference>false</reference>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="OBJECT_ID" id="47A4D34C-8685-86B6-AC03-00853CEED709">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>GEOSUCHE</sourceObjSchema>
+<sourceObjName>OBJECT_ID</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:42 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<alias>OBJECT_ID</alias>
+<dataType>NUMBER</dataType>
+<headerAlias>OBJECT_ID</headerAlias>
+<reference>false</reference>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="NAME" id="3BC6DA6C-ED55-EAC8-2A1C-0A99550E462F">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>GEOSUCHE</sourceObjSchema>
+<sourceObjName>NAME</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:42 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<alias>NAME</alias>
+<dataType>VARCHAR2 (100)</dataType>
+<headerAlias>NAME</headerAlias>
+<reference>false</reference>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="GEO_FIELD" id="7D58633E-4F2D-349A-74AF-22BE35086AE0">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>GEOSUCHE</sourceObjSchema>
+<sourceObjName>GEO_FIELD</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:42 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<alias>GEO_FIELD</alias>
+<dataType>SDO_GEOMETRY (64)</dataType>
+<headerAlias>GEO_FIELD</headerAlias>
+<reference>false</reference>
+</viewElement>
+</viewElements>
+</TableView>

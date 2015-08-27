@@ -1,0 +1,93 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="0EB84D65-F955-82CE-32F8-4043992D662F" name="CS QUERY STORE">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>524A941D-5F34-DFE1-082B-4A76CD921B76</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="ID" id="7D6038FC-1E3D-187C-F31C-48D9FE6E3A6D">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>158539EB-0242-40C8-26EE-7030618FE592</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>*</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,*,0</ownDataTypeParameters>
+</Attribute>
+<Attribute name="USER ID" id="52B67AD1-BF30-7017-A61A-798FDFB842DC">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>7089050D-A2ED-26F2-E18F-FB850B520B25</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>*</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,*,0</ownDataTypeParameters>
+</Attribute>
+<Attribute name="NAME" id="0979CD96-D006-D569-2700-462FEB3EC579">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>88C342E8-FEE5-10AD-D259-0AA82C7028DC</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 BYTE</dataTypeSize>
+<ownDataTypeParameters>100 BYTE,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="FILE NAME" id="23B2BCCD-E99D-603A-75C0-57124A016CEE">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>CB97EE19-5E0A-3DB3-8F7B-3FFC7BB90FA7</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 BYTE</dataTypeSize>
+<ownDataTypeParameters>100 BYTE,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="5B68618B-0E6D-1651-DA2B-89F7BD0844E8" name="CS QUERY STORE PK">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>56E4DFDD-DF59-2484-FCB1-EDB0BC7B999E</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>7D6038FC-1E3D-187C-F31C-48D9FE6E3A6D</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

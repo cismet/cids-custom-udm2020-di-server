@@ -1,0 +1,85 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="4687A364-8247-A875-5752-8C8B25EF7F0F" name="CS CONFIG ATTR TYPE">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>BD9FFAF9-9EB4-5617-4CE6-E2FE93BB95CE</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="ID" id="7C19C8F1-7819-9729-CC51-B85F46968C5C">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>29C217AC-E75B-10A5-CA6B-38D21C178139</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>*</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,*,0</ownDataTypeParameters>
+</Attribute>
+<Attribute name="TYPE" id="EE8670A9-87E2-F2E4-3254-8BEA2A2DA8FA">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>7510E9E0-3C7F-6E4B-91BE-0B45507CEE92</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<constraintName>SYS_C003624315</constraintName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT025</logicalDatatype>
+<dataTypeSize>1 BYTE</dataTypeSize>
+<listOfValues>
+<valueDef value="&apos;A&apos;" description=""/>
+<valueDef value="&apos;C&apos;" description=""/>
+<valueDef value="&apos;X&apos;" description=""/>
+</listOfValues>
+<ownDataTypeParameters>1 BYTE,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="DESCR" id="49BAE930-FC8B-60B0-B047-2240C728D74C">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>24EB64B4-2E33-3E57-38E6-6CD3132687EF</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>200 BYTE</dataTypeSize>
+<ownDataTypeParameters>200 BYTE,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="EE93FCC6-246C-879A-B5F8-AB64B6959CFC" name="CS CONFIG ATTR TYPE PK">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>36C6F8C2-8F7C-312F-6FCD-F770A72AB088</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>7C19C8F1-7819-9729-CC51-B85F46968C5C</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

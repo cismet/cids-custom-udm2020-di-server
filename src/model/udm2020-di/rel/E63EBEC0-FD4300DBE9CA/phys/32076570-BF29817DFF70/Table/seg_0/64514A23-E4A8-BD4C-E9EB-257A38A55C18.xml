@@ -1,0 +1,96 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev11g class="oracle.dbtools.crest.model.design.storage.oracle.v11g.TableProxyOraclev11g" name="CS_METHOD" directorySegmentName="seg_0" id="64514A23-E4A8-BD4C-E9EB-257A38A55C18">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:03 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<schemaObject>CF857C5F-7F93-32AB-A377-8FAFCA79F053</schemaObject>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<segment>4C1C564A-93AD-3BA7-F7F3-B9617CA73B7A</segment>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="PLUGIN_ID" id="79C9EA75-D80F-D2F1-ED71-B9490D4990E5">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:04 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<defaultValue>&apos;&apos;</defaultValue>
+</ColumnProxy>
+<ColumnProxy name="MULT" id="8FF7A819-52BB-DB3F-8F25-D91EA77FE103">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:04 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<defaultValue>&apos;0&apos;</defaultValue>
+</ColumnProxy>
+<ColumnProxy name="ID" id="91C7ACD4-C19E-549C-7A11-BC1BCABA359A">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:03 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<autoIncrementDDL>TRIGGER</autoIncrementDDL>
+</ColumnProxy>
+<ColumnProxy name="DESCR" id="A4E8A0F5-13AA-57DF-E5DA-ACED6B55970A">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:04 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="CLASS_MULT" id="ADA1AF37-FB65-AAC6-AEEA-32F83709499F">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:04 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<defaultValue>&apos;0&apos;</defaultValue>
+</ColumnProxy>
+<ColumnProxy name="METHOD_ID" id="D7F9946D-80D9-B165-87D9-2865EB0026E1">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:05 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<defaultValue>&apos;&apos;</defaultValue>
+</ColumnProxy>
+</columnProxies>
+<indexProxies>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="SYS_C00486396" id="90F6C4AB-7724-113E-927E-F4159570CB39">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:59 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<schemaObject>CF857C5F-7F93-32AB-A377-8FAFCA79F053</schemaObject>
+<segment>03C47428-2BC0-4B4F-F2C0-0306E4AFDCC3</segment>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+</IndexProxy>
+</indexProxies>
+<lobStorages>
+<LobStorage class="oracle.dbtools.crest.model.design.storage.oracle.v11g.LobStorageOraclev11g" name="SYS_LOB0002498299C00002$$" id="090A6377-60ED-C90A-F024-AD7A0F0F90A3">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:36 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<cache>NOCACHE</cache>
+<chunk>8192</chunk>
+<column>DESCR</column>
+<logging>YES</logging>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+</LobStorage>
+</lobStorages>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="CS_METHOD_PK" id="50FBF7E0-838E-3738-68ED-BB88192370C0">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:16 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<segment>03C47428-2BC0-4B4F-F2C0-0306E4AFDCC3</segment>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+<existingIndex>90F6C4AB-7724-113E-927E-F4159570CB39</existingIndex>
+<indexSegment>03C47428-2BC0-4B4F-F2C0-0306E4AFDCC3</indexSegment>
+<indexSort>SORTED</indexSort>
+<usingIndex>BY INDEX NAME</usingIndex>
+</PrimaryKey>
+</primaryKeys>
+</TableProxyOraclev11g>

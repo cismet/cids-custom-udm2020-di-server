@@ -1,0 +1,83 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev11g class="oracle.dbtools.crest.model.design.storage.oracle.v11g.TableProxyOraclev11g" name="CS_ATTR_STRING" directorySegmentName="seg_0" id="0DD6B90F-8C94-7C13-BEBC-712E1DF19675">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:15:54 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<schemaObject>CF857C5F-7F93-32AB-A377-8FAFCA79F053</schemaObject>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<segment>4C1C564A-93AD-3BA7-F7F3-B9617CA73B7A</segment>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="CLASS_ID" id="0ABDC336-18DF-40CE-8D16-419EDF158DC9">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:33 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="ATTR_ID" id="196AA291-BDA8-1819-A383-9F3AD413CD5B">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:34 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="OBJECT_ID" id="58034D4A-E363-BC61-7F46-ED30AAA422BD">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:34 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="STRING_VAL" id="A27E6583-B5A4-9F9C-77A5-69C7D265B391">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:34 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<indexProxies>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="CS_ATTR_STRING_CLASS_IDX" id="BE44CD7D-5212-EB97-83D5-AF6105ED6DF3">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:51 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<schemaObject>CF857C5F-7F93-32AB-A377-8FAFCA79F053</schemaObject>
+<segment>03C47428-2BC0-4B4F-F2C0-0306E4AFDCC3</segment>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+</IndexProxy>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="CS_ATTR_STRING_OBJECT_IDX" id="C41BAD34-767E-3CB1-ED74-D87747BB9605">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:51 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<schemaObject>CF857C5F-7F93-32AB-A377-8FAFCA79F053</schemaObject>
+<segment>03C47428-2BC0-4B4F-F2C0-0306E4AFDCC3</segment>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+</IndexProxy>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="I_CS_ATTR_STRING_ACO_ID" id="CC9831EB-FA9E-C3D2-FD81-0EA7CC6FC01E">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:51 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<schemaObject>CF857C5F-7F93-32AB-A377-8FAFCA79F053</schemaObject>
+<segment>03C47428-2BC0-4B4F-F2C0-0306E4AFDCC3</segment>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+</IndexProxy>
+</indexProxies>
+<lobStorages>
+<LobStorage class="oracle.dbtools.crest.model.design.storage.oracle.v11g.LobStorageOraclev11g" name="SYS_LOB0002498265C00004$$" id="20ED7723-8C8A-5CF4-206D-F4D4CD79BAA7">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:35 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<cache>NOCACHE</cache>
+<chunk>8192</chunk>
+<column>STRING_VAL</column>
+<logging>YES</logging>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+</LobStorage>
+</lobStorages>
+</TableProxyOraclev11g>

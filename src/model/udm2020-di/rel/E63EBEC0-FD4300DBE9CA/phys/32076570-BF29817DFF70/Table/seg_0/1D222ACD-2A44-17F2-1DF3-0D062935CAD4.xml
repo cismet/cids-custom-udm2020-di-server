@@ -1,0 +1,188 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev11g class="oracle.dbtools.crest.model.design.storage.oracle.v11g.TableProxyOraclev11g" name="CS_CAT_NODE" directorySegmentName="seg_0" id="1D222ACD-2A44-17F2-1DF3-0D062935CAD4">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:15:56 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<schemaObject>CF857C5F-7F93-32AB-A377-8FAFCA79F053</schemaObject>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<segment>4C1C564A-93AD-3BA7-F7F3-B9617CA73B7A</segment>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="OBJECT_ID" id="0D500CB9-930D-4DE7-8666-7CC17E2E012E">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:39 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="ORG" id="1500BE97-2EDE-E776-C701-6E0D47C1BA4B">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:40 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DERIVE_PERMISSIONS_FROM_CLASS" id="229C23AD-4814-C066-9365-F48FAD372454">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:41 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<defaultValue>&apos;1&apos;</defaultValue>
+</ColumnProxy>
+<ColumnProxy name="DYNAMIC_CHILDREN" id="2D44833F-6227-23A8-7416-F64E9FBEFD06">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:40 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="CLASS_ID" id="68114459-9F32-01FE-D17C-2E911B8EF26F">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:38 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="NODE_TYPE" id="8B528037-83CD-3D16-7EA2-21B783F4FA9C">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:39 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<defaultValue>&apos;0&apos;</defaultValue>
+</ColumnProxy>
+<ColumnProxy name="ICON" id="97B289BD-229B-B00F-8030-2ECA6283AB48">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:42 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="ICONFACTORY" id="9CF71384-FAF8-0746-01FC-1DE423C95579">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:41 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="NAME" id="A1E76FA1-B374-F5B7-F082-44EF8AB22CBE">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:38 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="ID" id="ABE077C2-B851-5C37-EEA4-56AB96F32D03">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:38 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<autoIncrementDDL>TRIGGER</autoIncrementDDL>
+</ColumnProxy>
+<ColumnProxy name="POLICY" id="BA873DC3-961A-0B95-F5B0-25AA00C138C0">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:41 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SQL_SORT" id="CBD0F021-A842-2BB4-6D76-C930F3FE5B49">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:41 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DESCR" id="DF7D55CF-023B-80BC-5165-1615BE5436B8">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:38 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<defaultValue>1</defaultValue>
+</ColumnProxy>
+<ColumnProxy name="IS_ROOT" id="EE10619F-8D36-D518-856E-5893D7FD57EB">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:40 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<defaultValue>&apos;0&apos;</defaultValue>
+</ColumnProxy>
+<ColumnProxy name="ARTIFICAL_ID" id="FED34140-BE2D-3282-1C6B-5581CA9B4EAA">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:42 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<indexProxies>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="CL_IDX" id="3C7763EB-F8EC-9D84-D301-6B0A85CEB626">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:53 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<schemaObject>CF857C5F-7F93-32AB-A377-8FAFCA79F053</schemaObject>
+<segment>03C47428-2BC0-4B4F-F2C0-0306E4AFDCC3</segment>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+</IndexProxy>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="OBJ_CL_IDX" id="73573BAF-13FD-4979-3F9C-A6F5E52304C1">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:56 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<schemaObject>CF857C5F-7F93-32AB-A377-8FAFCA79F053</schemaObject>
+<segment>03C47428-2BC0-4B4F-F2C0-0306E4AFDCC3</segment>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+</IndexProxy>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="OB_IDX" id="9562E3D7-075E-5425-13E9-2877E1462CC7">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:53 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<schemaObject>CF857C5F-7F93-32AB-A377-8FAFCA79F053</schemaObject>
+<segment>03C47428-2BC0-4B4F-F2C0-0306E4AFDCC3</segment>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+</IndexProxy>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="SYS_C00486361" id="C7098FB9-EBD1-1209-D879-D00525DCF07C">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:56 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<schemaObject>CF857C5F-7F93-32AB-A377-8FAFCA79F053</schemaObject>
+<segment>03C47428-2BC0-4B4F-F2C0-0306E4AFDCC3</segment>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+</IndexProxy>
+</indexProxies>
+<lobStorages>
+<LobStorage class="oracle.dbtools.crest.model.design.storage.oracle.v11g.LobStorageOraclev11g" name="SYS_LOB0002498274C00008$$" id="A2714712-CA54-6482-C97E-5F2843D24C1A">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:36 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<cache>NOCACHE</cache>
+<chunk>8192</chunk>
+<column>ORG</column>
+<logging>YES</logging>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+</LobStorage>
+<LobStorage class="oracle.dbtools.crest.model.design.storage.oracle.v11g.LobStorageOraclev11g" name="SYS_LOB0002498274C00009$$" id="42E03436-7F37-92CB-C9A3-272B681EA5CC">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:36 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<cache>NOCACHE</cache>
+<chunk>8192</chunk>
+<column>DYNAMIC_CHILDREN</column>
+<logging>YES</logging>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+</LobStorage>
+</lobStorages>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="CS_CAT_NODE_PK" id="0AE59C38-9315-7FE5-363B-9765AA28AAC5">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:09 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<segment>03C47428-2BC0-4B4F-F2C0-0306E4AFDCC3</segment>
+<tableSpace>7391018C-3A51-9A5A-0EE4-E2EE35E5699F</tableSpace>
+<existingIndex>C7098FB9-EBD1-1209-D879-D00525DCF07C</existingIndex>
+<indexSegment>03C47428-2BC0-4B4F-F2C0-0306E4AFDCC3</indexSegment>
+<indexSort>SORTED</indexSort>
+<usingIndex>BY INDEX NAME</usingIndex>
+</PrimaryKey>
+</primaryKeys>
+</TableProxyOraclev11g>

@@ -1,0 +1,97 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="9DAFDDD9-0A18-AA72-B5B7-797DC88BB1E8" schemaObject="CF857C5F-7F93-32AB-A377-8FAFCA79F053" name="CS_ATTR_OBJECT">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>UIM_DI01</sourceObjSchema>
+<sourceObjName>CS_ATTR_OBJECT</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:15:52 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="CLASS_ID" id="837C7DA1-C7A0-13A1-B442-E75575A0E9D9">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>CS_ATTR_OBJECT</sourceObjSchema>
+<sourceObjName>CLASS_ID</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:28 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>*</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,*,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="OBJECT_ID" id="4A96B1BD-E2B5-0EA8-22EA-83E38B7DF492">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>CS_ATTR_OBJECT</sourceObjSchema>
+<sourceObjName>OBJECT_ID</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:28 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>*</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,*,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="ATTR_CLASS_ID" id="FDD15113-088F-A7A7-838E-08C2B731DC2F">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>CS_ATTR_OBJECT</sourceObjSchema>
+<sourceObjName>ATTR_CLASS_ID</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:28 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>*</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,*,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="ATTR_OBJECT_ID" id="5B42E2A2-980E-1751-DD72-37A605D29FE0">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>CS_ATTR_OBJECT</sourceObjSchema>
+<sourceObjName>ATTR_OBJECT_ID</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:29 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>*</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,*,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="B19263A0-A1A4-8B0E-600E-4B39A33F3F31" schemaObject="CF857C5F-7F93-32AB-A377-8FAFCA79F053" name="ATTR_OBJECT_INDEX">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>UIM_DI01</sourceObjSchema>
+<sourceObjName>ATTR_OBJECT_INDEX</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:50 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="837C7DA1-C7A0-13A1-B442-E75575A0E9D9"/>
+<colUsage columnID="4A96B1BD-E2B5-0EA8-22EA-83E38B7DF492"/>
+<colUsage columnID="FDD15113-088F-A7A7-838E-08C2B731DC2F"/>
+<colUsage columnID="5B42E2A2-980E-1751-DD72-37A605D29FE0"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

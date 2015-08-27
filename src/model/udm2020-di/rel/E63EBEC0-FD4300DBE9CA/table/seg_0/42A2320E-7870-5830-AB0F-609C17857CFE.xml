@@ -1,0 +1,118 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="42A2320E-7870-5830-AB0F-609C17857CFE" schemaObject="CF857C5F-7F93-32AB-A377-8FAFCA79F053" name="GEOM">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>UIM_DI01</sourceObjSchema>
+<sourceObjName>GEOM</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:15 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<spatialTable>true</spatialTable>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="ID" id="85AC852E-6F1F-B148-7E15-3E276E132D6F">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>GEOM</sourceObjSchema>
+<sourceObjName>ID</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:36 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>*</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,*,0</ownDataTypeParameters>
+<autoIncrementColumn>true</autoIncrementColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<autoIncrementSequenceName>geom_seq</autoIncrementSequenceName>
+<autoIncrementTriggerName>GEOM_ID_TRIGGER</autoIncrementTriggerName>
+</Column>
+<Column name="GEO_FIELD" id="3C4DE473-4C36-67A2-4E70-6DE3DD396BD3">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>GEOM</sourceObjSchema>
+<sourceObjName>GEO_FIELD</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:37 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<allowSubtypeSubstitution>false</allowSubtypeSubstitution>
+<use>3</use>
+<structuredType>47E390DE-0671-C4B1-8428-0F45CBEE18F8</structuredType>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="FFDB860D-7572-FAFE-2C0C-56CBB222D492" name="GEOM_PK">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>UIM_DI01</sourceObjSchema>
+<sourceObjName>SYS_C003624445</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:25 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="85AC852E-6F1F-B148-7E15-3E276E132D6F"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="3DFF35B1-78A4-F420-C340-790BCDDDF623" schemaObject="CF857C5F-7F93-32AB-A377-8FAFCA79F053" name="GEO_INDEX">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>UIM_DI01</sourceObjSchema>
+<sourceObjName>GEO_INDEX</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:02 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<spatialIndex>true</spatialIndex>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="3C4DE473-4C36-67A2-4E70-6DE3DD396BD3"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="2A832076-9862-E19B-A3B8-1ABC8A7CD0E4" schemaObject="CF857C5F-7F93-32AB-A377-8FAFCA79F053" name="SYS_C00486496">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>UIM_DI01</sourceObjSchema>
+<sourceObjName>SYS_C00486496</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:03 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="85AC852E-6F1F-B148-7E15-3E276E132D6F"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+<spatialDefinitions>
+<spatialColumnDefinition class="oracle.dbtools.crest.model.design.relational.SpatialColumnDefObject" name="ColumnDefinition_1" objectID="954B8619-6B85-0D09-1EF6-D801AF61CC8D">
+<function>false</function>
+<spatialColumn>3C4DE473-4C36-67A2-4E70-6DE3DD396BD3</spatialColumn>
+<spatialIndex>3DFF35B1-78A4-F420-C340-790BCDDDF623</spatialIndex>
+<systemID>4326</systemID>
+<spatialDimensions>
+<spatialDimension class="oracle.dbtools.crest.model.design.relational.SpatialColumnDefObject$TableDimension">
+<name>X</name>
+<lowBoundary>-180</lowBoundary>
+<upperBoundary>180</upperBoundary>
+<tolerance>0.05</tolerance>
+</spatialDimension>
+<spatialDimension class="oracle.dbtools.crest.model.design.relational.SpatialColumnDefObject$TableDimension">
+<name>Y</name>
+<lowBoundary>-90</lowBoundary>
+<upperBoundary>90</upperBoundary>
+<tolerance>0.05</tolerance>
+</spatialDimension>
+</spatialDimensions>
+</spatialColumnDefinition>
+</spatialDefinitions>
+</Table>

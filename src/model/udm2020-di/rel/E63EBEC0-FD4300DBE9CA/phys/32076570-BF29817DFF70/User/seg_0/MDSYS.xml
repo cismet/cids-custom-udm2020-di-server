@@ -1,0 +1,9 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<UserOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v10g.UserOraclev10g" name="MDSYS" directorySegmentName="seg_0" id="MDSYS">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:15:49 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<nullInstance>true</nullInstance>
+<storableNullInstance>true</storableNullInstance>
+</UserOraclev10g>

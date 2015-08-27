@@ -1,0 +1,5 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<oracle.dbtools.crest.model.design.relational.RelationalDesign>
+   <object objectType="main_view" objectID="1ABD2142-082E-A9AB-6452-4752ECCE2654" name="UDM2020" visible="true"/>
+   <object objectType="sub_view" objectID="D2764119-B6E9-AB6E-CFBA-D3A2B74F6F3B" name="Mose" visible="true"/>
+</oracle.dbtools.crest.model.design.relational.RelationalDesign>

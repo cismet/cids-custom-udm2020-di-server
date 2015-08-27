@@ -54,6 +54,12 @@
             <email>martin.scholl@cismet.de</email>
             <organization>cismet GmbH</organization>
         </developer>
+        <developer>
+            <id>pdihe</id>
+            <name>Pascal Dihé</name>
+            <email>pascal.dihe@cismet.de</email>
+            <organization>cismet GmbH</organization>
+        </developer>
     </developers>
     
     <distributionManagement>
@@ -105,5 +111,45 @@
     </repositories>
 
     <build>
+        <plugins>
+            <!-- overwritten because the artifact has to be renamed du to
+            compatibility reasons to the cidsDistribution -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-installed</id>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <destFileName>cidsCustomServerStuff.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.3</version>
+                <dependencies>
+                    <dependency><!-- add support for ssh/scp -->
+                        <groupId>org.apache.maven.wagon</groupId>
+                        <artifactId>wagon-ssh</artifactId>
+                        <version>2.4</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 </project>

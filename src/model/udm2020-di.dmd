@@ -1,0 +1,10 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="udm2020-di" id="86200945-8D99-7B54-0899-4BC0F6502E42" version="3.5">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:11:19 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<notes>UDM2020-DI cids Integration Base Data Model</notes>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<capitalNames>false</capitalNames>
+<designId>86200945-8D99-7B54-0899-4BC0F6502E42</designId>
+</OSDM_Design>

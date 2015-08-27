@@ -1,0 +1,13 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<StoredProcedureOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v10g.StoredProcedureOraclev10g" name="RECREATE_STRINGREPCACHE_CLASS" directorySegmentName="seg_0" id="4D8ADDD6-FE08-42DB-BA75-82D56CF3332F">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>UIM_DI01</sourceObjSchema>
+<sourceObjName>RECREATE_STRINGREPCACHE_CLASS</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:43 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<owner>792A8200-7BF0-6F56-C9E8-89F2CB089D39</owner>
+<source>CREATE OR REPLACE PROCEDURE UIM_DI01.RECREATE_STRINGREPCACHE_CLASS (classid IN INTEGER)&lt;br/&gt;  IS&lt;br/&gt;  attr_value VARCHAR2(2000);&lt;br/&gt;  ins_stmt VARCHAR2(2100);&lt;br/&gt;BEGIN&lt;br/&gt;  DELETE FROM cs_stringrepcache WHERE class_id = classid;&lt;br/&gt;  &lt;br/&gt;  SELECT attr_value INTO attr_value FROM cs_class_attr WHERE attr_key = &apos;tostringcache&apos; AND class_id = classid;&lt;br/&gt;  &lt;br/&gt;  ins_stmt := &apos;INSERT INTO cs_stringrepcache (class_id, object_id, stringrep) SELECT &apos; || classid || &apos;, &apos;|| attr_value;&lt;br/&gt;  &lt;br/&gt;  EXECUTE IMMEDIATE ins_stmt;&lt;br/&gt;EXCEPTION WHEN OTHERS THEN&lt;br/&gt;  DBMS_OUTPUT.PUT_LINE(&apos;Error occured while recreating the stringrepcache for class &apos; || classid);&lt;br/&gt;  DBMS_OUTPUT.PUT_LINE(&apos;ERRM: &apos; || SQLERRM);&lt;br/&gt;  DBMS_OUTPUT.PUT_LINE(&apos;CODE: &apos; || SQLCODE);&lt;br/&gt;  RETURN;&lt;br/&gt;END;</source>
+<body>CREATE OR REPLACE PROCEDURE UIM_DI01.RECREATE_STRINGREPCACHE_CLASS (classid IN INTEGER)&lt;br/&gt;  IS&lt;br/&gt;  attr_value VARCHAR2(2000);&lt;br/&gt;  ins_stmt VARCHAR2(2100);&lt;br/&gt;BEGIN&lt;br/&gt;  DELETE FROM cs_stringrepcache WHERE class_id = classid;&lt;br/&gt;  &lt;br/&gt;  SELECT attr_value INTO attr_value FROM cs_class_attr WHERE attr_key = &apos;tostringcache&apos; AND class_id = classid;&lt;br/&gt;  &lt;br/&gt;  ins_stmt := &apos;INSERT INTO cs_stringrepcache (class_id, object_id, stringrep) SELECT &apos; || classid || &apos;, &apos;|| attr_value;&lt;br/&gt;  &lt;br/&gt;  EXECUTE IMMEDIATE ins_stmt;&lt;br/&gt;EXCEPTION WHEN OTHERS THEN&lt;br/&gt;  DBMS_OUTPUT.PUT_LINE(&apos;Error occured while recreating the stringrepcache for class &apos; || classid);&lt;br/&gt;  DBMS_OUTPUT.PUT_LINE(&apos;ERRM: &apos; || SQLERRM);&lt;br/&gt;  DBMS_OUTPUT.PUT_LINE(&apos;CODE: &apos; || SQLCODE);&lt;br/&gt;  RETURN;&lt;br/&gt;END;</body>
+</StoredProcedureOraclev10g>

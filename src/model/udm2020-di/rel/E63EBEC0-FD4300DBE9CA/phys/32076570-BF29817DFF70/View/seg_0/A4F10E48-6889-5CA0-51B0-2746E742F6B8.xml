@@ -1,0 +1,8 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableViewProxyOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v10g.TableViewProxyOraclev10g" name="CS_CLASS_HIERARCHY" directorySegmentName="seg_0" id="A4F10E48-6889-5CA0-51B0-2746E742F6B8">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:41 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<schemaObject>CF857C5F-7F93-32AB-A377-8FAFCA79F053</schemaObject>
+</TableViewProxyOraclev10g>

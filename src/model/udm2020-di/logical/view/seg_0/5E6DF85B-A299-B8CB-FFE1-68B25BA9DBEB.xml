@@ -1,0 +1,76 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<EntityView class="oracle.dbtools.crest.model.design.logical.EntityView" directorySegmentName="seg_0" id="5E6DF85B-A299-B8CB-FFE1-68B25BA9DBEB" name="TEXTSEARCH">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>DD0F541A-D35F-70AE-DB5C-9FB8439B06BC</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<userDefined>true</userDefined>
+<userDefinedSQL>CREATE OR REPLACE VIEW TEXTSEARCH&lt;br/&gt;AS &lt;br/&gt;SELECT DISTINCT x.class_id,&lt;br/&gt;                  x.object_id,&lt;br/&gt;                  c.name,&lt;br/&gt;                  To_char(x.string_val)&lt;br/&gt;  FROM   (cs_attr_string x&lt;br/&gt;          left join cs_cat_node c&lt;br/&gt;                 ON (( ( x.class_id = c.class_id )&lt;br/&gt;                       AND ( x.object_id = c.object_id ) )) )&lt;br/&gt;  ORDER  BY x.class_id,&lt;br/&gt;            x.object_id,&lt;br/&gt;            c.name,&lt;br/&gt;            Cast(x.string_val AS VARCHAR2(100))</userDefinedSQL>
+<validSQL>false</validSQL>
+<viewType>EntityView</viewType>
+<viewElements>
+<viewElement class="oracle.dbtools.crest.model.design.logical.AttributeView" name="CLASS_ID" id="11D1C1B2-FF69-E518-233A-0FA01FC05320">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>A0346B7F-8DE5-97BF-308C-7A7666D61FE8</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<alias>CLASS_ID</alias>
+<dataType>NUMBER</dataType>
+<reference>false</reference>
+<viewID>5E6DF85B-A299-B8CB-FFE1-68B25BA9DBEB</viewID>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.logical.AttributeView" name="OBJECT_ID" id="334BCFAD-0573-EBF6-1A74-AE0E485CC0AE">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>71F49849-BC84-51FF-D28E-6AFD753878B1</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<alias>OBJECT_ID</alias>
+<dataType>NUMBER</dataType>
+<reference>false</reference>
+<viewID>5E6DF85B-A299-B8CB-FFE1-68B25BA9DBEB</viewID>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.logical.AttributeView" name="NAME" id="679456F9-3B72-275D-1F62-97E6C67107F1">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>40E835E5-EB9C-E437-C7DC-0EBEE71CC80C</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<alias>NAME</alias>
+<dataType>VARCHAR2 (100)</dataType>
+<reference>false</reference>
+<viewID>5E6DF85B-A299-B8CB-FFE1-68B25BA9DBEB</viewID>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.logical.AttributeView" name="STRING_VAL" id="72BAFDF4-06C6-E056-3E0F-4218E413CDBC">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:22:53 UTC</createdTime>
+<generatorID>8A01C2E9-9997-1BA1-CBA6-F3DC7F916DE7</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<engineerTo>
+<item key="E63EBEC0-0CD8-5457-5AC4-FD4300DBE9CA" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<alias>STRING_VAL</alias>
+<dataType>VARCHAR2 (4000)</dataType>
+<reference>false</reference>
+<viewID>5E6DF85B-A299-B8CB-FFE1-68B25BA9DBEB</viewID>
+</viewElement>
+</viewElements>
+</EntityView>

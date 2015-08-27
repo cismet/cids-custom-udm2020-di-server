@@ -1,0 +1,186 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="D955A124-ED0E-97D3-ACA5-52D7556CE4DF" schemaObject="CF857C5F-7F93-32AB-A377-8FAFCA79F053" name="CS_CONFIG_ATTR_EXEMPT">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>UIM_DI01</sourceObjSchema>
+<sourceObjName>CS_CONFIG_ATTR_EXEMPT</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:15:58 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="ID" id="1E15C13D-E9A9-CF52-5859-66905FEDFF86">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>CS_CONFIG_ATTR_EXEMPT</sourceObjSchema>
+<sourceObjName>ID</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:48 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>*</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,*,0</ownDataTypeParameters>
+<autoIncrementColumn>true</autoIncrementColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<autoIncrementSequenceName>cs_config_attr_exempt_sequence</autoIncrementSequenceName>
+<autoIncrementTriggerName>CS_CONFIG_ATTR_EXEMPT_ID_TRIG</autoIncrementTriggerName>
+</Column>
+<Column name="USR_ID" id="200F6E57-5952-630A-BD79-B46F53E293A8">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>CS_CONFIG_ATTR_EXEMPT</sourceObjSchema>
+<sourceObjName>USR_ID</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:49 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>*</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,*,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="756837E4-0CCD-E3C4-7BF5-86D852A194DA" referredColumn="51CF1374-040E-B6A5-545A-8CE2AAC72F21"/>
+</associations>
+</Column>
+<Column name="KEY_ID" id="0CC6EA6F-E21B-D7D7-E6C0-C8833A2B1E5D">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>CS_CONFIG_ATTR_EXEMPT</sourceObjSchema>
+<sourceObjName>KEY_ID</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:49 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>*</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,*,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="73DBAC6D-2936-911E-E3CD-A53982A0C154" referredColumn="F8FD92EF-A708-22CA-103E-2D09FD243E51"/>
+</associations>
+</Column>
+<Column name="UG_ID" id="D75289E5-460C-4F0C-4785-717E90AB6C22">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>CS_CONFIG_ATTR_EXEMPT</sourceObjSchema>
+<sourceObjName>UG_ID</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:16:49 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>*</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,*,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="7CD5CAD1-F2A4-61B1-F5D4-F5EE447EFD0A" referredColumn="08260DDD-53E0-8BC9-6890-523FFC03AAA4"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="F256F648-B079-E5DE-8988-8D838083785A" name="CS_CONFIG_ATTR_EXEMPT_PK">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>UIM_DI01</sourceObjSchema>
+<sourceObjName>SYS_C003624302</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:11 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="1E15C13D-E9A9-CF52-5859-66905FEDFF86"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="544DD5AE-C4C8-32E8-9312-34C0146F5011" name="CS_CONFIG_ATTR_EXEMPT_USR_ID_KEY_ID_UN">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>UIM_DI01</sourceObjSchema>
+<sourceObjName>SYS_C003624303</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:11 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="200F6E57-5952-630A-BD79-B46F53E293A8"/>
+<colUsage columnID="0CC6EA6F-E21B-D7D7-E6C0-C8833A2B1E5D"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="6DCA21ED-04E1-F57C-4A32-A91F4863B750" schemaObject="CF857C5F-7F93-32AB-A377-8FAFCA79F053" name="SYS_C00486541">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>UIM_DI01</sourceObjSchema>
+<sourceObjName>SYS_C00486541</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:57 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="1E15C13D-E9A9-CF52-5859-66905FEDFF86"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="FF921EED-AE22-5E9A-4F11-11507E4A5F99" schemaObject="CF857C5F-7F93-32AB-A377-8FAFCA79F053" name="SYS_C00486542">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjSchema>UIM_DI01</sourceObjSchema>
+<sourceObjName>SYS_C00486542</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:17:57 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="200F6E57-5952-630A-BD79-B46F53E293A8"/>
+<colUsage columnID="0CC6EA6F-E21B-D7D7-E6C0-C8833A2B1E5D"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="7F5AB718-1522-82EE-1C95-CCC9E3086F07" name="SYS_C003624485">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:53 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="200F6E57-5952-630A-BD79-B46F53E293A8"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="2C017122-5BA1-EE0C-A5C8-3D079F61710A" name="SYS_C003624486">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:54 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="0CC6EA6F-E21B-D7D7-E6C0-C8833A2B1E5D"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="FEFF3581-D726-3F5A-ECA9-49A8761C90FB" name="SYS_C003624487">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:54 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D75289E5-460C-4F0C-4785-717E90AB6C22"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

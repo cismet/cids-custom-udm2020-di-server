@@ -1,0 +1,10 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<UserOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v10g.UserOraclev10g" name="UIM_DI01" directorySegmentName="seg_0" id="792A8200-7BF0-6F56-C9E8-89F2CB089D39">
+<sourceConnName>uim_di01</sourceConnName>
+<sourceObjName>UIM_DI01</sourceObjName>
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:15:49 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<schemaObject>CF857C5F-7F93-32AB-A377-8FAFCA79F053</schemaObject>
+</UserOraclev10g>

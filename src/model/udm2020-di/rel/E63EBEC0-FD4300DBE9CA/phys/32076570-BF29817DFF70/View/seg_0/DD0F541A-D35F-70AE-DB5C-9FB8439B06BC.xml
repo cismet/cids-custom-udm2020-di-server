@@ -1,0 +1,8 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableViewProxyOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v10g.TableViewProxyOraclev10g" name="TEXTSEARCH" directorySegmentName="seg_0" id="DD0F541A-D35F-70AE-DB5C-9FB8439B06BC">
+<createdBy>pd</createdBy>
+<createdTime>2015-08-25 12:18:42 UTC</createdTime>
+<generatorID>Benutzergeneriert</generatorID>
+<ownerDesignName>udm2020-di</ownerDesignName>
+<schemaObject>CF857C5F-7F93-32AB-A377-8FAFCA79F053</schemaObject>
+</TableViewProxyOraclev10g>

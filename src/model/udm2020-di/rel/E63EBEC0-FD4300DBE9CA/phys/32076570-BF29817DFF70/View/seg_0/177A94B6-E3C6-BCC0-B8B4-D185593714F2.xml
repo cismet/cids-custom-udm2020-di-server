@@ -1,8 +1,0 @@
-<?xml version = '1.0' encoding = 'UTF-8'?>
-<TableViewProxyOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v10g.TableViewProxyOraclev10g" name="GEOSUCHE" directorySegmentName="seg_0" id="177A94B6-E3C6-BCC0-B8B4-D185593714F2">
-<createdBy>pd</createdBy>
-<createdTime>2015-08-25 12:18:42 UTC</createdTime>
-<generatorID>Benutzergeneriert</generatorID>
-<ownerDesignName>udm2020-di</ownerDesignName>
-<schemaObject>CF857C5F-7F93-32AB-A377-8FAFCA79F053</schemaObject>
-</TableViewProxyOraclev10g>

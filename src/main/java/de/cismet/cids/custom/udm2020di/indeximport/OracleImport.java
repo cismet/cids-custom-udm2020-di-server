@@ -50,7 +50,7 @@ public class OracleImport {
     protected Properties properties = null;
     protected Connection sourceConnection;
     protected Connection targetConnection = null;
-    protected PreparedStatement insertUniqueTag;
+    protected PreparedStatement insertUniqueTag = null;
     protected PreparedStatement insertGenericGeom = null;
 
     //~ Constructors -----------------------------------------------------------
@@ -146,6 +146,8 @@ public class OracleImport {
             if (targetJdbcSchema != null) {
                 targetConnection.createStatement().execute("ALTER SESSION set current_schema=" + targetJdbcSchema);
             }
+
+            targetConnection.setAutoCommit(false);
         } catch (SQLException sqeex) {
             log.error("Could not connection to target database: " + targetJdbcUrl, sqeex);
             throw sqeex;
@@ -154,12 +156,12 @@ public class OracleImport {
         try {
             // prepare generic statements
             final String getSitesStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                        "/de/cismet/cids/custom/udm2020di/templates/insert-unique-tag.prs.sql"),
+                        "/de/cismet/cids/custom/udm2020di/indeximport/insert-unique-tag.prs.sql"),
                     "UTF-8");
             this.insertUniqueTag = targetConnection.prepareStatement(getSitesStatementTpl, new String[] { "ID" });
 
             final String insertGeomStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                        "/de/cismet/cids/custom/udm2020di/templates/insert-generic-geom.prs.sql"),
+                        "/de/cismet/cids/custom/udm2020di/indeximport/insert-generic-geom.prs.sql"),
                     "UTF-8");
             this.insertGenericGeom = targetConnection.prepareStatement(insertGeomStatementTpl, new String[] { "ID" });
         } catch (SQLException sqeex) {
@@ -192,7 +194,7 @@ public class OracleImport {
         this.insertUniqueTag.setString(4, taggroupkey);
         this.insertUniqueTag.executeUpdate();
 
-        // does not work with MERGE Statements
+        // does not work with MERGE Statements !!!!!
         // ResultSet generatedKeys = this.insertGenericGeom.getGeneratedKeys();
         // if (null != generatedKeys && generatedKeys.next()) {
         // return generatedKeys.getLong(1);
@@ -212,11 +214,10 @@ public class OracleImport {
      * @throws  IOException   DOCUMENT ME!
      * @throws  SQLException  DOCUMENT ME!
      */
-    protected String xmlToJson(final Clob xmlClob) throws IOException, SQLException {
+    protected String xmlClobToJsonString(final Clob xmlClob) throws IOException, SQLException {
         final JsonNode node = xmlMapper.readTree(xmlClob.getCharacterStream());
         return jsonMapper.writeValueAsString(node);
     }
-
     /**
      * DOCUMENT ME!
      *
@@ -240,12 +241,17 @@ public class OracleImport {
         this.insertGenericGeom.setFloat(3, targetSRS);
         this.insertGenericGeom.executeUpdate();
         final ResultSet generatedKeys = this.insertGenericGeom.getGeneratedKeys();
+        long generatedKey = -1;
+
         if ((null != generatedKeys) && generatedKeys.next()) {
-            return generatedKeys.getLong(1);
+            generatedKey = generatedKeys.getLong(1);
+            generatedKeys.close();
         } else {
             log.error("could not fetch generated key for inserted geometry!");
-            return -1;
         }
+
+        this.insertGenericGeom.close();
+        return generatedKey;
     }
 
     /**
@@ -263,12 +269,17 @@ public class OracleImport {
         final String[] batchStatements = batchStatementStr.split(";");
         final Statement batchStatement = connection.createStatement();
         for (final String StatementStr : batchStatements) {
-            if (log.isDebugEnabled()) {
-                log.debug(StatementStr);
-            }
+//            if (log.isDebugEnabled()) {
+//                log.debug(StatementStr);
+//            }
             batchStatement.addBatch(StatementStr);
         }
 
-        return batchStatement.executeBatch();
+        final int[] ret = batchStatement.executeBatch();
+
+        connection.commit();
+        batchStatement.close();
+
+        return ret;
     }
 }

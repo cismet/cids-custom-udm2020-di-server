@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import de.cismet.cids.custom.udm2020di.indeximport.OracleImport;
+import java.util.HashMap;
 
 /**
  * DOCUMENT ME!
@@ -48,6 +49,7 @@ public class BorisImport extends OracleImport {
     protected final PreparedStatement insertSampleValues;
     protected final PreparedStatement insertSiteValuesRel;
     protected final PreparedStatement insertSiteTagsRel;
+    protected final HashMap<String, String[]> parameterMappings = new HashMap<String, String[]>();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -100,7 +102,25 @@ public class BorisImport extends OracleImport {
                     "/de/cismet/cids/custom/udm2020di/indeximport/boris/insert-boris-site-tags-relation.prs.sql"),
                 "UTF-8");
         insertSiteTagsRel = this.targetConnection.prepareStatement(insertBorisSiteTagsRelTpl);
+        
+        
+        // load and cache mappings
+        final String selectBorisParameterMappingsTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+        "de/cismet/cids/custom/udm2020di/indeximport/boris/select-boris-parameter-mappings.sql"),
+        "UTF-8");
+        
+        final Statement selectBorisParameterMappings  = this.sourceConnection.createStatement();
+        final ResultSet mappingsResultSet = selectBorisParameterMappings.executeQuery(selectBorisParameterMappingsTpl);
+        while(mappingsResultSet.next()) {
+            this.parameterMappings.put(
+                    mappingsResultSet.getNString(1), new String[]
+                            {mappingsResultSet.getNString(2), 
+                                mappingsResultSet.getNString(3),
+                                mappingsResultSet.getNString(3)});
+        }
     }
+    
+     
 
     /**
      * Creates a new BorisImport object.
@@ -148,11 +168,11 @@ public class BorisImport extends OracleImport {
      * @throws  SQLException  DOCUMENT ME!
      * @throws  IOException   DOCUMENT ME!
      */
-    public void doImport() throws SQLException, IOException {
+    public int doImport() throws SQLException, IOException {
         final Statement getSitesStatement = this.sourceConnection.createStatement();
         // getSitesStatement.closeOnCompletion();
-        final long startTime = System.currentTimeMillis();
-        log.info("fetching BORIS sites .....");
+        long startTime = System.currentTimeMillis();
+        log.info("fetching BORIS sites from Source Connection " + this.sourceConnection.getSchema());
         final ResultSet sitesResultSet = getSitesStatement.executeQuery(getSitesStatementTpl);
         if (log.isDebugEnabled()) {
             log.debug("BORIS sites fetched in " + (System.currentTimeMillis() - startTime) + "ms");
@@ -161,11 +181,11 @@ public class BorisImport extends OracleImport {
 
         while (sitesResultSet.next()) {
             try {
+                startTime = System.currentTimeMillis();
+                
                 String tmpStr = sitesResultSet.getNString("STANDORT_PK");
                 final String siteSrcPk = tmpStr;
-                if (log.isDebugEnabled()) {
-                    log.debug("processing BORIS Site #" + (++i) + ": " + siteSrcPk);
-                }
+                log.info("processing BORIS Site #" + (++i) + ": " + siteSrcPk);
 
                 // key
                 final String siteKey = "BORIS." + tmpStr;
@@ -232,10 +252,17 @@ public class BorisImport extends OracleImport {
 
                 // save the site
                 this.targetConnection.commit();
+                
+                if (log.isDebugEnabled()) {
+                    log.debug("BORIS Site #" + (i) + ": " + siteSrcPk 
+                            + " processed and imported in " + (System.currentTimeMillis() - startTime) + "ms");
+                }
+
             } catch (Throwable t) {
                 log.error("rolling back BORIS Site #" + (i) + ": "
                             + " due to error: " + t.getMessage(), t);
                 this.targetConnection.rollback();
+                i--;
             }
         }
 
@@ -252,6 +279,8 @@ public class BorisImport extends OracleImport {
 
         this.sourceConnection.close();
         this.targetConnection.close();
+        
+        return i;
     }
 
     /**
@@ -307,17 +336,18 @@ public class BorisImport extends OracleImport {
         // <- GET AGGREGATED SAMPLE VALUES
         this.getSampleValues.setString(1, siteSrcPk);
         final ResultSet sampleValuesResultSet = this.getSampleValues.executeQuery();
-
         // build the batch insert statements
         while (sampleValuesResultSet.next()) {
-            this.insertSampleValues.setDate(1, sampleValuesResultSet.getDate("MIN_DATE"));
-            this.insertSampleValues.setDate(2, sampleValuesResultSet.getDate("MAX_DATE"));
-            this.insertSampleValues.setFloat(3, sampleValuesResultSet.getFloat("MIN_VALUE"));
-            this.insertSampleValues.setFloat(4, sampleValuesResultSet.getFloat("MAX_VALUE"));
-            this.insertSampleValues.setString(
-                5,
-                this.xmlClobToJsonString(sampleValuesResultSet.getClob("MESSWERTE_XML")));
-            this.insertSampleValues.setString(6, sampleValuesResultSet.getString("PARAMETER_PK"));
+            final String PARAMETER_PK = sampleValuesResultSet.getString("PARAMETER_PK");
+            this.insertSampleValues.setString(1, PARAMETER_PK);
+            this.insertSampleValues.setString(2, PARAMETER_PK);
+            this.insertSampleValues.setString(3, PARAMETER_PK);
+            this.insertSampleValues.setDate(4, sampleValuesResultSet.getDate("MIN_DATE"));
+            this.insertSampleValues.setDate(5, sampleValuesResultSet.getDate("MAX_DATE"));
+            this.insertSampleValues.setFloat(6, sampleValuesResultSet.getFloat("MIN_VALUE"));
+            this.insertSampleValues.setFloat(7, sampleValuesResultSet.getFloat("MAX_VALUE"));
+            final String srcContentJson = this.xmlClobToJsonString(sampleValuesResultSet.getClob("MESSWERTE_XML"));
+            this.insertSampleValues.setString(8, srcContentJson);
             this.insertSampleValues.addBatch();
             i++;
         }
@@ -331,8 +361,9 @@ public class BorisImport extends OracleImport {
                     sampeValueIds.add(generatedKeys.getLong(1));
                 }
                 generatedKeys.close();
+                log.debug(i + " sample values added for BORIS Site " + siteSrcPk);
             } else {
-                log.error("could not fetch generated key for inserted samples values!");
+                log.error("could not fetch generated key for inserted samples values for BORIS SITE " + siteSrcPk);
             }
         } else {
             log.warn("no sample values found for BORIS SITE " + siteSrcPk);
@@ -371,9 +402,9 @@ public class BorisImport extends OracleImport {
         this.insertSite.setString(1, siteKey);
         this.insertSite.setString(2, siteName);
         this.insertSite.setString(3, siteDescription);
-        this.insertSite.setString(4, siteLiteraturTagKey);
-        this.insertSite.setString(5, siteInstitutTagKey);
-        this.insertSite.setLong(6, siteGeomId);
+        this.insertSite.setLong(4, siteGeomId);
+        this.insertSite.setString(5, siteLiteraturTagKey);
+        this.insertSite.setString(6, siteInstitutTagKey);
         this.insertSite.setString(7, siteSrcPk);
         this.insertSite.setString(8, siteSrcContent);
 
@@ -409,8 +440,15 @@ public class BorisImport extends OracleImport {
                 borisImport = new BorisImport();
             }
 
-            borisImport.doBootstrap();
-            // borisImport.doImport();
+            final long startTime = System.currentTimeMillis();
+            BorisImport.log.info("Starting BORIS Import ......");
+           
+            //borisImport.doBootstrap();
+            final int sites = borisImport.doImport();
+            
+            BorisImport.log.info(sites + " BORIS Sites successfully imported in " 
+                    + ((System.currentTimeMillis() - startTime)/1000/60) + "m");
+            
         } catch (Exception ex) {
             log.error("could not create BORIS import instance: " + ex.getMessage(), ex);
             System.exit(1);

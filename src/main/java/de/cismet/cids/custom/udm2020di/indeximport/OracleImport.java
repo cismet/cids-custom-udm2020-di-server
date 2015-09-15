@@ -29,6 +29,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import java.util.Properties;
+import org.apache.log4j.PropertyConfigurator;
 
 /**
  * DOCUMENT ME!
@@ -68,8 +69,6 @@ public class OracleImport {
         ClassNotFoundException,
         SQLException // throws IOException
     {
-        BasicConfigurator.configure();
-
         final InputStreamReader isr = new InputStreamReader(propertyFile);
         final BufferedReader br = new BufferedReader(isr);
 
@@ -77,10 +76,13 @@ public class OracleImport {
         try {
             properties.load(br);
         } catch (IOException ioex) {
+            BasicConfigurator.configure();
             log.error("could not load properties file: " + ioex.getMessage(), ioex);
             throw ioex;
         }
-
+        
+        PropertyConfigurator.configure(properties);
+        
         String sourceJdbcDriver = null;
 
         try {
@@ -122,6 +124,8 @@ public class OracleImport {
             if (sourceJdbcSchema != null) {
                 sourceConnection.createStatement().execute("ALTER SESSION set current_schema=" + sourceJdbcSchema);
             }
+            log.info("SOURCE Connection established: " + sourceJdbcUrl + "/" + sourceJdbcSchema);
+            
         } catch (SQLException sqeex) {
             log.error("Could not connection to source database: " + sourceJdbcUrl, sqeex);
             throw sqeex;
@@ -148,6 +152,7 @@ public class OracleImport {
             }
 
             targetConnection.setAutoCommit(false);
+            log.info("TARGET Connection established: " + targetJdbcUrl + "/" + targetJdbcSchema);
         } catch (SQLException sqeex) {
             log.error("Could not connection to target database: " + targetJdbcUrl, sqeex);
             throw sqeex;

@@ -14,6 +14,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,7 +30,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import java.util.Properties;
-import org.apache.log4j.PropertyConfigurator;
 
 /**
  * DOCUMENT ME!
@@ -80,9 +80,9 @@ public class OracleImport {
             log.error("could not load properties file: " + ioex.getMessage(), ioex);
             throw ioex;
         }
-        
+
         PropertyConfigurator.configure(properties);
-        
+
         String sourceJdbcDriver = null;
 
         try {
@@ -125,7 +125,6 @@ public class OracleImport {
                 sourceConnection.createStatement().execute("ALTER SESSION set current_schema=" + sourceJdbcSchema);
             }
             log.info("SOURCE Connection established: " + sourceJdbcUrl + "/" + sourceJdbcSchema);
-            
         } catch (SQLException sqeex) {
             log.error("Could not connection to source database: " + sourceJdbcUrl, sqeex);
             throw sqeex;
@@ -255,7 +254,6 @@ public class OracleImport {
             log.error("could not fetch generated key for inserted geometry!");
         }
 
-        this.insertGenericGeom.close();
         return generatedKey;
     }
 

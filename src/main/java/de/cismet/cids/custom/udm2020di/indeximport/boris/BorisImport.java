@@ -28,10 +28,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import de.cismet.cids.custom.udm2020di.indeximport.OracleImport;
-import java.util.HashMap;
 
 /**
  * DOCUMENT ME!
@@ -102,25 +102,27 @@ public class BorisImport extends OracleImport {
                     "/de/cismet/cids/custom/udm2020di/indeximport/boris/insert-boris-site-tags-relation.prs.sql"),
                 "UTF-8");
         insertSiteTagsRel = this.targetConnection.prepareStatement(insertBorisSiteTagsRelTpl);
-        
-        
+
         // load and cache mappings
         final String selectBorisParameterMappingsTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-        "de/cismet/cids/custom/udm2020di/indeximport/boris/select-boris-parameter-mappings.sql"),
-        "UTF-8");
-        
-        final Statement selectBorisParameterMappings  = this.sourceConnection.createStatement();
+                    "/de/cismet/cids/custom/udm2020di/indeximport/boris/select-boris-parameter-mappings.sql"),
+                "UTF-8");
+
+        final Statement selectBorisParameterMappings = this.targetConnection.createStatement();
         final ResultSet mappingsResultSet = selectBorisParameterMappings.executeQuery(selectBorisParameterMappingsTpl);
-        while(mappingsResultSet.next()) {
+        while (mappingsResultSet.next()) {
             this.parameterMappings.put(
-                    mappingsResultSet.getNString(1), new String[]
-                            {mappingsResultSet.getNString(2), 
-                                mappingsResultSet.getNString(3),
-                                mappingsResultSet.getNString(3)});
+                mappingsResultSet.getNString(1),
+                new String[] {
+                    mappingsResultSet.getNString(2),
+                    mappingsResultSet.getNString(3),
+                    mappingsResultSet.getNString(3)
+                });
+        }
+        if (log.isDebugEnabled()) {
+            log.debug(this.parameterMappings.size() + " parameter mappings cached");
         }
     }
-    
-     
 
     /**
      * Creates a new BorisImport object.
@@ -165,6 +167,8 @@ public class BorisImport extends OracleImport {
     /**
      * DOCUMENT ME!
      *
+     * @return  DOCUMENT ME!
+     *
      * @throws  SQLException  DOCUMENT ME!
      * @throws  IOException   DOCUMENT ME!
      */
@@ -175,14 +179,14 @@ public class BorisImport extends OracleImport {
         log.info("fetching BORIS sites from Source Connection " + this.sourceConnection.getSchema());
         final ResultSet sitesResultSet = getSitesStatement.executeQuery(getSitesStatementTpl);
         if (log.isDebugEnabled()) {
-            log.debug("BORIS sites fetched in " + (System.currentTimeMillis() - startTime) + "ms");
+            log.debug("BORIS sites fetched in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
         }
         int i = 0;
 
         while (sitesResultSet.next()) {
             try {
                 startTime = System.currentTimeMillis();
-                
+
                 String tmpStr = sitesResultSet.getNString("STANDORT_PK");
                 final String siteSrcPk = tmpStr;
                 log.info("processing BORIS Site #" + (++i) + ": " + siteSrcPk);
@@ -252,12 +256,11 @@ public class BorisImport extends OracleImport {
 
                 // save the site
                 this.targetConnection.commit();
-                
-                if (log.isDebugEnabled()) {
-                    log.debug("BORIS Site #" + (i) + ": " + siteSrcPk 
-                            + " processed and imported in " + (System.currentTimeMillis() - startTime) + "ms");
-                }
 
+                if (log.isDebugEnabled()) {
+                    log.debug("BORIS Site #" + (i) + ": " + siteSrcPk
+                                + " processed and imported in " + (System.currentTimeMillis() - startTime) + "ms");
+                }
             } catch (Throwable t) {
                 log.error("rolling back BORIS Site #" + (i) + ": "
                             + " due to error: " + t.getMessage(), t);
@@ -279,7 +282,7 @@ public class BorisImport extends OracleImport {
 
         this.sourceConnection.close();
         this.targetConnection.close();
-        
+
         return i;
     }
 
@@ -311,11 +314,11 @@ public class BorisImport extends OracleImport {
             throws SQLException {
         for (final long sampeValueId : sampeValueIds) {
             this.insertSiteValuesRel.setLong(1, borisSiteId);
-            this.insertSiteValuesRel.setLong(1, sampeValueId);
+            this.insertSiteValuesRel.setLong(2, sampeValueId);
             this.insertSiteValuesRel.addBatch();
         }
 
-        this.insertSiteValuesRel.executeUpdate();
+        this.insertSiteValuesRel.executeBatch();
         // this.insertSiteValuesRel.close();
     }
 
@@ -332,6 +335,7 @@ public class BorisImport extends OracleImport {
     protected Collection<Long> getAndInsertSampleValues(final String siteSrcPk) throws SQLException, IOException {
         final Collection<Long> sampeValueIds = new HashSet<Long>();
         int i = 0;
+        int added = 0;
 
         // <- GET AGGREGATED SAMPLE VALUES
         this.getSampleValues.setString(1, siteSrcPk);
@@ -339,17 +343,26 @@ public class BorisImport extends OracleImport {
         // build the batch insert statements
         while (sampleValuesResultSet.next()) {
             final String PARAMETER_PK = sampleValuesResultSet.getString("PARAMETER_PK");
-            this.insertSampleValues.setString(1, PARAMETER_PK);
-            this.insertSampleValues.setString(2, PARAMETER_PK);
-            this.insertSampleValues.setString(3, PARAMETER_PK);
-            this.insertSampleValues.setDate(4, sampleValuesResultSet.getDate("MIN_DATE"));
-            this.insertSampleValues.setDate(5, sampleValuesResultSet.getDate("MAX_DATE"));
-            this.insertSampleValues.setFloat(6, sampleValuesResultSet.getFloat("MIN_VALUE"));
-            this.insertSampleValues.setFloat(7, sampleValuesResultSet.getFloat("MAX_VALUE"));
-            final String srcContentJson = this.xmlClobToJsonString(sampleValuesResultSet.getClob("MESSWERTE_XML"));
-            this.insertSampleValues.setString(8, srcContentJson);
-            this.insertSampleValues.addBatch();
             i++;
+            if (this.parameterMappings.containsKey(PARAMETER_PK)) {
+                final String[] mappedParameters = this.parameterMappings.get(PARAMETER_PK);
+                // NAME
+                this.insertSampleValues.setString(1, mappedParameters[0]);
+                // POLLUTANT
+                this.insertSampleValues.setString(2, mappedParameters[1]);
+                // POLLUTANT_GROUP
+                this.insertSampleValues.setString(3, mappedParameters[2]);
+                this.insertSampleValues.setDate(4, sampleValuesResultSet.getDate("MIN_DATE"));
+                this.insertSampleValues.setDate(5, sampleValuesResultSet.getDate("MAX_DATE"));
+                this.insertSampleValues.setFloat(6, sampleValuesResultSet.getFloat("MIN_VALUE"));
+                this.insertSampleValues.setFloat(7, sampleValuesResultSet.getFloat("MAX_VALUE"));
+                final String srcContentJson = this.xmlClobToJsonString(sampleValuesResultSet.getClob("MESSWERTE_XML"));
+                // SRC_CONTENT
+                this.insertSampleValues.setString(8, srcContentJson);
+
+                this.insertSampleValues.addBatch();
+                added++;
+            }
         }
         sampleValuesResultSet.close();
 
@@ -361,7 +374,9 @@ public class BorisImport extends OracleImport {
                     sampeValueIds.add(generatedKeys.getLong(1));
                 }
                 generatedKeys.close();
-                log.debug(i + " sample values added for BORIS Site " + siteSrcPk);
+                if (log.isDebugEnabled()) {
+                    log.debug(added + " of " + i + " sample values added for BORIS Site " + siteSrcPk);
+                }
             } else {
                 log.error("could not fetch generated key for inserted samples values for BORIS SITE " + siteSrcPk);
             }
@@ -431,7 +446,7 @@ public class BorisImport extends OracleImport {
      * @param  args  DOCUMENT ME!
      */
     public static void main(final String[] args) {
-        final BorisImport borisImport;
+        BorisImport borisImport = null;
         try {
             if (args.length > 0) {
                 log.info("loading BORIS properties from: " + args[0]);
@@ -442,16 +457,24 @@ public class BorisImport extends OracleImport {
 
             final long startTime = System.currentTimeMillis();
             BorisImport.log.info("Starting BORIS Import ......");
-           
+
             //borisImport.doBootstrap();
             final int sites = borisImport.doImport();
-            
-            BorisImport.log.info(sites + " BORIS Sites successfully imported in " 
-                    + ((System.currentTimeMillis() - startTime)/1000/60) + "m");
-            
+
+            BorisImport.log.info(sites + " BORIS Sites successfully imported in "
+                        + ((System.currentTimeMillis() - startTime) / 1000 / 60) + "m");
         } catch (Exception ex) {
             log.error("could not create BORIS import instance: " + ex.getMessage(), ex);
             System.exit(1);
+        } finally {
+            try {
+                if (borisImport != null) {
+                    borisImport.sourceConnection.close();
+                    borisImport.targetConnection.close();
+                }
+            } catch (SQLException ex) {
+                log.error("could not close connections", ex);
+            }
         }
     }
 }

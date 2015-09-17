@@ -5,3 +5,5 @@ pom.xml.versionsBackup
 pom.xml.next
 release.properties
 /nbproject/private
+boris.properties
+boris-import.log

@@ -1,4 +1,4 @@
---ALTER SESSION SET ddl_lock_timeout=60;
+ALTER SESSION SET ddl_lock_timeout=360;
 alter table UIMDI02.BORIS_SITE disable constraint BORIS_SITE_GEOM_FK;
 alter table UIMDI02.BORIS_SITE disable constraint BORIS_SITE_LIT_FK;
 alter table UIMDI02.BORIS_SITE disable constraint BORIS_SITE_INS_FK;

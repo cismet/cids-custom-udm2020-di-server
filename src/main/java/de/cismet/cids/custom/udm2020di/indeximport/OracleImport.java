@@ -11,6 +11,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
+import oracle.jdbc.OracleConnection;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
@@ -20,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 
 import java.sql.Clob;
 import java.sql.Connection;
@@ -30,6 +33,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import java.util.Properties;
+import java.util.logging.LogManager;
+
+import javax.management.AttributeNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.InvalidAttributeValueException;
+import javax.management.MBeanException;
+import javax.management.MalformedObjectNameException;
+import javax.management.ReflectionException;
 
 /**
  * DOCUMENT ME!
@@ -141,6 +152,22 @@ public class OracleImport {
             targetJdbcPassword = properties.getProperty("target.jdbc.password");
             targetJdbcSchema = properties.getProperty("target.jdbc.schema");
 
+            final String oracleLogProperties = this.properties.getProperty("oracle.jdbc.logging.properties");
+            if ((oracleLogProperties != null) && !oracleLogProperties.isEmpty()) {
+                try {
+                    this.enableOracleLogging(oracleLogProperties, true);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Oracle JDBC Logging is enabled");
+                    }
+                } catch (Exception ex) {
+                    log.error("could not enable oracle logging with properties file '"
+                                + oracleLogProperties + "'", ex);
+                }
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("Oracle JDBC Logging is disabled");
+                }
+            }
             targetConnection = DriverManager.getConnection(
                     targetJdbcUrl,
                     targetJdbcUsername,
@@ -151,6 +178,11 @@ public class OracleImport {
             }
 
             targetConnection.setAutoCommit(false);
+            if (log.isDebugEnabled()) {
+                log.debug("DefaultExecuteBatch of targetConnection: "
+                            + ((OracleConnection)targetConnection).getDefaultExecuteBatch());
+            }
+
             log.info("TARGET Connection established: " + targetJdbcUrl + "/" + targetJdbcSchema);
         } catch (SQLException sqeex) {
             log.error("Could not connection to target database: " + targetJdbcUrl, sqeex);
@@ -284,5 +316,60 @@ public class OracleImport {
         batchStatement.close();
 
         return ret;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   oracleLogProperties  DOCUMENT ME!
+     * @param   logDriver            DOCUMENT ME!
+     *
+     * @throws  MalformedObjectNameException    DOCUMENT ME!
+     * @throws  NullPointerException            DOCUMENT ME!
+     * @throws  AttributeNotFoundException      DOCUMENT ME!
+     * @throws  InstanceNotFoundException       DOCUMENT ME!
+     * @throws  MBeanException                  DOCUMENT ME!
+     * @throws  ReflectionException             DOCUMENT ME!
+     * @throws  InvalidAttributeValueException  DOCUMENT ME!
+     * @throws  SecurityException               DOCUMENT ME!
+     * @throws  IOException                     DOCUMENT ME!
+     */
+    private void enableOracleLogging(final String oracleLogProperties, final boolean logDriver)
+            throws MalformedObjectNameException,
+                NullPointerException,
+                AttributeNotFoundException,
+                InstanceNotFoundException,
+                MBeanException,
+                ReflectionException,
+                InvalidAttributeValueException,
+                SecurityException,
+                IOException {
+        oracle.jdbc.driver.OracleLog.setTrace(true);
+
+        // compute the ObjectName
+        final String loader = Thread.currentThread().getContextClassLoader().toString().replaceAll("[,=:\"]+", "");
+        final javax.management.ObjectName name = new javax.management.ObjectName(
+                "com.oracle.jdbc:type=diagnosability,name="
+                        + loader);
+
+        // get the MBean server
+        final javax.management.MBeanServer mbs = java.lang.management.ManagementFactory.getPlatformMBeanServer();
+
+        // find out if logging is enabled or not
+        log.info("Oracle JDBC Driver LoggingEnabled = " + mbs.getAttribute(name, "LoggingEnabled"));
+
+        // enable logging
+        mbs.setAttribute(name, new javax.management.Attribute("LoggingEnabled", true));
+
+        // File propFile = new File(oracleLogProperties);
+        final LogManager logManager = LogManager.getLogManager();
+        if (log.isDebugEnabled()) {
+            log.debug("loading logging.properties file from " + this.getClass().getResource(oracleLogProperties));
+        }
+        logManager.readConfiguration(this.getClass().getResourceAsStream(oracleLogProperties));
+
+        if (logDriver) {
+            DriverManager.setLogWriter(new PrintWriter(System.err));
+        }
     }
 }

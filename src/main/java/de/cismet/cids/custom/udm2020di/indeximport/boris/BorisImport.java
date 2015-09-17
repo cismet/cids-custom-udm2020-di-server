@@ -12,6 +12,8 @@
  */
 package de.cismet.cids.custom.udm2020di.indeximport.boris;
 
+import oracle.jdbc.OraclePreparedStatement;
+
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -46,7 +48,7 @@ public class BorisImport extends OracleImport {
     protected final String getSitesStatementTpl;
     protected final PreparedStatement getSampleValues;
     protected final PreparedStatement insertSite;
-    protected final PreparedStatement insertSampleValues;
+    protected final OraclePreparedStatement insertSampleValues;
     protected final PreparedStatement insertSiteValuesRel;
     protected final PreparedStatement insertSiteTagsRel;
     protected final HashMap<String, String[]> parameterMappings = new HashMap<String, String[]>();
@@ -89,7 +91,12 @@ public class BorisImport extends OracleImport {
         final String insertBorisSampleValuesTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/boris/insert-boris-aggregated-sample-values.prs.sql"),
                 "UTF-8");
-        insertSampleValues = this.targetConnection.prepareStatement(insertBorisSampleValuesTpl, new String[] { "ID" });
+        insertSampleValues = (OraclePreparedStatement)this.targetConnection.prepareStatement(
+                insertBorisSampleValuesTpl,
+                new String[] { "ID" });
+//        insertSampleValues.setExecuteBatch(200);
+//        log.debug ("insertBorisSampleValues Statement Execute Batch Value " +
+//                   insertSampleValues.getExecuteBatch());
 
         final String insertBorisSiteSampleValuesRelTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/boris/insert-boris-site-sample-values-relation.prs.sql"),
@@ -116,7 +123,7 @@ public class BorisImport extends OracleImport {
                 new String[] {
                     mappingsResultSet.getNString(2),
                     mappingsResultSet.getNString(3),
-                    mappingsResultSet.getNString(3)
+                    mappingsResultSet.getNString(4)
                 });
         }
         if (log.isDebugEnabled()) {
@@ -144,7 +151,9 @@ public class BorisImport extends OracleImport {
      * @throws  SQLException  DOCUMENT ME!
      */
     public void doBootstrap() throws IOException, SQLException {
-        log.info("Cleaning and Bootstrapping BORIS Tables");
+        if (log.isDebugEnabled()) {
+            log.debug("Cleaning and Bootstrapping BORIS Tables");
+        }
 
         final String truncateBorisTablesTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/boris/truncate-boris-tables.sql"),
@@ -189,7 +198,9 @@ public class BorisImport extends OracleImport {
 
                 String tmpStr = sitesResultSet.getNString("STANDORT_PK");
                 final String siteSrcPk = tmpStr;
-                log.info("processing BORIS Site #" + (++i) + ": " + siteSrcPk);
+                if (log.isDebugEnabled()) {
+                    log.debug("processing BORIS Site #" + (++i) + ": " + siteSrcPk);
+                }
 
                 // key
                 final String siteKey = "BORIS." + tmpStr;
@@ -252,19 +263,27 @@ public class BorisImport extends OracleImport {
                 final Collection<Long> sampeValueIds = getAndInsertSampleValues(siteSrcPk);
                 if (!sampeValueIds.isEmpty()) {
                     this.insertSiteValuesRelation(borisSiteId, sampeValueIds);
+                    this.insertBorisSiteTagsRelation(borisSiteId);
                 }
 
                 // save the site
                 this.targetConnection.commit();
 
                 if (log.isDebugEnabled()) {
-                    log.debug("BORIS Site #" + (i) + ": " + siteSrcPk
-                                + " processed and imported in " + (System.currentTimeMillis() - startTime) + "ms");
+                    log.info("BORIS Site #" + (i) + ": " + siteSrcPk
+                                + " with " + sampeValueIds.size()
+                                + " aggregated sample values processed and imported in "
+                                + (System.currentTimeMillis() - startTime) + "ms");
                 }
             } catch (Throwable t) {
                 log.error("rolling back BORIS Site #" + (i) + ": "
                             + " due to error: " + t.getMessage(), t);
-                this.targetConnection.rollback();
+                try {
+                    this.targetConnection.rollback();
+                } catch (SQLException sx) {
+                    log.error("could not rollback target connection", sx);
+                }
+
                 i--;
             }
         }
@@ -293,13 +312,16 @@ public class BorisImport extends OracleImport {
      *
      * @throws  SQLException  DOCUMENT ME!
      */
-    protected void insertBorisSiteTagsRelRelation(final long borisSiteId) throws SQLException {
+    protected void insertBorisSiteTagsRelation(final long borisSiteId) throws SQLException {
         this.insertSiteTagsRel.setLong(1, borisSiteId);
         this.insertSiteTagsRel.setLong(2, borisSiteId);
         this.insertSiteTagsRel.setLong(3, borisSiteId);
         this.insertSiteTagsRel.setLong(4, borisSiteId);
 
         this.insertSiteTagsRel.executeUpdate();
+        if (log.isDebugEnabled()) {
+            log.debug("SiteTagsRelation created");
+        }
     }
 
     /**
@@ -319,7 +341,10 @@ public class BorisImport extends OracleImport {
         }
 
         this.insertSiteValuesRel.executeBatch();
-        // this.insertSiteValuesRel.close();
+        if (log.isDebugEnabled()) {
+            // this.insertSiteValuesRel.close();
+            log.debug(sampeValueIds.size() + " Site-Values-Relations created");
+        }
     }
 
     /**
@@ -347,41 +372,95 @@ public class BorisImport extends OracleImport {
             if (this.parameterMappings.containsKey(PARAMETER_PK)) {
                 final String[] mappedParameters = this.parameterMappings.get(PARAMETER_PK);
                 // NAME
-                this.insertSampleValues.setString(1, mappedParameters[0]);
+                // log.debug(mappedParameters[0]);
+                this.insertSampleValues.setStringAtName("NAME", mappedParameters[0]);
+                // this.insertSampleValues.setString(1, mappedParameters[0]);
+// if (log.isDebugEnabled()) {
+// log.debug("["+added+"] " + mappedParameters[1]);
+// }
                 // POLLUTANT
-                this.insertSampleValues.setString(2, mappedParameters[1]);
+                this.insertSampleValues.setStringAtName("POLLUTANT", mappedParameters[1]);
+                // this.insertSampleValues.setString(2, mappedParameters[1]);
+// if (log.isDebugEnabled()) {
+// log.debug("["+added+"] " + mappedParameters[2]);
+// }
                 // POLLUTANT_GROUP
-                this.insertSampleValues.setString(3, mappedParameters[2]);
-                this.insertSampleValues.setDate(4, sampleValuesResultSet.getDate("MIN_DATE"));
-                this.insertSampleValues.setDate(5, sampleValuesResultSet.getDate("MAX_DATE"));
-                this.insertSampleValues.setFloat(6, sampleValuesResultSet.getFloat("MIN_VALUE"));
-                this.insertSampleValues.setFloat(7, sampleValuesResultSet.getFloat("MAX_VALUE"));
+                this.insertSampleValues.setStringAtName("POLLUTANT_GROUP", mappedParameters[2]);
+                // this.insertSampleValues.setString(3, mappedParameters[2]);
+// if (log.isDebugEnabled()) {
+// log.debug("["+added+"] " + sampleValuesResultSet.getDate("MIN_DATE"));
+// }
+                this.insertSampleValues.setDateAtName("MIN_DATE", sampleValuesResultSet.getDate("MIN_DATE"));
+                // this.insertSampleValues.setDate(4, sampleValuesResultSet.getDate("MIN_DATE"));
+//                if (log.isDebugEnabled()) {
+//                    log.debug("["+added+"] " + sampleValuesResultSet.getDate("MAX_DATE"));
+//                }
+
+                this.insertSampleValues.setDateAtName("MAX_DATE", sampleValuesResultSet.getDate("MAX_DATE"));
+                // this.insertSampleValues.setDate(5, sampleValuesResultSet.getDate("MAX_DATE"));
+// if (log.isDebugEnabled()) {
+// log.debug("["+added+"] " + sampleValuesResultSet.getFloat("MIN_VALUE"));
+// }
+                this.insertSampleValues.setFloatAtName("MIN_VALUE", sampleValuesResultSet.getFloat("MIN_VALUE"));
+                // this.insertSampleValues.setFloat(6, sampleValuesResultSet.getFloat("MIN_VALUE"));
+// if (log.isDebugEnabled()) {
+// log.debug("["+added+"] " + sampleValuesResultSet.getFloat("MAX_VALUE"));
+// }
+                this.insertSampleValues.setFloatAtName("MAX_VALUE", sampleValuesResultSet.getFloat("MAX_VALUE"));
+                // this.insertSampleValues.setFloat(7, sampleValuesResultSet.getFloat("MAX_VALUE"));
                 final String srcContentJson = this.xmlClobToJsonString(sampleValuesResultSet.getClob("MESSWERTE_XML"));
                 // SRC_CONTENT
+                // log.debug(srcContentJson);
+                this.insertSampleValues.setStringAtName("SRC_CONTENT", srcContentJson);
                 this.insertSampleValues.setString(8, srcContentJson);
 
-                this.insertSampleValues.addBatch();
-                added++;
+                // FIXME: Execute Batch does not work with large updates!!!!!
+                // this.insertSampleValues.addBatch();
+
+                this.insertSampleValues.executeUpdate();
+                final ResultSet generatedKeys = this.insertSampleValues.getGeneratedKeys();
+                if ((null != generatedKeys)) {
+                    while (generatedKeys.next()) {
+                        sampeValueIds.add(generatedKeys.getLong(1));
+                    }
+                    generatedKeys.close();
+                    added++;
+                } else {
+                    log.error("could not fetch generated key for inserted samples values for BORIS SITE " + siteSrcPk);
+                }
             }
         }
+
         sampleValuesResultSet.close();
 
-        if (i > 0) {
-            this.insertSampleValues.executeBatch();
-            final ResultSet generatedKeys = this.insertSampleValues.getGeneratedKeys();
-            if ((null != generatedKeys)) {
-                while (generatedKeys.next()) {
-                    sampeValueIds.add(generatedKeys.getLong(1));
-                }
-                generatedKeys.close();
-                if (log.isDebugEnabled()) {
-                    log.debug(added + " of " + i + " sample values added for BORIS Site " + siteSrcPk);
-                }
-            } else {
-                log.error("could not fetch generated key for inserted samples values for BORIS SITE " + siteSrcPk);
+        if (added > 0) {
+// FIXME: Execute Batch does not work with large updates!!!!!
+//            if (log.isDebugEnabled()) {
+//                log.debug("adding " + added + " of " + i + " sample values for BORIS Site " + siteSrcPk);
+//            }
+//            this.insertSampleValues.executeBatch();
+
+//            final ResultSet generatedKeys = this.insertSampleValues.getGeneratedKeys();
+//            if ((null != generatedKeys)) {
+//                while (generatedKeys.next()) {
+//                    sampeValueIds.add(generatedKeys.getLong(1));
+//                }
+//                generatedKeys.close();
+//                if (log.isDebugEnabled()) {
+//                    log.debug(added + " of " + i + " sample values added for BORIS Site " + siteSrcPk
+//                    + ", " + sampeValueIds.size() + " IDs generated");
+//                }
+//            } else {
+//                log.error("could not fetch generated key for inserted samples values for BORIS SITE " + siteSrcPk);
+//            }
+
+            if (log.isDebugEnabled()) {
+                log.debug(added + " of " + i + " sample values added for BORIS Site " + siteSrcPk
+                            + ", " + sampeValueIds.size() + " IDs generated");
             }
         } else {
-            log.warn("no sample values found for BORIS SITE " + siteSrcPk);
+            log.warn("no supported sample values found in " + i + " available sample values for BORIS SITE "
+                        + siteSrcPk);
         }
 
         return sampeValueIds;
@@ -411,7 +490,9 @@ public class BorisImport extends OracleImport {
             final long siteGeomId,
             final String siteSrcPk,
             final String siteSrcContent) throws SQLException {
-        log.info("inserting BORIS Site " + siteKey + ": '" + siteName + "'");
+        if (log.isDebugEnabled()) {
+            log.debug("inserting BORIS Site " + siteKey + ": '" + siteName + "'");
+        }
         final long startTime = System.currentTimeMillis();
 
         this.insertSite.setString(1, siteKey);
@@ -432,11 +513,12 @@ public class BorisImport extends OracleImport {
         } else {
             log.error("could not fetch generated key for inserted BORIS SITE!");
         }
-
-        // this.insertSite.close();
-
-        log.info("BORIS site " + siteKey + " inserted in " + (System.currentTimeMillis() - startTime) + "ms, new ID is "
-                    + generatedKey);
+        if (log.isDebugEnabled()) {
+            // this.insertSite.close();
+            log.debug("BORIS site " + siteKey + " inserted in " + (System.currentTimeMillis() - startTime)
+                        + "ms, new ID is "
+                        + generatedKey);
+        }
         return generatedKey;
     }
 
@@ -449,7 +531,9 @@ public class BorisImport extends OracleImport {
         BorisImport borisImport = null;
         try {
             if (args.length > 0) {
-                log.info("loading BORIS properties from: " + args[0]);
+                if (log.isDebugEnabled()) {
+                    log.debug("loading BORIS properties from: " + args[0]);
+                }
                 borisImport = new BorisImport(FileSystems.getDefault().getPath(args[0]));
             } else {
                 borisImport = new BorisImport();
@@ -458,22 +542,36 @@ public class BorisImport extends OracleImport {
             final long startTime = System.currentTimeMillis();
             BorisImport.log.info("Starting BORIS Import ......");
 
-            //borisImport.doBootstrap();
+            borisImport.doBootstrap();
             final int sites = borisImport.doImport();
 
             BorisImport.log.info(sites + " BORIS Sites successfully imported in "
                         + ((System.currentTimeMillis() - startTime) / 1000 / 60) + "m");
         } catch (Exception ex) {
             log.error("could not create BORIS import instance: " + ex.getMessage(), ex);
-            System.exit(1);
         } finally {
             try {
                 if (borisImport != null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("closing source connection");
+                    }
                     borisImport.sourceConnection.close();
+                }
+            } catch (SQLException ex) {
+                log.error("could not close source connection", ex);
+                System.exit(1);
+            }
+
+            try {
+                if (borisImport != null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("closing target connection");
+                    }
                     borisImport.targetConnection.close();
                 }
             } catch (SQLException ex) {
-                log.error("could not close connections", ex);
+                log.error("could not close target connection", ex);
+                System.exit(1);
             }
         }
     }

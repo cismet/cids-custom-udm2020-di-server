@@ -177,7 +177,7 @@ INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, P
 VALUES ('Diuron', 'Diuron', 'Diuron', 'Pestizide', 'PEST');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('EDC', 'Dichlormethan (EDC)', 'DCM', 'Pestizide', 'PEST');
+VALUES ('DCM', 'Dichlormethan (DCM)', 'DCM', 'Pestizide', 'PEST');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
 VALUES ('EDC', '1,2-Dichlorethan (EDC)', 'EDC', 'Pestizide', 'PEST');
@@ -228,7 +228,7 @@ INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, P
 VALUES ('Benzolperylen', 'Benzo(g,h,i)perylen', 'Benzoperylen', 'Synthetische Organische Schadstoffe', 'SOSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('Chlor', 'Chlor und anorganische Verbindungen (als HCl)', 'CI', 'Synthetische Organische Schadstoffe', 'SOSS');
+VALUES ('Chlor', 'Chlor und anorganische Verbindungen (als HCl)', 'Cl', 'Synthetische Organische Schadstoffe', 'SOSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
 VALUES ('Chloride', 'Chloride (als Gesamt-Cl)', 'Clr', 'Synthetische Organische Schadstoffe', 'SOSS');
@@ -258,7 +258,7 @@ INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, P
 VALUES ('Hexabrombiphenyl', 'Hexabrombiphenyl', 'Hexabrombiphenyl', 'Synthetische Organische Schadstoffe', 'SOSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('HFCKW', 'Fluor und anorganische Verbindungen (als HF)', 'HF', 'Synthetische Organische Schadstoffe', 'SOSS');
+VALUES ('HF', 'Fluor und anorganische Verbindungen (als HF)', 'HF', 'Synthetische Organische Schadstoffe', 'SOSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
 VALUES ('Isodrin', 'Isodrin', 'Isodrin', 'Synthetische Organische Schadstoffe', 'SOSS');

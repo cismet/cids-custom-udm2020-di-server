@@ -42,13 +42,13 @@ INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, P
 VALUES ('Schwefel', 'Schwefel (S)', 'S', 'Düngemittel', 'DNM');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('Sonst. DNM', 'Sonstige nicht näher spezifizierte Düngemittel', 'DNM+', 'Düngemittel', 'DNM');
+VALUES ('Sonst. DNM', 'Sonstige nicht näher spezifizierte Düngemittel', 'DNMplus', 'Düngemittel', 'DNM');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
 VALUES ('Stickstoff', 'Gesamtstickstoff (N)', 'N', 'Düngemittel', 'DNM');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('PCDD+PCDF', 'PCDD + PCDF (Dioxine + Furane)', 'PCDD+PCDF', 'Dioxine und Furane', 'DXF');
+VALUES ('PCDD+PCDF', 'PCDD & PCDF (Dioxine & Furane)', 'PCDDundPCDF', 'Dioxine und Furane', 'DXF');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
 VALUES ('Anthracen', 'Anthracen', 'Anthracen', 'Kohlenwasserstoffe', 'KWS');
@@ -69,7 +69,7 @@ INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, P
 VALUES ('PER', 'Tetrachlorethen (PER)', 'PER', 'Kohlenwasserstoffe', 'KWS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('Sonst. KWS', 'Sonstige nicht näher spezifizierte Kohlenwasserstoffe', 'KWS+', 'Kohlenwasserstoffe', 'KWS');
+VALUES ('Sonst. KWS', 'Sonstige nicht näher spezifizierte Kohlenwasserstoffe', 'KWSplus', 'Kohlenwasserstoffe', 'KWS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
 VALUES ('TCB', 'Trichlorbenzole (TCB)', 'TCB', 'Kohlenwasserstoffe', 'KWS');
@@ -129,7 +129,7 @@ INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, P
 VALUES ('Quecksilber', 'Quecksilber und Verbindungen (Hg)', 'Hg', 'Metalle und Schwermetalle', 'MET');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('Sonst. MET', 'Sonstige nicht näher spezifizierte Metalle und Schwermetalle', 'MET+', 'Metalle und Schwermetalle', 'MET');
+VALUES ('Sonst. MET', 'Sonstige nicht näher spezifizierte Metalle und Schwermetalle', 'METplus', 'Metalle und Schwermetalle', 'MET');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
 VALUES ('Vanadium', 'Vanadium (V)', 'V', 'Metalle und Schwermetalle', 'MET');
@@ -216,7 +216,7 @@ INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, P
 VALUES ('Simazin', 'Simazin', 'Simazin', 'Pestizide', 'PEST');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('Sonst. PEST', 'Sonstige nicht näher spezifizierte Pestizide', 'PEST+', 'Pestizide', 'PEST');
+VALUES ('Sonst. PEST', 'Sonstige nicht näher spezifizierte Pestizide', 'PESTplus', 'Pestizide', 'PEST');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
 VALUES ('Toxaphen', 'Toxaphen', 'Toxaphen', 'Pestizide', 'PEST');
@@ -258,7 +258,7 @@ INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, P
 VALUES ('Hexabrombiphenyl', 'Hexabrombiphenyl', 'Hexabrombiphenyl', 'Synthetische Organische Schadstoffe', 'SOSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('HF', 'Fluor und anorganische Verbindungen (als HF)', 'HF', 'Synthetische Organische Schadstoffe', 'SOSS');
+VALUES ('HFCKW', 'Fluor und anorganische Verbindungen (als HF)', 'HF', 'Synthetische Organische Schadstoffe', 'SOSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
 VALUES ('Isodrin', 'Isodrin', 'Isodrin', 'Synthetische Organische Schadstoffe', 'SOSS');
@@ -267,7 +267,7 @@ INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, P
 VALUES ('Isoproturon', 'Isoproturon', 'Isoproturon', 'Synthetische Organische Schadstoffe', 'SOSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('NNP/NPE', 'Nonylphenol und Nonylphenolethoxylate (NP/NPEs)', 'NP/NPEs', 'Synthetische Organische Schadstoffe', 'SOSS');
+VALUES ('NNP/NPE', 'Nonylphenol und Nonylphenolethoxylate (NP/NPEs)', 'NPNPEs', 'Synthetische Organische Schadstoffe', 'SOSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
 VALUES ('Octylphenole ', 'Octylphenole und Octylphenolethoxylate', 'Octylphenole ', 'Synthetische Organische Schadstoffe', 'SOSS');
@@ -282,10 +282,10 @@ INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, P
 VALUES ('Phenole', 'Phenole (als Gesamt-C)', 'Phenole', 'Synthetische Organische Schadstoffe', 'SOSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('PM10', 'Feinstaub (PM10)', 'PM10', 'Treibhausgase und Luftschadstoffe', 'SOSS');
+VALUES ('PM10', 'Feinstaub (PM10)', 'PM10', 'Treibhausgase und Luftschadstoffe', 'THGundLSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('Sonst. SYSS', 'Sonstige nicht näher spezifizierte Synthetische Schadstoffe', 'SYSS++', 'Synthetische Organische Schadstoffe', 'SOSS');
+VALUES ('Sonst. SYSS', 'Sonstige nicht näher spezifizierte Synthetische Schadstoffe', 'SYSSplus', 'Synthetische Organische Schadstoffe', 'SOSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
 VALUES ('Toluol', 'Toluol', 'Tuluol', 'Synthetische Organische Schadstoffe', 'SOSS');
@@ -306,49 +306,49 @@ INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, P
 VALUES ('Xylole', 'Xylole', 'Xylole', 'Synthetische Organische Schadstoffe', 'SOSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('Ammoniak', 'Ammoniak (NH3)', 'NH3', 'Treibhausgase und Luftschadstoffe', 'THG+LSS');
+VALUES ('Ammoniak', 'Ammoniak (NH3)', 'NH3', 'Treibhausgase und Luftschadstoffe', 'THGundLSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('Distickoxid', 'Distickoxid (N2O)', 'N2O', 'Treibhausgase und Luftschadstoffe', 'THG+LSS');
+VALUES ('Distickoxid', 'Distickoxid (N2O)', 'N2O', 'Treibhausgase und Luftschadstoffe', 'THGundLSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('FCKW', 'Fluorchlorkohlenwasserstoffe (FCKWs)', 'FCKW', 'Treibhausgase und Luftschadstoffe', 'THG+LSS');
+VALUES ('FCKW', 'Fluorchlorkohlenwasserstoffe (FCKWs)', 'FCKW', 'Treibhausgase und Luftschadstoffe', 'THGundLSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('Halone', 'Halone', 'Halone', 'Treibhausgase und Luftschadstoffe', 'THG+LSS');
+VALUES ('Halone', 'Halone', 'Halone', 'Treibhausgase und Luftschadstoffe', 'THGundLSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('HFCKW', 'Teilhalogenierte Fluorchlorkohlenwasserstoffe (HFCKW)', 'HFCKW', 'Treibhausgase und Luftschadstoffe', 'THG+LSS');
+VALUES ('HFCKW', 'Teilhalogenierte Fluorchlorkohlenwasserstoffe (HFCKW)', 'HFCKW', 'Treibhausgase und Luftschadstoffe', 'THGundLSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('HFKW', 'Teilfluorierte Kohlenwasserstoffe (HFKWs)', 'HFKW', 'Treibhausgase und Luftschadstoffe', 'THG+LSS');
+VALUES ('HFKW', 'Teilfluorierte Kohlenwasserstoffe (HFKWs)', 'HFKW', 'Treibhausgase und Luftschadstoffe', 'THGundLSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('Kohlendioxid', 'Kohlendioxid (CO2)', 'CO2', 'Treibhausgase und Luftschadstoffe', 'THG+LSS');
+VALUES ('Kohlendioxid', 'Kohlendioxid (CO2)', 'CO2', 'Treibhausgase und Luftschadstoffe', 'THGundLSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('Kohlenmonoxid', 'Kohlenmonoxid (CO)', 'CO1', 'Treibhausgase und Luftschadstoffe', 'THG+LSS');
+VALUES ('Kohlenmonoxid', 'Kohlenmonoxid (CO)', 'CO1', 'Treibhausgase und Luftschadstoffe', 'THGundLSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('Methan', 'Methan (CH4)', 'CH4', 'Treibhausgase und Luftschadstoffe', 'THG+LSS');
+VALUES ('Methan', 'Methan (CH4)', 'CH4', 'Treibhausgase und Luftschadstoffe', 'THGundLSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('NMVOC', 'flüchtige organische Verbindungen ohne Methan (NMVOC)', 'NMVOC', 'Treibhausgase und Luftschadstoffe', 'THG+LSS');
+VALUES ('NMVOC', 'flüchtige organische Verbindungen ohne Methan (NMVOC)', 'NMVOC', 'Treibhausgase und Luftschadstoffe', 'THGundLSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('PFKWs', 'Perfluorierte Kohlenwasserstoffe (PFKWs)', 'PFKW', 'Treibhausgase und Luftschadstoffe', 'THG+LSS');
+VALUES ('PFKWs', 'Perfluorierte Kohlenwasserstoffe (PFKWs)', 'PFKW', 'Treibhausgase und Luftschadstoffe', 'THGundLSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('Schwefelhexafluorid', 'Schwefelhexafluorid (SF6)', 'SF6', 'Treibhausgase und Luftschadstoffe', 'THG+LSS');
+VALUES ('Schwefelhexafluorid', 'Schwefelhexafluorid (SF6)', 'SF6', 'Treibhausgase und Luftschadstoffe', 'THGundLSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('Schwefeloxid', 'Schwefeloxide (SOx/SO2)', 'SOx', 'Treibhausgase und Luftschadstoffe', 'THG+LSS');
+VALUES ('Schwefeloxid', 'Schwefeloxide (SOx/SO2)', 'SOx', 'Treibhausgase und Luftschadstoffe', 'THGundLSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('Sonst. LSS', 'Sonstige nicht näher spezifizierte Luftschadstoffe', 'THG+LSS+', 'Treibhausgase und Luftschadstoffe', 'THG+LSS');
+VALUES ('Sonst. LSS', 'Sonstige nicht näher spezifizierte Luftschadstoffe', 'THGundLSSplus', 'Treibhausgase und Luftschadstoffe', 'THGundLSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
-VALUES ('Stickoxide', 'Stickoxide (NO/NO2)', 'NOx', 'Treibhausgase und Luftschadstoffe', 'THG+LSS');
+VALUES ('Stickoxide', 'Stickoxide (NO/NO2)', 'NOx', 'Treibhausgase und Luftschadstoffe', 'THGundLSS');
 
 INSERT INTO CSX_REFLIST (POLLUTANT_NAME, POLLUTANT_DESCRIPTION, POLLUTANT_KEY, POLLUTANTGROUP, POLLUTANTGROUP_KEY) 
 VALUES ('TOC', 'Gesamter organischer Kohlenstoff (TOC) (als Gesamt-C oder CSB/3)', 'TOC', 'Gesamter organischer Kohlenstoff ', 'TOC');

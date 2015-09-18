@@ -9,6 +9,7 @@ package de.cismet.cids.custom.udm2020di.indeximport;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import oracle.jdbc.OracleConnection;
@@ -32,6 +33,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Properties;
 import java.util.logging.LogManager;
 
@@ -41,6 +45,8 @@ import javax.management.InvalidAttributeValueException;
 import javax.management.MBeanException;
 import javax.management.MalformedObjectNameException;
 import javax.management.ReflectionException;
+
+import de.cismet.cids.custom.udm2020di.tools.ResultSetSerializer;
 
 /**
  * DOCUMENT ME!
@@ -53,6 +59,8 @@ public class OracleImport {
     //~ Static fields/initializers ---------------------------------------------
 
     protected static final Logger log = Logger.getLogger(OracleImport.class);
+
+    protected static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     //~ Instance fields --------------------------------------------------------
 
@@ -189,6 +197,7 @@ public class OracleImport {
             throw sqeex;
         }
 
+        // STATEMENTS ----------------------------------------------------------
         try {
             // prepare generic statements
             final String getSitesStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
@@ -204,6 +213,13 @@ public class OracleImport {
             log.error("Could not prepare generic statements:" + sqeex.getMessage(), sqeex);
             throw sqeex;
         }
+
+        // JACKSON CONFIG ------------------------------------------------------
+        final SimpleModule module = new SimpleModule();
+        module.addSerializer(new ResultSetSerializer());
+        jsonMapper.registerModule(module);
+        xmlMapper.registerModule(module);
+        xmlMapper.setDateFormat(DATE_FORMAT);
     }
 
     //~ Methods ----------------------------------------------------------------

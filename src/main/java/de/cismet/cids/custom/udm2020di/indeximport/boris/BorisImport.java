@@ -12,18 +12,24 @@
  */
 package de.cismet.cids.custom.udm2020di.indeximport.boris;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import oracle.jdbc.OraclePreparedStatement;
 
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -51,6 +57,8 @@ public class BorisImport extends OracleImport {
     protected final OraclePreparedStatement insertSampleValues;
     protected final PreparedStatement insertSiteValuesRel;
     protected final PreparedStatement insertSiteTagsRel;
+    protected final PreparedStatement getTags;
+    protected final PreparedStatement updateSiteJson;
     protected final HashMap<String, String[]> parameterMappings = new HashMap<String, String[]>();
 
     //~ Constructors -----------------------------------------------------------
@@ -109,6 +117,16 @@ public class BorisImport extends OracleImport {
                     "/de/cismet/cids/custom/udm2020di/indeximport/boris/insert-boris-site-tags-relation.prs.sql"),
                 "UTF-8");
         insertSiteTagsRel = this.targetConnection.prepareStatement(insertBorisSiteTagsRelTpl);
+
+        final String getTagsTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                    "/de/cismet/cids/custom/udm2020di/serversearch/boris/get-boris-tags.prs.sql"),
+                "UTF-8");
+        getTags = this.targetConnection.prepareStatement(getTagsTpl);
+
+        final String updateSiteJsonTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                    "/de/cismet/cids/custom/udm2020di/indeximport/boris/update-boris-site-json.prs.sql"),
+                "UTF-8");
+        updateSiteJson = this.targetConnection.prepareStatement(getTagsTpl);
 
         // load and cache mappings
         final String selectBorisParameterMappingsTpl = IOUtils.toString(this.getClass().getResourceAsStream(
@@ -244,7 +262,7 @@ public class BorisImport extends OracleImport {
                 }
 
                 // SRC JSON CONTENT
-                final String siteSrcContent = this.xmlClobToJsonString(sitesResultSet.getClob("STANDORT_XML"));
+                // final String siteSrcContent = this.xmlClobToJsonString(sitesResultSet.getClob("STANDORT_XML"));
 
                 // -> INSERT SITE
                 final long borisSiteId = insertSite(
@@ -255,16 +273,23 @@ public class BorisImport extends OracleImport {
                         siteInstitutTagKey,
                         siteGeomId,
                         siteSrcPk,
-                        siteSrcContent);
+                        null);
                 if (borisSiteId == -1) {
                     continue;
                 }
 
-                final Collection<Long> sampeValueIds = getAndInsertSampleValues(siteSrcPk);
+                // PARSE AND UPDATE JSON
+                final ObjectNode jsonObject = (ObjectNode)xmlMapper.readTree(sitesResultSet.getClob("STANDORT_XML")
+                                .getCharacterStream());
+
+                // -> SAMPLE VALUES AND TAGS
+                final Collection<Long> sampeValueIds = getAndInsertSampleValues(siteSrcPk, jsonObject);
                 if (!sampeValueIds.isEmpty()) {
                     this.insertSiteValuesRelation(borisSiteId, sampeValueIds);
                     this.insertBorisSiteTagsRelation(borisSiteId);
                 }
+
+                this.updateSrcJson(borisSiteId, jsonObject);
 
                 // save the site
                 this.targetConnection.commit();
@@ -286,9 +311,14 @@ public class BorisImport extends OracleImport {
 
                 i--;
             }
-        }
 
-        // clean up
+            // test mode
+            break;
+        }
+        if (log.isDebugEnabled()) {
+            // clean up
+            log.debug("closing connections ....");
+        }
         this.getSampleValues.close();
 
         this.insertGenericGeom.close();
@@ -298,11 +328,48 @@ public class BorisImport extends OracleImport {
         this.insertSampleValues.close();
         this.insertSiteValuesRel.close();
         this.insertSiteTagsRel.close();
+        this.updateSiteJson.close();
+        this.getTags.close();
 
         this.sourceConnection.close();
         this.targetConnection.close();
 
         return i;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   borisSiteId  DOCUMENT ME!
+     * @param   jsonNode     DOCUMENT ME!
+     *
+     * @throws  SQLException             DOCUMENT ME!
+     * @throws  JsonProcessingException  DOCUMENT ME!
+     */
+    protected void updateSrcJson(final long borisSiteId, final ObjectNode jsonNode) throws SQLException,
+        JsonProcessingException {
+        getTags.setLong(1, borisSiteId);
+        final ResultSet getTagsResult = getTags.executeQuery();
+
+        // put the resultset in a containing structure
+        jsonNode.putPOJO("TAGS", getTagsResult);
+
+        try {
+            final String jsonString = this.jsonMapper.writeValueAsString(jsonNode);
+            //updateSiteJson.setClob(1, new StringReader(jsonString));
+            //updateSiteJson.setString(1, jsonString);
+            updateSiteJson.setCharacterStream(1, new StringReader(jsonString), jsonString.length());
+        } catch (JsonProcessingException jpe) {
+            log.error("could not deserialize JSON: " + jpe.getMessage(), jpe);
+            getTagsResult.close();
+            throw jpe;
+        }
+
+        updateSiteJson.execute();
+        getTagsResult.close();
+        if (log.isDebugEnabled()) {
+            log.debug("JSON Content of BORIS Site " + borisSiteId + " successfully updated");
+        }
     }
 
     /**
@@ -350,17 +417,21 @@ public class BorisImport extends OracleImport {
     /**
      * DOCUMENT ME!
      *
-     * @param   siteSrcPk  DOCUMENT ME!
+     * @param   siteSrcPk   DOCUMENT ME!
+     * @param   jsonObject  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  SQLException  DOCUMENT ME!
      * @throws  IOException   DOCUMENT ME!
      */
-    protected Collection<Long> getAndInsertSampleValues(final String siteSrcPk) throws SQLException, IOException {
+    protected Collection<Long> getAndInsertSampleValues(final String siteSrcPk, final ObjectNode jsonObject)
+            throws SQLException, IOException {
         final Collection<Long> sampeValueIds = new HashSet<Long>();
         int i = 0;
         int added = 0;
+
+        final ArrayNode jsonValues = jsonObject.putArray("VALUES");
 
         // <- GET AGGREGATED SAMPLE VALUES
         this.getSampleValues.setString(1, siteSrcPk);
@@ -370,44 +441,58 @@ public class BorisImport extends OracleImport {
             final String PARAMETER_PK = sampleValuesResultSet.getString("PARAMETER_PK");
             i++;
             if (this.parameterMappings.containsKey(PARAMETER_PK)) {
+                final ObjectNode jsonValue = this.jsonMapper.createObjectNode();
+                jsonValues.add(jsonValue);
+
                 final String[] mappedParameters = this.parameterMappings.get(PARAMETER_PK);
                 // NAME
                 // log.debug(mappedParameters[0]);
                 this.insertSampleValues.setStringAtName("NAME", mappedParameters[0]);
+                jsonValue.put("NAME", mappedParameters[0]);
                 // this.insertSampleValues.setString(1, mappedParameters[0]);
 // if (log.isDebugEnabled()) {
 // log.debug("["+added+"] " + mappedParameters[1]);
 // }
                 // POLLUTANT
                 this.insertSampleValues.setStringAtName("POLLUTANT", mappedParameters[1]);
+                jsonValue.put("POLLUTANT", mappedParameters[1]);
                 // this.insertSampleValues.setString(2, mappedParameters[1]);
 // if (log.isDebugEnabled()) {
 // log.debug("["+added+"] " + mappedParameters[2]);
 // }
                 // POLLUTANT_GROUP
                 this.insertSampleValues.setStringAtName("POLLUTANT_GROUP", mappedParameters[2]);
+                jsonValue.put("POLLUTANT", mappedParameters[2]);
                 // this.insertSampleValues.setString(3, mappedParameters[2]);
 // if (log.isDebugEnabled()) {
 // log.debug("["+added+"] " + sampleValuesResultSet.getDate("MIN_DATE"));
 // }
-                this.insertSampleValues.setDateAtName("MIN_DATE", sampleValuesResultSet.getDate("MIN_DATE"));
-                // this.insertSampleValues.setDate(4, sampleValuesResultSet.getDate("MIN_DATE"));
-//                if (log.isDebugEnabled()) {
-//                    log.debug("["+added+"] " + sampleValuesResultSet.getDate("MAX_DATE"));
-//                }
+                final Date minDate = sampleValuesResultSet.getDate("MIN_DATE");
+                this.insertSampleValues.setDateAtName("MIN_DATE", minDate);
+                jsonValue.put("MIN_DATE", DATE_FORMAT.format(minDate));
+                // this.insertSampleValues.setDate(4, sampleValuesResultSet.getDate("MIN_DATE")); if
+                // (log.isDebugEnabled()) { log.debug("["+added+"] " + sampleValuesResultSet.getDate("MAX_DATE")); }
 
-                this.insertSampleValues.setDateAtName("MAX_DATE", sampleValuesResultSet.getDate("MAX_DATE"));
+                final Date maxDate = sampleValuesResultSet.getDate("MAX_DATE");
+                this.insertSampleValues.setDateAtName("MAX_DATE", maxDate);
+                jsonValue.put("MAX_DATE", DATE_FORMAT.format(maxDate));
+
                 // this.insertSampleValues.setDate(5, sampleValuesResultSet.getDate("MAX_DATE"));
 // if (log.isDebugEnabled()) {
 // log.debug("["+added+"] " + sampleValuesResultSet.getFloat("MIN_VALUE"));
 // }
-                this.insertSampleValues.setFloatAtName("MIN_VALUE", sampleValuesResultSet.getFloat("MIN_VALUE"));
+                final float minValue = sampleValuesResultSet.getFloat("MIN_VALUE");
+                this.insertSampleValues.setFloatAtName("MIN_VALUE", minValue);
+                jsonValue.put("MIN_VALUE", minValue);
                 // this.insertSampleValues.setFloat(6, sampleValuesResultSet.getFloat("MIN_VALUE"));
 // if (log.isDebugEnabled()) {
 // log.debug("["+added+"] " + sampleValuesResultSet.getFloat("MAX_VALUE"));
 // }
-                this.insertSampleValues.setFloatAtName("MAX_VALUE", sampleValuesResultSet.getFloat("MAX_VALUE"));
+                final float maxValue = sampleValuesResultSet.getFloat("MAX_VALUE");
+                this.insertSampleValues.setFloatAtName("MAX_VALUE", maxValue);
+                jsonValue.put("MAX_VALUE", maxValue);
                 // this.insertSampleValues.setFloat(7, sampleValuesResultSet.getFloat("MAX_VALUE"));
+
                 final String srcContentJson = this.xmlClobToJsonString(sampleValuesResultSet.getClob("MESSWERTE_XML"));
                 // SRC_CONTENT
                 // log.debug(srcContentJson);

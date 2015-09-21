@@ -320,7 +320,7 @@ public class BorisImport extends OracleImport {
             }
 
             // test mode
-            //break;
+            // break;
         }
         if (log.isDebugEnabled()) {
             // clean up
@@ -371,7 +371,7 @@ public class BorisImport extends OracleImport {
 
             final Clob srcContentClob = this.targetConnection.createClob();
             final Writer clobWriter = srcContentClob.setCharacterStream(1);
-            this.JSON_MAPPER.writeValue(clobWriter, jsonNode);
+            JSON_MAPPER.writeValue(clobWriter, jsonNode);
             updateSiteJson.setClob(1, srcContentClob);
             updateSiteJson.setLong(2, borisSiteId);
 

@@ -39,7 +39,7 @@ public class Standort {
     private String standortbezeichnung;
 
     @JacksonXmlProperty(isAttribute = true)
-    private int standortnummer;
+    private String standortnummer;
 
     @JacksonXmlProperty(isAttribute = true)
     @JsonDeserialize(
@@ -117,7 +117,7 @@ public class Standort {
      *
      * @return  DOCUMENT ME!
      */
-    public int getStandortnummer() {
+    public String getStandortnummer() {
         return standortnummer;
     }
 
@@ -126,7 +126,7 @@ public class Standort {
      *
      * @param  standortnummer  DOCUMENT ME!
      */
-    public void setStandortnummer(final int standortnummer) {
+    public void setStandortnummer(final String standortnummer) {
         this.standortnummer = standortnummer;
     }
 

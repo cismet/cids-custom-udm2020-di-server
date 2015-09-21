@@ -7,7 +7,13 @@
 ****************************************************/
 package de.cismet.cids.custom.udm2020di.indeximport;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -62,10 +68,68 @@ public class OracleImport {
 
     protected static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-    //~ Instance fields --------------------------------------------------------
+    public static final SimpleModule DOUBLE_DESERIALIZER =
+        new SimpleModule(
+            "DoubleCustomDeserializer",
+            new com.fasterxml.jackson.core.Version(1, 0, 0, null)).addDeserializer(
+            Double.class,
+            new JsonDeserializer<Double>() {
 
-    protected XmlMapper xmlMapper = new XmlMapper();
-    protected ObjectMapper jsonMapper = new ObjectMapper();
+                @Override
+                public Double deserialize(final JsonParser jp, final DeserializationContext ctxt) throws IOException,
+                    JsonProcessingException {
+                    final String valueAsString = jp.getValueAsString();
+                    if ((valueAsString == null) || valueAsString.isEmpty()) {
+                        return null;
+                    }
+
+                    return Double.parseDouble(valueAsString.replaceAll(",", "\\."));
+                }
+            });
+
+    public static final SimpleModule FLOAT_DESERIALIZER =
+        new SimpleModule(
+            "FloatCustomDeserializer",
+            new com.fasterxml.jackson.core.Version(1, 0, 0, null)).addDeserializer(
+            Float.class,
+            new JsonDeserializer<Float>() {
+
+                @Override
+                public Float deserialize(final JsonParser jp, final DeserializationContext ctxt) throws IOException,
+                    JsonProcessingException {
+                    final String valueAsString = jp.getValueAsString();
+                    if ((valueAsString == null) || valueAsString.isEmpty()) {
+                        return null;
+                    }
+
+                    return Float.parseFloat(valueAsString.replaceAll(",", "\\."));
+                }
+            });
+
+    public static final XmlMapper XML_MAPPER = new XmlMapper();
+    public static final ObjectMapper JSON_MAPPER = new ObjectMapper();
+
+    static {
+        // JACKSON CONFIG ------------------------------------------------------
+
+        final SimpleModule jsonModule = new SimpleModule();
+        jsonModule.addSerializer(new ResultSetSerializer());
+        JSON_MAPPER.registerModule(jsonModule);
+        JSON_MAPPER.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+        // JSON_MAPPER.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
+
+        // final JacksonXmlModule xmlModule = new JacksonXmlModule();
+        // xmlModule.setKeyDeserializers(new CaseInsensitiveKeyDeserializers());
+        // xmlModule.setDefaultUseWrapper(false);
+        // XML_MAPPER.registerModule(xmlModule);
+        XML_MAPPER.setDateFormat(DATE_FORMAT);
+        XML_MAPPER.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
+        XML_MAPPER.registerModule(DOUBLE_DESERIALIZER);
+        XML_MAPPER.registerModule(FLOAT_DESERIALIZER);
+        // XML_MAPPER.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+    }
+
+    //~ Instance fields --------------------------------------------------------
 
     protected Properties properties = null;
     protected Connection sourceConnection;
@@ -213,13 +277,6 @@ public class OracleImport {
             log.error("Could not prepare generic statements:" + sqeex.getMessage(), sqeex);
             throw sqeex;
         }
-
-        // JACKSON CONFIG ------------------------------------------------------
-        final SimpleModule module = new SimpleModule();
-        module.addSerializer(new ResultSetSerializer());
-        jsonMapper.registerModule(module);
-        xmlMapper.registerModule(module);
-        xmlMapper.setDateFormat(DATE_FORMAT);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -267,8 +324,8 @@ public class OracleImport {
      * @throws  SQLException  DOCUMENT ME!
      */
     protected String xmlClobToJsonString(final Clob xmlClob) throws IOException, SQLException {
-        final JsonNode node = xmlMapper.readTree(xmlClob.getCharacterStream());
-        return jsonMapper.writeValueAsString(node);
+        final JsonNode node = XML_MAPPER.readTree(xmlClob.getCharacterStream());
+        return JSON_MAPPER.writeValueAsString(node);
     }
     /**
      * DOCUMENT ME!
@@ -387,5 +444,26 @@ public class OracleImport {
         if (logDriver) {
             DriverManager.setLogWriter(new PrintWriter(System.err));
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   <T>        DOCUMENT ME!
+     * @param   resultSet  DOCUMENT ME!
+     * @param   type       DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  JsonProcessingException  DOCUMENT ME!
+     */
+    public <T> T deserializeResultSet(final ResultSet resultSet, final Class<T> type) throws JsonProcessingException {
+        // deserialize to tree model
+        final JsonNode resultSetNode = JSON_MAPPER.valueToTree(resultSet);
+
+        // deserilaize to object
+        final T mappedObject = JSON_MAPPER.treeToValue(resultSetNode, type);
+
+        return mappedObject;
     }
 }

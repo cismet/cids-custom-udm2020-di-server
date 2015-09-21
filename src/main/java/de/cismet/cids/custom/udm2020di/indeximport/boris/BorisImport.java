@@ -5,15 +5,9 @@
 *              ... and it just works.
 *
 ****************************************************/
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cismet.cids.custom.udm2020di.indeximport.boris;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import oracle.jdbc.OraclePreparedStatement;
@@ -22,29 +16,35 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
+import java.io.Writer;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
+import java.sql.Clob;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import de.cismet.cids.custom.udm2020di.indeximport.OracleImport;
+import de.cismet.cids.custom.udm2020di.types.AggregationValue;
+import de.cismet.cids.custom.udm2020di.types.ParameterMapping;
+import de.cismet.cids.custom.udm2020di.types.boris.Standort;
 
 /**
  * DOCUMENT ME!
  *
- * @author   pd
+ * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
 public class BorisImport extends OracleImport {
@@ -59,7 +59,7 @@ public class BorisImport extends OracleImport {
     protected final PreparedStatement insertSiteTagsRel;
     protected final PreparedStatement getTags;
     protected final PreparedStatement updateSiteJson;
-    protected final HashMap<String, String[]> parameterMappings = new HashMap<String, String[]>();
+    protected final HashMap<String, ParameterMapping> parameterMappings = new HashMap<String, ParameterMapping>();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -126,7 +126,7 @@ public class BorisImport extends OracleImport {
         final String updateSiteJsonTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/boris/update-boris-site-json.prs.sql"),
                 "UTF-8");
-        updateSiteJson = this.targetConnection.prepareStatement(getTagsTpl);
+        updateSiteJson = this.targetConnection.prepareStatement(updateSiteJsonTpl);
 
         // load and cache mappings
         final String selectBorisParameterMappingsTpl = IOUtils.toString(this.getClass().getResourceAsStream(
@@ -135,15 +135,15 @@ public class BorisImport extends OracleImport {
 
         final Statement selectBorisParameterMappings = this.targetConnection.createStatement();
         final ResultSet mappingsResultSet = selectBorisParameterMappings.executeQuery(selectBorisParameterMappingsTpl);
-        while (mappingsResultSet.next()) {
-            this.parameterMappings.put(
-                mappingsResultSet.getNString(1),
-                new String[] {
-                    mappingsResultSet.getNString(2),
-                    mappingsResultSet.getNString(3),
-                    mappingsResultSet.getNString(4)
-                });
+
+        final ParameterMapping[] parameterMappingArray = this.deserializeResultSet(
+                mappingsResultSet,
+                ParameterMapping[].class);
+        for (final ParameterMapping parameterMapping : parameterMappingArray) {
+            this.parameterMappings.put(parameterMapping.getParameterPk(),
+                parameterMapping);
         }
+
         if (log.isDebugEnabled()) {
             log.debug(this.parameterMappings.size() + " parameter mappings cached");
         }
@@ -279,16 +279,23 @@ public class BorisImport extends OracleImport {
                 }
 
                 // PARSE AND UPDATE JSON
-                final ObjectNode jsonObject = (ObjectNode)xmlMapper.readTree(sitesResultSet.getClob("STANDORT_XML")
-                                .getCharacterStream());
+                // final ObjectNode jsonObject = (ObjectNode)XML_MAPPER.readTree(sitesResultSet.getClob("STANDORT_XML")
+                // .getCharacterStream());
+
+                final Standort borisStandort = XML_MAPPER.readValue(sitesResultSet.getClob("STANDORT_XML")
+                                .getCharacterStream(),
+                        Standort.class);
 
                 // -> SAMPLE VALUES AND TAGS
-                final Collection<Long> sampeValueIds = getAndInsertSampleValues(siteSrcPk, jsonObject);
+                final List<AggregationValue> aggregationValues = new ArrayList<AggregationValue>();
+                borisStandort.setAggregationValues(aggregationValues);
+                final Collection<Long> sampeValueIds = getAndInsertSampleValues(siteSrcPk, aggregationValues);
                 if (!sampeValueIds.isEmpty()) {
                     this.insertSiteValuesRelation(borisSiteId, sampeValueIds);
                     this.insertBorisSiteTagsRelation(borisSiteId);
                 }
 
+                final ObjectNode jsonObject = (ObjectNode)JSON_MAPPER.valueToTree(borisStandort);
                 this.updateSrcJson(borisSiteId, jsonObject);
 
                 // save the site
@@ -313,7 +320,7 @@ public class BorisImport extends OracleImport {
             }
 
             // test mode
-            break;
+            //break;
         }
         if (log.isDebugEnabled()) {
             // clean up
@@ -345,27 +352,39 @@ public class BorisImport extends OracleImport {
      *
      * @throws  SQLException             DOCUMENT ME!
      * @throws  JsonProcessingException  DOCUMENT ME!
+     * @throws  IOException              DOCUMENT ME!
      */
     protected void updateSrcJson(final long borisSiteId, final ObjectNode jsonNode) throws SQLException,
-        JsonProcessingException {
+        JsonProcessingException,
+        IOException {
         getTags.setLong(1, borisSiteId);
         final ResultSet getTagsResult = getTags.executeQuery();
 
         // put the resultset in a containing structure
-        jsonNode.putPOJO("TAGS", getTagsResult);
+        jsonNode.putPOJO("tags", getTagsResult);
 
         try {
-            final String jsonString = this.jsonMapper.writeValueAsString(jsonNode);
-            //updateSiteJson.setClob(1, new StringReader(jsonString));
-            //updateSiteJson.setString(1, jsonString);
-            updateSiteJson.setCharacterStream(1, new StringReader(jsonString), jsonString.length());
-        } catch (JsonProcessingException jpe) {
-            log.error("could not deserialize JSON: " + jpe.getMessage(), jpe);
+            // final String jsonString = this.JSON_MAPPER.writeValueAsString(jsonNode);
+            // updateSiteJson.setClob(1, new StringReader(jsonString));
+            // updateSiteJson.setString(1, jsonString);
+            // updateSiteJson.setCharacterStream(1, new StringReader(jsonString), jsonString.length());
+
+            final Clob srcContentClob = this.targetConnection.createClob();
+            final Writer clobWriter = srcContentClob.setCharacterStream(1);
+            this.JSON_MAPPER.writeValue(clobWriter, jsonNode);
+            updateSiteJson.setClob(1, srcContentClob);
+            updateSiteJson.setLong(2, borisSiteId);
+
+            updateSiteJson.executeUpdate();
+            clobWriter.close();
+        } catch (Exception ex) {
+            log.error("could not deserialize and update JSON of Boris Site "
+                        + borisSiteId + ": " + ex.getMessage(),
+                ex);
             getTagsResult.close();
-            throw jpe;
+            throw ex;
         }
 
-        updateSiteJson.execute();
         getTagsResult.close();
         if (log.isDebugEnabled()) {
             log.debug("JSON Content of BORIS Site " + borisSiteId + " successfully updated");
@@ -417,21 +436,19 @@ public class BorisImport extends OracleImport {
     /**
      * DOCUMENT ME!
      *
-     * @param   siteSrcPk   DOCUMENT ME!
-     * @param   jsonObject  DOCUMENT ME!
+     * @param   siteSrcPk          DOCUMENT ME!
+     * @param   aggregationValues  jsonObject DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  SQLException  DOCUMENT ME!
      * @throws  IOException   DOCUMENT ME!
      */
-    protected Collection<Long> getAndInsertSampleValues(final String siteSrcPk, final ObjectNode jsonObject)
-            throws SQLException, IOException {
+    protected Collection<Long> getAndInsertSampleValues(final String siteSrcPk,
+            final List<AggregationValue> aggregationValues) throws SQLException, IOException {
         final Collection<Long> sampeValueIds = new HashSet<Long>();
         int i = 0;
         int added = 0;
-
-        final ArrayNode jsonValues = jsonObject.putArray("VALUES");
 
         // <- GET AGGREGATED SAMPLE VALUES
         this.getSampleValues.setString(1, siteSrcPk);
@@ -441,41 +458,41 @@ public class BorisImport extends OracleImport {
             final String PARAMETER_PK = sampleValuesResultSet.getString("PARAMETER_PK");
             i++;
             if (this.parameterMappings.containsKey(PARAMETER_PK)) {
-                final ObjectNode jsonValue = this.jsonMapper.createObjectNode();
-                jsonValues.add(jsonValue);
+                final AggregationValue aggregationValue = new AggregationValue();
+                aggregationValues.add(aggregationValue);
 
-                final String[] mappedParameters = this.parameterMappings.get(PARAMETER_PK);
+                final ParameterMapping parameterMapping = this.parameterMappings.get(PARAMETER_PK);
                 // NAME
                 // log.debug(mappedParameters[0]);
-                this.insertSampleValues.setStringAtName("NAME", mappedParameters[0]);
-                jsonValue.put("NAME", mappedParameters[0]);
+                this.insertSampleValues.setStringAtName("NAME", parameterMapping.getDisplayName());
+                aggregationValue.setName(parameterMapping.getDisplayName());
                 // this.insertSampleValues.setString(1, mappedParameters[0]);
 // if (log.isDebugEnabled()) {
 // log.debug("["+added+"] " + mappedParameters[1]);
 // }
                 // POLLUTANT
-                this.insertSampleValues.setStringAtName("POLLUTANT", mappedParameters[1]);
-                jsonValue.put("POLLUTANT", mappedParameters[1]);
+                this.insertSampleValues.setStringAtName("POLLUTANT", parameterMapping.getPollutantTagKey());
+                aggregationValue.setPollutantKey(parameterMapping.getPollutantTagKey());
                 // this.insertSampleValues.setString(2, mappedParameters[1]);
 // if (log.isDebugEnabled()) {
 // log.debug("["+added+"] " + mappedParameters[2]);
 // }
                 // POLLUTANT_GROUP
-                this.insertSampleValues.setStringAtName("POLLUTANT_GROUP", mappedParameters[2]);
-                jsonValue.put("POLLUTANT", mappedParameters[2]);
+                this.insertSampleValues.setStringAtName("POLLUTANT_GROUP", parameterMapping.getPollutantGroupKey());
+                aggregationValue.setPollutantgroupKey(parameterMapping.getPollutantGroupKey());
                 // this.insertSampleValues.setString(3, mappedParameters[2]);
 // if (log.isDebugEnabled()) {
 // log.debug("["+added+"] " + sampleValuesResultSet.getDate("MIN_DATE"));
 // }
                 final Date minDate = sampleValuesResultSet.getDate("MIN_DATE");
                 this.insertSampleValues.setDateAtName("MIN_DATE", minDate);
-                jsonValue.put("MIN_DATE", DATE_FORMAT.format(minDate));
+                aggregationValue.setMinDate(minDate);
                 // this.insertSampleValues.setDate(4, sampleValuesResultSet.getDate("MIN_DATE")); if
                 // (log.isDebugEnabled()) { log.debug("["+added+"] " + sampleValuesResultSet.getDate("MAX_DATE")); }
 
                 final Date maxDate = sampleValuesResultSet.getDate("MAX_DATE");
                 this.insertSampleValues.setDateAtName("MAX_DATE", maxDate);
-                jsonValue.put("MAX_DATE", DATE_FORMAT.format(maxDate));
+                aggregationValue.setMaxDate(maxDate);
 
                 // this.insertSampleValues.setDate(5, sampleValuesResultSet.getDate("MAX_DATE"));
 // if (log.isDebugEnabled()) {
@@ -483,16 +500,17 @@ public class BorisImport extends OracleImport {
 // }
                 final float minValue = sampleValuesResultSet.getFloat("MIN_VALUE");
                 this.insertSampleValues.setFloatAtName("MIN_VALUE", minValue);
-                jsonValue.put("MIN_VALUE", minValue);
+                aggregationValue.setMinValue(minValue);
                 // this.insertSampleValues.setFloat(6, sampleValuesResultSet.getFloat("MIN_VALUE"));
 // if (log.isDebugEnabled()) {
 // log.debug("["+added+"] " + sampleValuesResultSet.getFloat("MAX_VALUE"));
 // }
                 final float maxValue = sampleValuesResultSet.getFloat("MAX_VALUE");
                 this.insertSampleValues.setFloatAtName("MAX_VALUE", maxValue);
-                jsonValue.put("MAX_VALUE", maxValue);
+                aggregationValue.setMaxValue(maxValue);
                 // this.insertSampleValues.setFloat(7, sampleValuesResultSet.getFloat("MAX_VALUE"));
 
+                // FIXME: define POJOs
                 final String srcContentJson = this.xmlClobToJsonString(sampleValuesResultSet.getClob("MESSWERTE_XML"));
                 // SRC_CONTENT
                 // log.debug(srcContentJson);

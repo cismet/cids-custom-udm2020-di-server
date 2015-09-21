@@ -70,7 +70,7 @@ public class ResultSetSerializer extends JsonSerializer<ResultSet> {
                 jgen.writeStartObject();
 
                 for (int i = 0; i < columnNames.length; i++) {
-                    jgen.writeFieldName(columnNames[i]);
+                    jgen.writeFieldName(columnNames[i].toLowerCase());
                     switch (columnTypes[i]) {
                         case Types.INTEGER: {
                             l = rs.getInt(i + 1);
@@ -207,7 +207,7 @@ public class ResultSetSerializer extends JsonSerializer<ResultSet> {
 
             jgen.writeEndArray();
             if (log.isDebugEnabled()) {
-                log.debug("result set with " + numColumns + "columns and "
+                log.debug("result set with " + numColumns + " columns and "
                             + numRows + " rows successfully serialized to JSON");
             }
         } catch (SQLException e) {

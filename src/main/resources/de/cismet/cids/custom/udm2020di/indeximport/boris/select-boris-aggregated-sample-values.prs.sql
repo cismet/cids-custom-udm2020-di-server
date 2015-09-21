@@ -22,10 +22,11 @@ SELECT STANDORT_PK,
       else MIN_VALUE end) AS MIN_VALUE,
   MAX(case when PARAMETER_PK = 'B434' then 0 
       else MAX_VALUE end) AS MAX_VALUE,*/
-  XMLSerialize(CONTENT XMLRoot(xmlelement("MESSWERTE", XMLATTRIBUTES(STANDORT_PK, PROBEN_PKS), 
+  XMLSerialize(CONTENT XMLRoot(xmlelement("messwerte", XMLATTRIBUTES(STANDORT_PK standortPk, PROBEN_PKS probenPks), 
     --XMLParse(CONTENT PROBEN_XML WELLFORMED),
-    xmlagg (xmlelement (PARAMETER, XMLATTRIBUTES(PARAMETER_PK, PARAMETER_NAME, MAX_DATE, MIN_DATE
-      ,MIN_VALUE, MAX_VALUE)))), VERSION '1.0', STANDALONE YES)) MESSWERTE_XML
+    xmlagg (xmlelement ("messwerte", XMLATTRIBUTES(PARAMETER_PK parameterPk, PARAMETER_NAME parameterName, 
+       MAX_DATE maxDate, MIN_DATE minDate, MIN_VALUE minValue, MAX_VALUE maxValue)))), 
+  VERSION '1.0', STANDALONE YES)) MESSWERTE_XML
 FROM (SELECT DISTINCT T_BIS_STANDORT_D.PK AS STANDORT_PK,
           --T_BIS_MESSWERT_F.PK AS BIS_MESSWERT_FK,
           rtrim(xmlagg (xmlelement (PROBEN, T_BIS_PROBE_B.PK || ',')).extract ('//text()'), ',') PROBEN_PKS,

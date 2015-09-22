@@ -166,51 +166,53 @@ public class OracleImport {
 
         PropertyConfigurator.configure(properties);
 
-        String sourceJdbcDriver = null;
-
-        try {
-            sourceJdbcDriver = properties.getProperty("source.jdbc.driver");
-            Class.forName(sourceJdbcDriver);
-        } catch (ClassNotFoundException cnfe) {
-            log.error("could not find JDBC Driver for source connection: " + sourceJdbcDriver, cnfe);
-            throw cnfe;
-        }
-
-        String targetJdbcDriver = null;
-
-        try {
-            targetJdbcDriver = properties.getProperty("target.jdbc.driver");
-            if (!targetJdbcDriver.equals(sourceJdbcDriver)) {
-                Class.forName(targetJdbcDriver);
+        final String sourceJdbcDriver = properties.getProperty("source.jdbc.driver");
+        if ((sourceJdbcDriver != null) && !sourceJdbcDriver.isEmpty()) {
+            try {
+                Class.forName(sourceJdbcDriver);
+            } catch (ClassNotFoundException cnfe) {
+                log.error("could not find JDBC Driver for source connection: " + sourceJdbcDriver, cnfe);
+                throw cnfe;
             }
-        } catch (ClassNotFoundException cnfe) {
-            log.error("could not find JDBC Driver for target connection: " + targetJdbcDriver, cnfe);
-            throw cnfe;
-        }
 
-        String sourceJdbcUrl = null;
-        final String sourceJdbcUsername;
-        final String sourceJdbcPassword;
-        final String sourceJdbcSchema;
+            String targetJdbcDriver = null;
 
-        try {
-            sourceJdbcUrl = properties.getProperty("source.jdbc.url");
-            sourceJdbcUsername = properties.getProperty("source.jdbc.username");
-            sourceJdbcPassword = properties.getProperty("source.jdbc.password");
-            sourceJdbcSchema = properties.getProperty("source.jdbc.schema");
-
-            sourceConnection = DriverManager.getConnection(
-                    sourceJdbcUrl,
-                    sourceJdbcUsername,
-                    sourceJdbcPassword);
-
-            if (sourceJdbcSchema != null) {
-                sourceConnection.createStatement().execute("ALTER SESSION set current_schema=" + sourceJdbcSchema);
+            try {
+                targetJdbcDriver = properties.getProperty("target.jdbc.driver");
+                if (!targetJdbcDriver.equals(sourceJdbcDriver)) {
+                    Class.forName(targetJdbcDriver);
+                }
+            } catch (ClassNotFoundException cnfe) {
+                log.error("could not find JDBC Driver for target connection: " + targetJdbcDriver, cnfe);
+                throw cnfe;
             }
-            log.info("SOURCE Connection established: " + sourceJdbcUrl + "/" + sourceJdbcSchema);
-        } catch (SQLException sqeex) {
-            log.error("Could not connection to source database: " + sourceJdbcUrl, sqeex);
-            throw sqeex;
+
+            String sourceJdbcUrl = null;
+            final String sourceJdbcUsername;
+            final String sourceJdbcPassword;
+            final String sourceJdbcSchema;
+
+            try {
+                sourceJdbcUrl = properties.getProperty("source.jdbc.url");
+                sourceJdbcUsername = properties.getProperty("source.jdbc.username");
+                sourceJdbcPassword = properties.getProperty("source.jdbc.password");
+                sourceJdbcSchema = properties.getProperty("source.jdbc.schema");
+
+                sourceConnection = DriverManager.getConnection(
+                        sourceJdbcUrl,
+                        sourceJdbcUsername,
+                        sourceJdbcPassword);
+
+                if (sourceJdbcSchema != null) {
+                    sourceConnection.createStatement().execute("ALTER SESSION set current_schema=" + sourceJdbcSchema);
+                }
+                log.info("SOURCE Connection established: " + sourceJdbcUrl + "/" + sourceJdbcSchema);
+            } catch (SQLException sqeex) {
+                log.error("Could not connection to source database: " + sourceJdbcUrl, sqeex);
+                throw sqeex;
+            }
+        } else {
+            log.warn("no source connection specified!");
         }
 
         String targetJdbcUrl = null;
@@ -264,10 +266,10 @@ public class OracleImport {
         // STATEMENTS ----------------------------------------------------------
         try {
             // prepare generic statements
-            final String getSitesStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+            final String insertUniqueTagTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                         "/de/cismet/cids/custom/udm2020di/indeximport/insert-unique-tag.prs.sql"),
                     "UTF-8");
-            this.insertUniqueTag = targetConnection.prepareStatement(getSitesStatementTpl, new String[] { "ID" });
+            this.insertUniqueTag = targetConnection.prepareStatement(insertUniqueTagTpl, new String[] { "ID" });
 
             final String insertGeomStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                         "/de/cismet/cids/custom/udm2020di/indeximport/insert-generic-geom.prs.sql"),

@@ -6,4 +6,5 @@ pom.xml.next
 release.properties
 /nbproject/private
 boris.properties
-boris-import.log
+*.log
+bundeslaender.properties

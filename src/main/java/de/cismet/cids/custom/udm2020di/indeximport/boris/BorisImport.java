@@ -54,6 +54,7 @@ public class BorisImport extends OracleImport {
     protected final String getSitesStatementTpl;
     protected final PreparedStatement getSampleValues;
     protected final PreparedStatement insertSite;
+    protected final PreparedStatement deleteSite;
     protected final OraclePreparedStatement insertSampleValues;
     protected final PreparedStatement insertSiteValuesRel;
     protected final PreparedStatement insertSiteTagsRel;
@@ -95,6 +96,11 @@ public class BorisImport extends OracleImport {
                     "/de/cismet/cids/custom/udm2020di/indeximport/boris/insert-boris-site.prs.sql"),
                 "UTF-8");
         insertSite = this.targetConnection.prepareStatement(insertBorisSiteTpl, new String[] { "ID" });
+
+        final String deleteBorisSiteTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                    "/de/cismet/cids/custom/udm2020di/indeximport/boris/delete-boris-site.prs.sql"),
+                "UTF-8");
+        deleteSite = this.targetConnection.prepareStatement(deleteBorisSiteTpl);
 
         final String insertBorisSampleValuesTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/boris/insert-boris-aggregated-sample-values.prs.sql"),
@@ -240,23 +246,23 @@ public class BorisImport extends OracleImport {
                             .append('\n')
                             .toString();
 
-                // LITERATUR TAG for Catalogue
-                tmpStr = sitesResultSet.getNString("LITERATUR");
-                final String siteLiteraturTagKey = Integer.toHexString(tmpStr.hashCode());
-                // -> INSERT LITERATUR TAG
-                this.insertUniqueTag(siteLiteraturTagKey, tmpStr, tmpStr, "BORIS.LITERATUR");
-
                 // INSITUT TAG for Catalogue
                 tmpStr = sitesResultSet.getNString("INSTITUT");
                 final String siteInstitutTagKey = Integer.toHexString(tmpStr.hashCode());
                 // -> INSERT INSTITUT TAG
                 this.insertUniqueTag(siteInstitutTagKey, tmpStr, tmpStr, "BORIS.INSTITUT");
 
+                // LITERATUR TAG for Catalogue
+                tmpStr = sitesResultSet.getNString("LITERATUR");
+                final String siteLiteraturTagKey = Integer.toHexString(tmpStr.hashCode());
+                // -> INSERT LITERATUR TAG
+                this.insertUniqueTag(siteLiteraturTagKey, tmpStr, tmpStr, "BORIS.LITERATUR");
+
                 // GEOM
                 final float siteHochwert = sitesResultSet.getFloat("HOCHWERT");     // X
                 final float siteRechtswert = sitesResultSet.getFloat("RECHTSWERT"); // Y
                 // -> INSERT GEOM and GET ID!
-                final long siteGeomId = this.insertGeomPoint(siteHochwert, siteRechtswert, 31287, 4326);
+                final long siteGeomId = this.insertGeomPoint(siteRechtswert, siteHochwert, 31287, 4326);
                 if (siteGeomId == -1) {
                     continue;
                 }
@@ -269,12 +275,13 @@ public class BorisImport extends OracleImport {
                         siteKey,
                         siteName,
                         siteDescription,
-                        siteLiteraturTagKey,
                         siteInstitutTagKey,
+                        siteLiteraturTagKey,
                         siteGeomId,
                         siteSrcPk,
                         null);
                 if (borisSiteId == -1) {
+                    i--;
                     continue;
                 }
 
@@ -290,13 +297,20 @@ public class BorisImport extends OracleImport {
                 final List<AggregationValue> aggregationValues = new ArrayList<AggregationValue>();
                 borisStandort.setAggregationValues(aggregationValues);
                 final Collection<Long> sampeValueIds = getAndInsertSampleValues(siteSrcPk, aggregationValues);
+
+                // site with at lest on supported sample value?
                 if (!sampeValueIds.isEmpty()) {
                     this.insertSiteValuesRelation(borisSiteId, sampeValueIds);
                     this.insertBorisSiteTagsRelation(borisSiteId);
-                }
 
-                final ObjectNode jsonObject = (ObjectNode)JSON_MAPPER.valueToTree(borisStandort);
-                this.updateSrcJson(borisSiteId, jsonObject);
+                    final ObjectNode jsonObject = (ObjectNode)JSON_MAPPER.valueToTree(borisStandort);
+                    this.updateSrcJson(borisSiteId, jsonObject);
+                } else {
+                    log.warn("removing BORIS Site #" + (--i) + " '" + siteSrcPk
+                                + "': no supported sample values found!");
+                    this.deleteSite.setLong(1, borisSiteId);
+                    this.deleteSite.executeUpdate();
+                }
 
                 // save the site
                 this.targetConnection.commit();
@@ -320,7 +334,7 @@ public class BorisImport extends OracleImport {
             }
 
             // test mode
-            //break;
+            // break;
         }
         if (log.isDebugEnabled()) {
             // clean up
@@ -332,6 +346,7 @@ public class BorisImport extends OracleImport {
         this.insertUniqueTag.close();
 
         this.insertSite.close();
+        this.deleteSite.close();
         this.insertSampleValues.close();
         this.insertSiteValuesRel.close();
         this.insertSiteTagsRel.close();
@@ -371,7 +386,7 @@ public class BorisImport extends OracleImport {
 
             final Clob srcContentClob = this.targetConnection.createClob();
             final Writer clobWriter = srcContentClob.setCharacterStream(1);
-            this.JSON_MAPPER.writeValue(clobWriter, jsonNode);
+            JSON_MAPPER.writeValue(clobWriter, jsonNode);
             updateSiteJson.setClob(1, srcContentClob);
             updateSiteJson.setLong(2, borisSiteId);
 

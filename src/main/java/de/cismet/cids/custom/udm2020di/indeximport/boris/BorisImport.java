@@ -219,11 +219,12 @@ public class BorisImport extends OracleImport {
         while (sitesResultSet.next()) {
             try {
                 startTime = System.currentTimeMillis();
-
+                ++i;
+                
                 String tmpStr = sitesResultSet.getNString("STANDORT_PK");
                 final String siteSrcPk = tmpStr;
                 if (log.isDebugEnabled()) {
-                    log.debug("processing BORIS Site #" + (++i) + ": " + siteSrcPk);
+                    log.debug("processing BORIS Site #" + (i) + ": " + siteSrcPk);
                 }
 
                 // key
@@ -264,6 +265,7 @@ public class BorisImport extends OracleImport {
                 // -> INSERT GEOM and GET ID!
                 final long siteGeomId = this.insertGeomPoint(siteRechtswert, siteHochwert, 31287, 4326);
                 if (siteGeomId == -1) {
+                    --i;
                     continue;
                 }
 
@@ -281,7 +283,7 @@ public class BorisImport extends OracleImport {
                         siteSrcPk,
                         null);
                 if (borisSiteId == -1) {
-                    i--;
+                    --i;
                     continue;
                 }
 
@@ -298,7 +300,7 @@ public class BorisImport extends OracleImport {
                 borisStandort.setAggregationValues(aggregationValues);
                 final Collection<Long> sampeValueIds = getAndInsertSampleValues(siteSrcPk, aggregationValues);
 
-                // site with at lest on supported sample value?
+                // site with at least on supported sample value?
                 if (!sampeValueIds.isEmpty()) {
                     this.insertSiteValuesRelation(borisSiteId, sampeValueIds);
                     this.insertBorisSiteTagsRelation(borisSiteId);
@@ -330,10 +332,10 @@ public class BorisImport extends OracleImport {
                     log.error("could not rollback target connection", sx);
                 }
 
-                i--;
+                --i;
             }
 
-            // test mode
+            // test mode:
             // break;
         }
         if (log.isDebugEnabled()) {
@@ -530,7 +532,7 @@ public class BorisImport extends OracleImport {
                 // SRC_CONTENT
                 // log.debug(srcContentJson);
                 this.insertSampleValues.setStringAtName("SRC_CONTENT", srcContentJson);
-                this.insertSampleValues.setString(8, srcContentJson);
+                //this.insertSampleValues.setString(8, srcContentJson);
 
                 // FIXME: Execute Batch does not work with large updates!!!!!
                 // this.insertSampleValues.addBatch();

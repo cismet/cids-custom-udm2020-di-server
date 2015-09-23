@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.cids.custom.udm2020di.indeximport.geom;
 
+import org.apache.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -130,17 +132,19 @@ public class BundeslaenderImport extends OracleImport {
      * @param  args  the command line arguments
      */
     public static void main(final String[] args) {
+        final Logger logger = Logger.getLogger(BundeslaenderImport.class);
+
         try {
-            log.info("Starting Bundesländer  Import");
+            logger.info("Starting Bundesländer  Import");
 
             final long startTime = System.currentTimeMillis();
             final BundeslaenderImport bundeslaenderImport = new BundeslaenderImport();
             final int i = bundeslaenderImport.doImport();
 
-            log.info(i + " Bundesländer successfully imported in "
+            logger.info(i + " Bundesländer successfully imported in "
                         + ((System.currentTimeMillis() - startTime) / 1000 / 60) + "m");
         } catch (Exception ex) {
-            BundeslaenderImport.log.error("could not perform Bundeslaender Import: "
+            logger.error("could not perform Bundeslaender Import: "
                         + ex.getMessage(), ex);
         }
     }

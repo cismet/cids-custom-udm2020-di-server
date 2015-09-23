@@ -7,7 +7,6 @@
 ****************************************************/
 package de.cismet.cids.custom.udm2020di.types.boris;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
@@ -18,7 +17,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
  * @version  $Revision$, $Date$
  */
 @JacksonXmlRootElement
-public class Standortparameter {
+public class Standortparameter implements Comparable<Standortparameter> {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -84,5 +83,15 @@ public class Standortparameter {
      */
     public void setWert(final String wert) {
         this.wert = wert;
+    }
+
+    @Override
+    public int compareTo(final Standortparameter standortparameter) {
+        return this.getName().compareTo(standortparameter.getName());
+    }
+
+    @Override
+    public String toString() {
+        return this.getName() + " = " + this.getWert();
     }
 }

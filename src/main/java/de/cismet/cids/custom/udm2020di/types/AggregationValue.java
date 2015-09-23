@@ -25,7 +25,7 @@ import java.util.Date;
  * @version  $Revision$, $Date$
  */
 @JacksonXmlRootElement
-public class AggregationValue {
+public class AggregationValue implements Comparable<AggregationValue> {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -182,5 +182,15 @@ public class AggregationValue {
      */
     public void setMaxValue(final float maxValue) {
         this.maxValue = maxValue;
+    }
+
+    @Override
+    public int compareTo(final AggregationValue aggregationValue) {
+        return this.getName().compareTo(aggregationValue.getName());
+    }
+
+    @Override
+    public String toString() {
+        return this.getName();
     }
 }

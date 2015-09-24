@@ -11,6 +11,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
+import de.cismet.cids.custom.udm2020di.types.boris.Probenparameter;
+import de.cismet.cids.custom.udm2020di.types.boris.Standortparameter;
+
 /**
  * DOCUMENT ME!
  *
@@ -18,7 +21,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
  * @version  $Revision$, $Date$
  */
 @JacksonXmlRootElement
-public class Tag {
+public class Tag implements Comparable<Tag> {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -150,5 +153,15 @@ public class Tag {
      */
     public void setName(final String name) {
         this.name = name;
+    }
+
+    @Override
+    public int compareTo(final Tag tag) {
+        return this.getName().compareTo(tag.getName());
+    }
+
+    @Override
+    public String toString() {
+        return this.getName();
     }
 }

@@ -12,11 +12,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import de.cismet.cids.custom.udm2020di.tools.FlexibleFloatDeserializer;
+import de.cismet.cids.custom.udm2020di.serializers.FlexibleFloatDeserializer;
 import de.cismet.cids.custom.udm2020di.types.AggregationValue;
 import de.cismet.cids.custom.udm2020di.types.Tag;
 
@@ -73,6 +74,9 @@ public class Standort {
     @JacksonXmlProperty(localName = "aggregationvalues")
     @JsonProperty("aggregationvalues")
     private List<AggregationValue> aggregationValues;
+
+    @JacksonXmlProperty
+    private List<String> proben;
 
     //~ Methods ----------------------------------------------------------------
 
@@ -236,6 +240,10 @@ public class Standort {
      */
     public void setProbenparameter(final List<Probenparameter> probenparameter) {
         this.probenparameter = probenparameter;
+
+        if ((this.probenparameter != null) && !this.probenparameter.isEmpty()) {
+            Collections.sort(this.probenparameter);
+        }
     }
 
     /**
@@ -254,6 +262,10 @@ public class Standort {
      */
     public void setTags(final List<Tag> tags) {
         this.tags = tags;
+
+        if ((this.tags != null) && !this.tags.isEmpty()) {
+            Collections.sort(this.tags);
+        }
     }
 
     /**
@@ -272,5 +284,31 @@ public class Standort {
      */
     public void setAggregationValues(final List<AggregationValue> aggregationValues) {
         this.aggregationValues = aggregationValues;
+
+        if ((this.aggregationValues != null) && !this.aggregationValues.isEmpty()) {
+            Collections.sort(this.aggregationValues);
+        }
+    }
+
+    /**
+     * Get the value of proben.
+     *
+     * @return  the value of proben
+     */
+    public List<String> getProben() {
+        return proben;
+    }
+
+    /**
+     * Set the value of proben.
+     *
+     * @param  proben  new value of proben
+     */
+    public void setProben(final List<String> proben) {
+        this.proben = proben;
+
+        if ((this.proben != null) && !this.proben.isEmpty()) {
+            Collections.sort(this.proben);
+        }
     }
 }

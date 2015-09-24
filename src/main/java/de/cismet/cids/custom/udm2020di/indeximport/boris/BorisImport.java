@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import oracle.jdbc.OraclePreparedStatement;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -82,6 +83,8 @@ public class BorisImport extends OracleImport {
      */
     public BorisImport(final InputStream propertiesFile) throws Exception {
         super(propertiesFile);
+        this.log = Logger.getLogger(BorisImport.class);
+
         getSitesStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/boris/select-boris-sites.prs.sql"),
                 "UTF-8");
@@ -220,7 +223,7 @@ public class BorisImport extends OracleImport {
             try {
                 startTime = System.currentTimeMillis();
                 ++i;
-                
+
                 String tmpStr = sitesResultSet.getNString("STANDORT_PK");
                 final String siteSrcPk = tmpStr;
                 if (log.isDebugEnabled()) {
@@ -532,7 +535,7 @@ public class BorisImport extends OracleImport {
                 // SRC_CONTENT
                 // log.debug(srcContentJson);
                 this.insertSampleValues.setStringAtName("SRC_CONTENT", srcContentJson);
-                //this.insertSampleValues.setString(8, srcContentJson);
+                // this.insertSampleValues.setString(8, srcContentJson);
 
                 // FIXME: Execute Batch does not work with large updates!!!!!
                 // this.insertSampleValues.addBatch();
@@ -648,11 +651,12 @@ public class BorisImport extends OracleImport {
      * @param  args  DOCUMENT ME!
      */
     public static void main(final String[] args) {
+        final Logger logger = Logger.getLogger(BorisImport.class);
         BorisImport borisImport = null;
         try {
             if (args.length > 0) {
-                if (log.isDebugEnabled()) {
-                    log.debug("loading BORIS properties from: " + args[0]);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("loading BORIS properties from: " + args[0]);
                 }
                 borisImport = new BorisImport(FileSystems.getDefault().getPath(args[0]));
             } else {
@@ -660,37 +664,37 @@ public class BorisImport extends OracleImport {
             }
 
             final long startTime = System.currentTimeMillis();
-            BorisImport.log.info("Starting BORIS Import ......");
+            logger.info("Starting BORIS Import ......");
 
             borisImport.doBootstrap();
             final int sites = borisImport.doImport();
 
-            BorisImport.log.info(sites + " BORIS Sites successfully imported in "
+            logger.info(sites + " BORIS Sites successfully imported in "
                         + ((System.currentTimeMillis() - startTime) / 1000 / 60) + "m");
         } catch (Exception ex) {
-            log.error("could not create BORIS import instance: " + ex.getMessage(), ex);
+            logger.error("could not create BORIS import instance: " + ex.getMessage(), ex);
         } finally {
             try {
                 if (borisImport != null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("closing source connection");
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("closing source connection");
                     }
                     borisImport.sourceConnection.close();
                 }
             } catch (SQLException ex) {
-                log.error("could not close source connection", ex);
+                logger.error("could not close source connection", ex);
                 System.exit(1);
             }
 
             try {
                 if (borisImport != null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("closing target connection");
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("closing target connection");
                     }
                     borisImport.targetConnection.close();
                 }
             } catch (SQLException ex) {
-                log.error("could not close target connection", ex);
+                logger.error("could not close target connection", ex);
                 System.exit(1);
             }
         }

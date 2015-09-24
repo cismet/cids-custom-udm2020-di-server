@@ -10,7 +10,6 @@ package de.cismet.cids.custom.udm2020di.serveractions.boris;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -48,6 +47,7 @@ public class BorisExportAction extends OracleExport implements ServerAction {
 
     //~ Static fields/initializers ---------------------------------------------
 
+    public static final String TASK_NAME = "borisExportAction";
     public static final String PARAM_STANDORTE = "standorte";
     public static final String PARAM_PARAMETER = "parameter";
 
@@ -162,7 +162,10 @@ public class BorisExportAction extends OracleExport implements ServerAction {
 
         for (int i = 1; i <= columnCount; i++) {
             final String columnName = metaData.getColumnName(i);
-            csvBuilder.append(columnName);
+            csvBuilder.append('\"');
+            csvBuilder.append(columnName.replace('\"', '\'').replace('\n', ' '));
+            csvBuilder.append('\"');
+
             if (i < columnCount) {
                 csvBuilder.append(", ");
             }
@@ -265,7 +268,7 @@ public class BorisExportAction extends OracleExport implements ServerAction {
 
     @Override
     public String getTaskName() {
-        return "borisExportAction";
+        return TASK_NAME;
     }
 
     /**

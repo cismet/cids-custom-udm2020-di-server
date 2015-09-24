@@ -11,7 +11,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import java.nio.file.Files;
@@ -19,18 +18,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import de.cismet.cids.custom.udm2020di.indeximport.boris.BorisImport;
-import de.cismet.cids.custom.udm2020di.indeximport.dataexport.OracleExport;
+import de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction;
 import de.cismet.cids.custom.udm2020di.types.Parameter;
 
 import de.cismet.cids.server.actions.ServerAction;
@@ -43,15 +39,13 @@ import de.cismet.cids.server.actions.ServerActionParameter;
  * @version  $Revision$, $Date$
  */
 @org.openide.util.lookup.ServiceProvider(service = ServerAction.class)
-public class BorisExportAction extends OracleExport implements ServerAction {
+public class BorisExportAction extends AbstractExportAction {
 
     //~ Static fields/initializers ---------------------------------------------
 
     public static final String TASK_NAME = "borisExportAction";
     public static final String PARAM_STANDORTE = "standorte";
     public static final String PARAM_PARAMETER = "parameter";
-
-    private static final Logger LOG = Logger.getLogger(BorisExportAction.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -68,7 +62,7 @@ public class BorisExportAction extends OracleExport implements ServerAction {
      * @throws  SQLException            DOCUMENT ME!
      */
     public BorisExportAction() throws IOException, ClassNotFoundException, SQLException {
-        super(BorisImport.class.getResourceAsStream("boris.properties"), false);
+        super(BorisImport.class.getResourceAsStream("boris.properties"));
         this.log = Logger.getLogger(BorisExportAction.class);
         log.info("new BorisExportAction created");
 
@@ -143,75 +137,6 @@ public class BorisExportAction extends OracleExport implements ServerAction {
         return exportBorisMesswerteStatement;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   resultSet  DOCUMENT ME!
-     * @param   zip        DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  SQLException  DOCUMENT ME!
-     * @throws  IOException   DOCUMENT ME!
-     */
-    protected Object createCsv(final ResultSet resultSet, final boolean zip) throws SQLException, IOException {
-        final ResultSetMetaData metaData = resultSet.getMetaData();
-        final StringBuilder csvBuilder = new StringBuilder();
-
-        final int columnCount = metaData.getColumnCount();
-
-        for (int i = 1; i <= columnCount; i++) {
-            final String columnName = metaData.getColumnName(i);
-            csvBuilder.append('\"');
-            csvBuilder.append(columnName.replace('\"', '\'').replace('\n', ' '));
-            csvBuilder.append('\"');
-
-            if (i < columnCount) {
-                csvBuilder.append(", ");
-            }
-        }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("CSV Header: " + csvBuilder.toString());
-        }
-        csvBuilder.append(System.getProperty("line.separator"));
-
-        int numResults = 0;
-        while (resultSet.next()) {
-            for (int i = 1; i <= columnCount; i++) {
-                final String value = resultSet.getString(i);
-                if ((value != null) && (value.length() > 0)) {
-                    csvBuilder.append('\"');
-                    csvBuilder.append(value.replace('\"', '\'').replace('\n', ' '));
-                    csvBuilder.append('\"');
-                }
-                if (i < columnCount) {
-                    csvBuilder.append(", ");
-                }
-            }
-            csvBuilder.append(System.getProperty("line.separator"));
-            numResults++;
-        }
-
-        LOG.info(numResults + " resources exported from Database");
-        resultSet.close();
-
-        if (zip) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("zipping output");
-            }
-            final ByteArrayOutputStream output = new ByteArrayOutputStream();
-            final ZipOutputStream zipStream = new ZipOutputStream(output);
-            zipStream.putNextEntry(new ZipEntry("boris-export.csv"));
-            zipStream.write(csvBuilder.toString().getBytes("UTF-8"));
-            zipStream.closeEntry();
-            zipStream.close();
-
-            return output.toByteArray();
-        } else {
-            return csvBuilder.toString();
-        }
-    }
-
     @Override
     public Object execute(final Object body, final ServerActionParameter... params) {
         Statement exportBorisMesswerteStatement = null;
@@ -221,12 +146,21 @@ public class BorisExportAction extends OracleExport implements ServerAction {
 
             Collection<String> standortPks = null;
             Collection<Parameter> parameters = null;
+            String exportFormat = PARAM_EXPORTFORMAT_CSV;
+            String name = "export";
 
             for (final ServerActionParameter param : params) {
                 if (param.getKey().equalsIgnoreCase(PARAM_STANDORTE)) {
                     standortPks = (Collection<String>)param.getValue();
                 } else if (param.getKey().equalsIgnoreCase(PARAM_PARAMETER)) {
                     parameters = (Collection<Parameter>)param.getValue();
+                } else if (param.getKey().equalsIgnoreCase(PARAM_EXPORTFORMAT)) {
+                    exportFormat = param.getValue().toString();
+                } else if (param.getKey().equalsIgnoreCase(PARAM_NAME)) {
+                    name = param.getValue().toString();
+                } else {
+                    log.warn("ignoring unsupported server action parameter: '"
+                                + param.getKey() + "' = '" + param.getValue() + "'!");
                 }
             }
 
@@ -236,7 +170,16 @@ public class BorisExportAction extends OracleExport implements ServerAction {
                 exportBorisMesswerteStatement = this.sourceConnection.createStatement();
                 exportBorisMesswerteResult = exportBorisMesswerteStatement.executeQuery(exportBorisMesswerte);
 
-                result = this.createCsv(exportBorisMesswerteResult, false);
+                if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_CSV)) {
+                    result = this.createCsv(exportBorisMesswerteResult, name, false);
+                } else if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_XLSX)) {
+                    result = this.createXlsx(exportBorisMesswerteResult, name);
+                } else {
+                    final String message = "unsupported export format '" + exportFormat + "'";
+                    log.error(message);
+                    throw new Exception(message);
+                }
+
                 exportBorisMesswerteStatement.close();
             } else {
                 log.error("no PARAM_STANDORTE and PARAM_PARAMETER server action parameters provided,"
@@ -245,7 +188,7 @@ public class BorisExportAction extends OracleExport implements ServerAction {
 
             return result;
         } catch (Exception ex) {
-            LOG.error(ex.getMessage(), ex);
+            log.error(ex.getMessage(), ex);
             if (exportBorisMesswerteResult != null) {
                 try {
                     exportBorisMesswerteResult.close();
@@ -289,17 +232,20 @@ public class BorisExportAction extends OracleExport implements ServerAction {
 
             final ServerActionParameter[] serverActionParameters = new ServerActionParameter[] {
                     new ServerActionParameter<Collection<String>>(PARAM_STANDORTE, standortPks),
-                    new ServerActionParameter<Collection<Parameter>>(PARAM_PARAMETER, parameter)
+                    new ServerActionParameter<Collection<Parameter>>(PARAM_PARAMETER, parameter),
+                    new ServerActionParameter<String>(PARAM_EXPORTFORMAT, PARAM_EXPORTFORMAT_XLSX),
+                    new ServerActionParameter<String>(PARAM_NAME, "testexport")
                 };
 
             BasicConfigurator.configure();
             final BorisExportAction borisExportAction = new BorisExportAction();
 
             final Object result = borisExportAction.execute(null, serverActionParameters);
-            final Path csvFile = Files.write(Paths.get("boris-export.csv"), result.toString().getBytes("UTF-8"));
+            // final Path csvFile = Files.write(Paths.get("boris-export.xlsx"), result.toString().getBytes("UTF-8"));
+            final Path file = Files.write(Paths.get("boris-export.xlsx"), (byte[])result);
             Logger.getLogger(BorisExportAction.class)
-                    .info("CSV Export written to "
-                        + csvFile.toAbsolutePath().toString());
+                    .info("Export File written to "
+                        + file.toAbsolutePath().toString());
         } catch (Throwable ex) {
             Logger.getLogger(BorisExportAction.class).fatal(ex.getMessage(), ex);
             System.exit(1);

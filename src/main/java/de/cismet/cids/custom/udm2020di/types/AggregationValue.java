@@ -12,11 +12,18 @@
  */
 package de.cismet.cids.custom.udm2020di.types;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
+import java.io.Serializable;
+
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * DOCUMENT ME!
@@ -25,7 +32,13 @@ import java.util.Date;
  * @version  $Revision$, $Date$
  */
 @JacksonXmlRootElement
-public class AggregationValue implements Comparable<AggregationValue> {
+public class AggregationValue implements Serializable, Cloneable, Comparable<AggregationValue> {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    @JsonIgnore
+    @XmlTransient
+    public static final Pattern UNIT_REGEX = Pattern.compile("(?<=\\[)[^\\[.]+?(?=\\])");
 
     //~ Instance fields --------------------------------------------------------
 
@@ -56,7 +69,78 @@ public class AggregationValue implements Comparable<AggregationValue> {
     @JsonProperty("maxvalue")
     private float maxValue;
 
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new AggregationValue object.
+     */
+    public AggregationValue() {
+    }
+
+    /**
+     * Creates a new AggregationValue object.
+     *
+     * @param  name               DOCUMENT ME!
+     * @param  pollutantKey       DOCUMENT ME!
+     * @param  pollutantgroupKey  DOCUMENT ME!
+     * @param  minDate            DOCUMENT ME!
+     * @param  maxDate            DOCUMENT ME!
+     * @param  minValue           DOCUMENT ME!
+     * @param  maxValue           DOCUMENT ME!
+     */
+    public AggregationValue(final String name,
+            final String pollutantKey,
+            final String pollutantgroupKey,
+            final Date minDate,
+            final Date maxDate,
+            final float minValue,
+            final float maxValue) {
+        this.name = name;
+        this.pollutantKey = pollutantKey;
+        this.pollutantgroupKey = pollutantgroupKey;
+        this.minDate = minDate;
+        this.maxDate = maxDate;
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+    }
+
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    @XmlTransient
+    @JsonIgnore
+    public String getPlainName() {
+        if (this.getName() != null) {
+            final int index = this.getName().indexOf('[');
+            if (index != -1) {
+                return this.getName().substring(0, index).trim();
+            }
+        }
+
+        return this.getName();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    @XmlTransient
+    @JsonIgnore
+    public String getUnit() {
+        if (this.getName() != null) {
+            final Matcher matcher = UNIT_REGEX.matcher(this.getName());
+            if (matcher.find()) {
+                return matcher.group();
+            }
+        }
+
+        return null;
+    }
 
     /**
      * DOCUMENT ME!
@@ -192,5 +276,17 @@ public class AggregationValue implements Comparable<AggregationValue> {
     @Override
     public String toString() {
         return this.getName();
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return new AggregationValue(
+                name,
+                pollutantKey,
+                pollutantgroupKey,
+                (minDate != null) ? (Date)minDate.clone() : null,
+                (maxDate != null) ? (Date)maxDate.clone() : null,
+                minValue,
+                maxValue);
     }
 }

@@ -17,6 +17,8 @@ import java.beans.PropertyChangeSupport;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlTransient;
+
 /**
  * DOCUMENT ME!
  *
@@ -58,6 +60,7 @@ public class Parameter implements Serializable, Comparable<Parameter> {
     private String parametergruppeName;
 
     @JsonIgnore
+    @XmlTransient
     private boolean selected;
 
     private final transient PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);

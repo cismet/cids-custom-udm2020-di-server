@@ -28,7 +28,7 @@ import java.sql.SQLException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import de.cismet.cids.custom.udm2020di.indeximport.dataexport.OracleExport;
+import de.cismet.cids.custom.udm2020di.dataexport.OracleExport;
 
 import de.cismet.cids.server.actions.ServerAction;
 

@@ -7,23 +7,44 @@
 ****************************************************/
 package de.cismet.cids.custom.udm2020di.serveractions.boris;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 
+import org.deegree.datatypes.Types;
+import org.deegree.datatypes.UnknownTypeException;
+import org.deegree.io.dbaseapi.DBaseException;
+import org.deegree.io.shpapi.shape_new.ShapeFile;
+import org.deegree.io.shpapi.shape_new.ShapeFileWriter;
+import org.deegree.model.feature.FeatureCollection;
+import org.deegree.model.spatialschema.GeometryException;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.zip.ZipOutputStream;
 
 import de.cismet.cids.custom.udm2020di.indeximport.boris.BorisImport;
 import de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction;
@@ -31,6 +52,12 @@ import de.cismet.cids.custom.udm2020di.types.Parameter;
 
 import de.cismet.cids.server.actions.ServerAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
+
+import de.cismet.cismap.commons.features.DefaultFeatureServiceFeature;
+import de.cismet.cismap.commons.features.FeatureServiceFeature;
+import de.cismet.cismap.commons.featureservice.DefaultLayerProperties;
+import de.cismet.cismap.commons.featureservice.FeatureServiceAttribute;
+import de.cismet.cismap.commons.tools.SimpleFeatureCollection;
 
 /**
  * DOCUMENT ME!
@@ -46,6 +73,7 @@ public class BorisExportAction extends AbstractExportAction {
     public static final String TASK_NAME = "borisExportAction";
     public static final String PARAM_STANDORTE = "standorte";
     public static final String PARAM_PARAMETER = "parameter";
+    public static final int BORIS_EPSG = 31287;
 
     //~ Instance fields --------------------------------------------------------
 
@@ -174,6 +202,8 @@ public class BorisExportAction extends AbstractExportAction {
                     result = this.createCsv(exportBorisMesswerteResult, name, false);
                 } else if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_XLSX)) {
                     result = this.createXlsx(exportBorisMesswerteResult, name);
+                } else if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_SHP)) {
+                    result = this.createShapeFile(exportBorisMesswerteResult, name);
                 } else {
                     final String message = "unsupported export format '" + exportFormat + "'";
                     log.error(message);
@@ -209,6 +239,131 @@ public class BorisExportAction extends AbstractExportAction {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   resultSet  DOCUMENT ME!
+     * @param   name       DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  SQLException          DOCUMENT ME!
+     * @throws  DBaseException        DOCUMENT ME!
+     * @throws  GeometryException     DOCUMENT ME!
+     * @throws  IOException           DOCUMENT ME!
+     * @throws  UnknownTypeException  org.deegree.datatypes.UnknownTypeException
+     * @throws  Exception             DOCUMENT ME!
+     */
+    protected byte[] createShapeFile(final ResultSet resultSet, final String name) throws SQLException,
+        DBaseException,
+        GeometryException,
+        IOException,
+        UnknownTypeException,
+        Exception {
+        final PrecisionModel precisionModel = new PrecisionModel(PrecisionModel.FLOATING);
+        final GeometryFactory geometryFactory = new GeometryFactory(precisionModel, BORIS_EPSG);
+        final ResultSetMetaData metaData = resultSet.getMetaData();
+
+        final int columnCount = metaData.getColumnCount();
+        final List<String[]> aliasAttributeList = new ArrayList<String[]>();
+        final Map<String, FeatureServiceAttribute> propertyTypesMap =
+            new LinkedHashMap<String, FeatureServiceAttribute>();
+
+        for (int columnNum = 1; columnNum <= columnCount; columnNum++) {
+            aliasAttributeList.add(
+                new String[] {
+                    metaData.getColumnLabel(columnNum),
+                    metaData.getColumnName(columnNum)
+                });
+
+            propertyTypesMap.put(
+                metaData.getColumnName(columnNum),
+                new FeatureServiceAttribute(
+                    metaData.getColumnName(columnNum),
+                    String.valueOf(Types.getTypeNameForSQLTypeCode(metaData.getColumnType(columnNum))),
+                    true));
+        }
+
+        aliasAttributeList.add(new String[] { "geom", "geom" });
+        propertyTypesMap.put(
+            "geom",
+            new FeatureServiceAttribute(
+                "geom",
+                String.valueOf(Types.GEOMETRY),
+                true));
+
+        final List<FeatureServiceFeature> featureList = new ArrayList<FeatureServiceFeature>();
+        int rowNum = 0;
+
+        while (resultSet.next()) {
+            rowNum++;
+
+            // final String STANDORT_PK = resultSet.getString("STANDORT_PK");
+            final float RECHTSWERT = resultSet.getFloat("RECHTSWERT");
+            final float HOCHWERT = resultSet.getFloat("HOCHWERT");
+            final String PROBE_PK = resultSet.getString("PROBE_PK");
+
+            int id;
+            try {
+                id = Integer.parseInt(PROBE_PK);
+            } catch (Exception ex) {
+                id = rowNum;
+            }
+
+            final Geometry geometry = geometryFactory.createPoint(new Coordinate(RECHTSWERT, HOCHWERT));
+            final FeatureServiceFeature feature = new DefaultFeatureServiceFeature(
+                    id,
+                    geometry,
+                    new DefaultLayerProperties());
+
+            for (int columnNum = 1; columnNum <= columnCount; columnNum++) {
+                feature.addProperty(metaData.getColumnName(columnNum), resultSet.getString(columnNum));
+            }
+
+            feature.addProperty("geom", geometry);
+            featureList.add(feature);
+        }
+
+        final FeatureCollection featureCollection = new SimpleFeatureCollection(
+                String.valueOf(System.currentTimeMillis()),
+                featureList.toArray(new FeatureServiceFeature[featureList.size()]),
+                aliasAttributeList,
+                propertyTypesMap);
+
+        final ShapeFile shapeFile = new ShapeFile(
+                featureCollection,
+                name);
+
+        final ByteArrayOutputStream output = new ByteArrayOutputStream();
+        final ZipOutputStream zipStream = new ZipOutputStream(output);
+        this.writeShapeFileToZip(featureCollection,
+            name,
+            new File(System.getProperty("java.io.tmpdir")),
+            zipStream);
+
+        return output.toByteArray();
+
+//        final ShapeFileWriter writer = new ShapeFileWriter(shapeFile);
+//        writer.write();
+//        return shapeFile;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   featureCollection  DOCUMENT ME!
+     * @param   shapeFileName      DOCUMENT ME!
+     * @param   tempDirectory      DOCUMENT ME!
+     * @param   zipStream          DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    protected void writeShapeFileToZip(final org.deegree.model.feature.FeatureCollection featureCollection,
+            final String shapeFileName,
+            final File tempDirectory,
+            final ZipOutputStream zipStream) throws Exception {
+    }
+
     @Override
     public String getTaskName() {
         return TASK_NAME;
@@ -221,7 +376,7 @@ public class BorisExportAction extends AbstractExportAction {
      */
     public static void main(final String[] args) {
         try {
-            final Collection<String> standortPks = Arrays.asList(new String[] { "1000066", "1000067" });
+            final Collection<String> standortPks = Arrays.asList(new String[] { "1000066", "1000067", "1000068" });
 
             final Collection<Parameter> parameter = Arrays.asList(
                     new Parameter[] {
@@ -233,19 +388,22 @@ public class BorisExportAction extends AbstractExportAction {
             final ServerActionParameter[] serverActionParameters = new ServerActionParameter[] {
                     new ServerActionParameter<Collection<String>>(PARAM_STANDORTE, standortPks),
                     new ServerActionParameter<Collection<Parameter>>(PARAM_PARAMETER, parameter),
-                    new ServerActionParameter<String>(PARAM_EXPORTFORMAT, PARAM_EXPORTFORMAT_XLSX),
-                    new ServerActionParameter<String>(PARAM_NAME, "testexport")
+                    new ServerActionParameter<String>(PARAM_EXPORTFORMAT, PARAM_EXPORTFORMAT_SHP),
+                    new ServerActionParameter<String>(PARAM_NAME, "terror")
                 };
 
-            BasicConfigurator.configure();
+            final ConsoleAppender consoleAppender = new ConsoleAppender();
+            consoleAppender.setThreshold(Priority.DEBUG);
+            BasicConfigurator.configure(consoleAppender);
             final BorisExportAction borisExportAction = new BorisExportAction();
 
             final Object result = borisExportAction.execute(null, serverActionParameters);
             // final Path csvFile = Files.write(Paths.get("boris-export.xlsx"), result.toString().getBytes("UTF-8"));
-            final Path file = Files.write(Paths.get("boris-export.xlsx"), (byte[])result);
-            Logger.getLogger(BorisExportAction.class)
-                    .info("Export File written to "
-                        + file.toAbsolutePath().toString());
+
+//            final Path file = Files.write(Paths.get("boris-export.xlsx"), (byte[])result);
+//            Logger.getLogger(BorisExportAction.class)
+//                    .info("Export File written to "
+//                        + file.toAbsolutePath().toString());
         } catch (Throwable ex) {
             Logger.getLogger(BorisExportAction.class).fatal(ex.getMessage(), ex);
             System.exit(1);

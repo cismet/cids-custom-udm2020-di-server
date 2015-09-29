@@ -52,7 +52,7 @@ import javax.management.MBeanException;
 import javax.management.MalformedObjectNameException;
 import javax.management.ReflectionException;
 
-import de.cismet.cids.custom.udm2020di.indeximport.dataexport.OracleExport;
+import de.cismet.cids.custom.udm2020di.dataexport.OracleExport;
 import de.cismet.cids.custom.udm2020di.serializers.ResultSetSerializer;
 
 /**

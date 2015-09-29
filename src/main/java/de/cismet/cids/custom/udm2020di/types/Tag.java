@@ -11,9 +11,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
-import de.cismet.cids.custom.udm2020di.types.boris.Probenparameter;
-import de.cismet.cids.custom.udm2020di.types.boris.Standortparameter;
-
 /**
  * DOCUMENT ME!
  *

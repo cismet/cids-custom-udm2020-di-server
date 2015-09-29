@@ -15,6 +15,8 @@ import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
+import java.math.BigDecimal;
+
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
@@ -112,11 +114,18 @@ public class BorisCustomSearch extends AbstractCidsServerSearch implements Custo
             }
         }
 
-        borisCustomSearchStatement = this.borisCustomSearchTpl.replace("%CLASS_ID%", String.valueOf(classId));
-        borisCustomSearchStatement = borisCustomSearchStatement.replace("%BORIS_SITE_IDS%", objectIdsBuilder);
+        borisCustomSearchStatement = this.borisCustomSearchTpl.replace(
+                "%CLASS_ID%",
+                String.valueOf(classId));
+        borisCustomSearchStatement = borisCustomSearchStatement.replace(
+                "%BORIS_SITE_IDS%",
+                objectIdsBuilder);
         borisCustomSearchStatement = borisCustomSearchStatement.replace(
                 "%MAX_SAMPLE_VALUE_CONDITIONS%",
                 maxValuesBuilder);
+        borisCustomSearchStatement = borisCustomSearchStatement.replace(
+                "%NUM_MAX_SAMPLE_VALUE_CONDITIONS%",
+                String.valueOf(maxValues.size()));
 
         return borisCustomSearchStatement;
     }
@@ -203,8 +212,8 @@ public class BorisCustomSearch extends AbstractCidsServerSearch implements Custo
                 final ArrayList<ArrayList> resultSet = metaService.performCustomSearch(borisCustomSearchStatement);
 
                 for (final ArrayList row : resultSet) {
-                    final int classID = (Integer)row.get(0);
-                    final int objectID = (Integer)row.get(1);
+                    final int classID = ((BigDecimal)row.get(0)).intValue();
+                    final int objectID = ((BigDecimal)row.get(1)).intValue();
                     final String name = (String)row.get(2);
 
                     final MetaObjectNode node = new MetaObjectNode(DOMAIN, objectID, classID, name);

@@ -5,7 +5,7 @@
 *              ... and it just works.
 *
 ****************************************************/
-package de.cismet.cids.custom.udm2020di.indeximport.dataexport;
+package de.cismet.cids.custom.udm2020di.dataexport;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;

@@ -10,7 +10,7 @@ package de.cismet.cids.custom.udm2020di.serversearch;
 import java.util.Collection;
 import java.util.Map;
 
-import de.cismet.cids.server.search.CidsServerSearch;
+import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 
 /**
  * DOCUMENT ME!
@@ -18,7 +18,7 @@ import de.cismet.cids.server.search.CidsServerSearch;
  * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
-public interface CustomMaxValuesSearch extends CidsServerSearch {
+public interface CustomMaxValuesSearch extends MetaObjectNodeServerSearch {
 
     //~ Methods ----------------------------------------------------------------
 
@@ -27,14 +27,14 @@ public interface CustomMaxValuesSearch extends CidsServerSearch {
      *
      * @return  the value of maxValues
      */
-    Map<String, Integer> getMaxValues();
+    Map<String, Float> getMaxValues();
 
     /**
      * Set the value of maxValues.
      *
      * @param  maxValues  new value of maxValues
      */
-    void setMaxValues(final Map<String, Integer> maxValues);
+    void setMaxValues(final Map<String, Float> maxValues);
     /**
      * Get the value of objectIds.
      *

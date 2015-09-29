@@ -40,11 +40,11 @@ public class BorisCustomSearch extends AbstractCidsServerSearch implements Custo
 
     protected static final String DOMAIN = "UDM2020-DI";
 
+    protected static final Logger log = Logger.getLogger(BorisCustomSearch.class);
+
     //~ Instance fields --------------------------------------------------------
 
-    protected Map<String, Integer> maxValues;
-
-    protected Logger log = Logger.getLogger(BorisCustomSearch.class);
+    protected Map<String, Float> maxValues;
 
     protected final String maxSampleValueConditionTpl;
     protected final String borisCustomSearchTpl;
@@ -61,14 +61,12 @@ public class BorisCustomSearch extends AbstractCidsServerSearch implements Custo
      * @throws  IOException  DOCUMENT ME!
      */
     public BorisCustomSearch() throws IOException {
-        this.log = Logger.getLogger(BorisCustomSearch.class);
-
         this.maxSampleValueConditionTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/serversearch/boris/max-sample-value-condition.tpl.sql"),
                 "UTF-8");
 
         this.borisCustomSearchTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/dataexport/boris/boris-custom-search.tpl.sql"),
+                    "/de/cismet/cids/custom/udm2020di/serversearch/boris/boris-custom-search.tpl.sql"),
                 "UTF-8");
     }
 
@@ -86,22 +84,22 @@ public class BorisCustomSearch extends AbstractCidsServerSearch implements Custo
     protected String createBorisCustomSearchStatement(
             final int classId,
             final Collection<Integer> objectIds,
-            final Map<String, Integer> maxValues) {
+            final Map<String, Float> maxValues) {
         String borisCustomSearchStatement;
 
         final StringBuilder objectIdsBuilder = new StringBuilder();
-        final Iterator<Integer> standortPksIterator = objectIds.iterator();
-        while (standortPksIterator.hasNext()) {
-            objectIdsBuilder.append('\'').append(standortPksIterator.next()).append('\'');
-            if (standortPksIterator.hasNext()) {
+        final Iterator<Integer> objectIdsIterator = objectIds.iterator();
+        while (objectIdsIterator.hasNext()) {
+            objectIdsBuilder.append('\'').append(objectIdsIterator.next()).append('\'');
+            if (objectIdsIterator.hasNext()) {
                 objectIdsBuilder.append(',');
             }
         }
 
         final StringBuilder maxValuesBuilder = new StringBuilder();
-        final Iterator<Entry<String, Integer>> maxValuesIterator = maxValues.entrySet().iterator();
+        final Iterator<Entry<String, Float>> maxValuesIterator = maxValues.entrySet().iterator();
         while (maxValuesIterator.hasNext()) {
-            final Entry<String, Integer> maxValue = maxValuesIterator.next();
+            final Entry<String, Float> maxValue = maxValuesIterator.next();
 
             String maxSampleValueConditionStatement;
             maxSampleValueConditionStatement = this.maxSampleValueConditionTpl.replace("%TAG_KEY%", maxValue.getKey());
@@ -115,6 +113,7 @@ public class BorisCustomSearch extends AbstractCidsServerSearch implements Custo
         }
 
         borisCustomSearchStatement = this.borisCustomSearchTpl.replace("%CLASS_ID%", String.valueOf(classId));
+        borisCustomSearchStatement = borisCustomSearchStatement.replace("%BORIS_SITE_IDS%", objectIdsBuilder);
         borisCustomSearchStatement = borisCustomSearchStatement.replace(
                 "%MAX_SAMPLE_VALUE_CONDITIONS%",
                 maxValuesBuilder);
@@ -128,7 +127,7 @@ public class BorisCustomSearch extends AbstractCidsServerSearch implements Custo
      * @return  the value of maxValues
      */
     @Override
-    public Map<String, Integer> getMaxValues() {
+    public Map<String, Float> getMaxValues() {
         return maxValues;
     }
 
@@ -138,7 +137,7 @@ public class BorisCustomSearch extends AbstractCidsServerSearch implements Custo
      * @param  maxValues  new value of maxValues
      */
     @Override
-    public void setMaxValues(final Map<String, Integer> maxValues) {
+    public void setMaxValues(final Map<String, Float> maxValues) {
         this.maxValues = maxValues;
     }
 

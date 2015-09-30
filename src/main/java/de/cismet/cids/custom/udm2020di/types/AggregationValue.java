@@ -69,6 +69,10 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
     @JsonProperty("maxvalue")
     private float maxValue;
 
+    @JacksonXmlProperty(localName = "unit")
+    @JsonProperty("unit")
+    private String unit;
+
     //~ Constructors -----------------------------------------------------------
 
     /**
@@ -81,6 +85,7 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
      * Creates a new AggregationValue object.
      *
      * @param  name               DOCUMENT ME!
+     * @param  unit               DOCUMENT ME!
      * @param  pollutantKey       DOCUMENT ME!
      * @param  pollutantgroupKey  DOCUMENT ME!
      * @param  minDate            DOCUMENT ME!
@@ -89,6 +94,7 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
      * @param  maxValue           DOCUMENT ME!
      */
     public AggregationValue(final String name,
+            final String unit,
             final String pollutantKey,
             final String pollutantgroupKey,
             final Date minDate,
@@ -96,6 +102,7 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
             final float minValue,
             final float maxValue) {
         this.name = name;
+        this.unit = unit;
         this.pollutantKey = pollutantKey;
         this.pollutantgroupKey = pollutantgroupKey;
         this.minDate = minDate;
@@ -106,6 +113,14 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
 
     //~ Methods ----------------------------------------------------------------
 
+    /**
+     * Set the value of unit.
+     *
+     * @param  unit  new value of unit
+     */
+    public void setUnit(final String unit) {
+        this.unit = unit;
+    }
     /**
      * DOCUMENT ME!
      *
@@ -129,17 +144,16 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
      *
      * @return  DOCUMENT ME!
      */
-    @XmlTransient
-    @JsonIgnore
     public String getUnit() {
-        if (this.getName() != null) {
-            final Matcher matcher = UNIT_REGEX.matcher(this.getName());
-            if (matcher.find()) {
-                return matcher.group();
+        if ((this.unit == null) || this.unit.isEmpty()) {
+            if ((this.getName() != null) && this.getName().isEmpty()) {
+                final Matcher matcher = UNIT_REGEX.matcher(this.getName());
+                if (matcher.find()) {
+                    this.unit = matcher.group();
+                }
             }
         }
-
-        return null;
+        return this.unit;
     }
 
     /**
@@ -280,13 +294,15 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
+        super.clone();
         return new AggregationValue(
-                name,
-                pollutantKey,
-                pollutantgroupKey,
-                (minDate != null) ? (Date)minDate.clone() : null,
-                (maxDate != null) ? (Date)maxDate.clone() : null,
-                minValue,
-                maxValue);
+                this.name,
+                this.getUnit(),
+                this.pollutantKey,
+                this.pollutantgroupKey,
+                (this.minDate != null) ? (Date)this.minDate.clone() : null,
+                (this.maxDate != null) ? (Date)this.maxDate.clone() : null,
+                this.minValue,
+                this.maxValue);
     }
 }

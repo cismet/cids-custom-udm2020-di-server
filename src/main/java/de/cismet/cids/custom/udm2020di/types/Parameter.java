@@ -17,6 +17,9 @@ import java.beans.PropertyChangeSupport;
 
 import java.io.Serializable;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
@@ -30,7 +33,13 @@ public class Parameter implements Serializable, Comparable<Parameter> {
 
     //~ Static fields/initializers ---------------------------------------------
 
+    @JsonIgnore
+    @XmlTransient
     public static final String PROP_SELECTED = "selected";
+
+    @JsonIgnore
+    @XmlTransient
+    public static final Pattern UNIT_REGEX = Pattern.compile("(?<=\\[)[^\\[.]+?(?=\\])");
 
     //~ Instance fields --------------------------------------------------------
 
@@ -58,6 +67,12 @@ public class Parameter implements Serializable, Comparable<Parameter> {
     )
     @JsonProperty("parametergruppename")
     private String parametergruppeName;
+    @JacksonXmlProperty(
+        isAttribute = true,
+        localName = "parametereinheit"
+    )
+    @JsonProperty("parametereinheit")
+    private String parameterEinheit;
 
     @JsonIgnore
     @XmlTransient
@@ -225,5 +240,47 @@ public class Parameter implements Serializable, Comparable<Parameter> {
     @Override
     public String toString() {
         return this.getParameterName();
+    }
+
+    /**
+     * Get the value of parameterEinheit.
+     *
+     * @return  the value of parameterEinheit
+     */
+    public String getParameterEinheit() {
+        if ((this.parameterEinheit == null) || this.parameterEinheit.isEmpty()) {
+            if ((this.getParameterName() != null) && this.getParameterName().isEmpty()) {
+                final Matcher matcher = UNIT_REGEX.matcher(this.getParameterName());
+                if (matcher.find()) {
+                    this.parameterEinheit = matcher.group();
+                }
+            }
+        }
+        return this.parameterEinheit;
+    }
+
+    /**
+     * Set the value of parameterEinheit.
+     *
+     * @param  parameterEinheit  new value of parameterEinheit
+     */
+    public void setParameterEinheit(final String parameterEinheit) {
+        this.parameterEinheit = parameterEinheit;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  ParameterName ohne Einheit.
+     */
+    @JsonIgnore
+    @XmlTransient
+    public String getParameterNamePlain() {
+        final String paramUnit = this.getParameterEinheit();
+        if ((paramUnit != null) && !paramUnit.isEmpty()) {
+            return this.getParameterName().replace(paramUnit, "").trim();
+        } else {
+            return this.getParameterName();
+        }
     }
 }

@@ -35,11 +35,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 import de.cismet.cids.custom.udm2020di.indeximport.OracleImport;
 import de.cismet.cids.custom.udm2020di.types.AggregationValue;
+import de.cismet.cids.custom.udm2020di.types.AggregationValues;
 import de.cismet.cids.custom.udm2020di.types.ParameterMapping;
+import de.cismet.cids.custom.udm2020di.types.ParameterMappings;
 import de.cismet.cids.custom.udm2020di.types.boris.Standort;
 
 /**
@@ -166,7 +171,7 @@ public class BorisImport extends OracleImport {
      * @throws  Exception  DOCUMENT ME!
      */
     public BorisImport(final Path propertiesFile) throws Exception {
-        this(Files.newInputStream(null, StandardOpenOption.READ));
+        this(Files.newInputStream(propertiesFile, StandardOpenOption.READ));
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -299,10 +304,12 @@ public class BorisImport extends OracleImport {
                         Standort.class);
 
                 // -> SAMPLE VALUES AND TAGS
-                final List<AggregationValue> aggregationValues = new ArrayList<AggregationValue>();
-                borisStandort.setAggregationValues(aggregationValues);
+                // AggregationValues -> collection impl. that stores only maximum/minimum values!
+                final Collection<AggregationValue> aggregationValues = new AggregationValues();
                 final Collection<Long> sampeValueIds = getAndInsertSampleValues(siteSrcPk, aggregationValues);
 
+                // set unique aggregation values
+                borisStandort.setAggregationValues(new ArrayList<AggregationValue>(aggregationValues));
                 // site with at least on supported sample value?
                 if (!sampeValueIds.isEmpty()) {
                     this.insertSiteValuesRelation(borisSiteId, sampeValueIds);
@@ -465,7 +472,7 @@ public class BorisImport extends OracleImport {
      * @throws  IOException   DOCUMENT ME!
      */
     protected Collection<Long> getAndInsertSampleValues(final String siteSrcPk,
-            final List<AggregationValue> aggregationValues) throws SQLException, IOException {
+            final Collection<AggregationValue> aggregationValues) throws SQLException, IOException {
         final Collection<Long> sampeValueIds = new HashSet<Long>();
         int i = 0;
         int added = 0;
@@ -479,7 +486,6 @@ public class BorisImport extends OracleImport {
             i++;
             if (this.parameterMappings.containsKey(PARAMETER_PK)) {
                 final AggregationValue aggregationValue = new AggregationValue();
-                aggregationValues.add(aggregationValue);
 
                 final ParameterMapping parameterMapping = this.parameterMappings.get(PARAMETER_PK);
                 // NAME
@@ -529,6 +535,9 @@ public class BorisImport extends OracleImport {
                 this.insertSampleValues.setFloatAtName("MAX_VALUE", maxValue);
                 aggregationValue.setMaxValue(maxValue);
                 // this.insertSampleValues.setFloat(7, sampleValuesResultSet.getFloat("MAX_VALUE"));
+
+                // fill the list and eliminate duplicates
+                aggregationValues.add(aggregationValue);
 
                 // FIXME: define POJOs
                 final String srcContentJson = this.xmlClobToJsonString(sampleValuesResultSet.getClob("MESSWERTE_XML"));
@@ -652,6 +661,20 @@ public class BorisImport extends OracleImport {
      */
     public static void main(final String[] args) {
         final Logger logger = Logger.getLogger(BorisImport.class);
+
+        final ScriptEngineManager manager = new ScriptEngineManager();
+        final ScriptEngine engine = manager.getEngineByName("js");
+        try {
+            final float x = 25.55f;
+            final Object result = engine.eval(x + "/4");
+            System.out.println(Float.valueOf(result.toString()));
+        } catch (ScriptException ex) {
+            logger.error(ex);
+            System.exit(1);
+        }
+
+        System.exit(0);
+
         BorisImport borisImport = null;
         try {
             if (args.length > 0) {

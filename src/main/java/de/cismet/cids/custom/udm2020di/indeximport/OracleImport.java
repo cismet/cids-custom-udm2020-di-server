@@ -7,53 +7,24 @@
 ****************************************************/
 package de.cismet.cids.custom.udm2020di.indeximport;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-
 import oracle.jdbc.OracleConnection;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 
-import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
-import java.util.Properties;
-import java.util.logging.LogManager;
-
-import javax.management.AttributeNotFoundException;
-import javax.management.InstanceNotFoundException;
-import javax.management.InvalidAttributeValueException;
-import javax.management.MBeanException;
-import javax.management.MalformedObjectNameException;
-import javax.management.ReflectionException;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 
 import de.cismet.cids.custom.udm2020di.dataexport.OracleExport;
-import de.cismet.cids.custom.udm2020di.serializers.ResultSetSerializer;
 
 /**
  * DOCUMENT ME!
@@ -63,11 +34,16 @@ import de.cismet.cids.custom.udm2020di.serializers.ResultSetSerializer;
  */
 public class OracleImport extends OracleExport {
 
+    //~ Static fields/initializers ---------------------------------------------
+
+    public static String EVAL_PARAM = "$messwert";
+
     //~ Instance fields --------------------------------------------------------
 
     protected Connection targetConnection = null;
     protected PreparedStatement insertUniqueTag = null;
     protected PreparedStatement insertGenericGeom = null;
+    protected final ScriptEngine engine;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -86,6 +62,9 @@ public class OracleImport extends OracleExport {
     {
         super(propertyFile, true);
         this.log = Logger.getLogger(OracleImport.class);
+
+        final ScriptEngineManager manager = new ScriptEngineManager();
+        this.engine = manager.getEngineByName("js");
 
         String targetJdbcDriver = null;
 
@@ -242,5 +221,29 @@ public class OracleImport extends OracleExport {
      */
     public final Connection getTargerConnection() {
         return targetConnection;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   aggregationValue  DOCUMENT ME!
+     * @param   expressionTpl     DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    protected float convertAggregationValue(final float aggregationValue, final String expressionTpl) {
+        if ((aggregationValue != 0) && (expressionTpl != null) && !expressionTpl.isEmpty()) {
+            final String expression = expressionTpl.replace(EVAL_PARAM, String.valueOf(aggregationValue));
+
+            try {
+                final Object result = this.engine.eval(expression);
+                final float convertedAggregationValue = Float.parseFloat(String.valueOf(result));
+                return convertedAggregationValue;
+            } catch (Throwable ex) {
+                log.error("could not evaluate expression '" + expression + "': " + ex.getMessage(), ex);
+            }
+        }
+
+        return aggregationValue;
     }
 }

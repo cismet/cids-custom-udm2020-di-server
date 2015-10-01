@@ -5,11 +5,6 @@
 *              ... and it just works.
 *
 ****************************************************/
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cismet.cids.custom.udm2020di.types;
 
 import java.util.AbstractCollection;
@@ -82,15 +77,17 @@ public class AggregationValues extends AbstractCollection<AggregationValue> {
         if (aggregationValues.containsKey(aggregationValue.getPollutantKey())) {
             final AggregationValue existingAggregationValue = aggregationValues.get(aggregationValue.getPollutantKey());
 
+            // set new max values and corresponding date of max value (not max date!)
             if (aggregationValue.getMaxValue() > existingAggregationValue.getMaxValue()) {
                 existingAggregationValue.setMaxValue(aggregationValue.getMaxValue());
                 existingAggregationValue.setMaxDate(aggregationValue.getMaxDate());
-                existingAggregationValue.setMinDate(aggregationValue.getMinDate());
+                // existingAggregationValue.setMinDate(aggregationValue.getMinDate());
             }
 
+            // set new min values and corresponding date of min value (not min date!)
             if (aggregationValue.getMinValue() < existingAggregationValue.getMinValue()) {
                 existingAggregationValue.setMinValue(aggregationValue.getMinValue());
-                existingAggregationValue.setMaxDate(aggregationValue.getMaxDate());
+                // existingAggregationValue.setMaxDate(aggregationValue.getMaxDate());
                 existingAggregationValue.setMinDate(aggregationValue.getMinDate());
             }
 
@@ -105,10 +102,11 @@ public class AggregationValues extends AbstractCollection<AggregationValue> {
                 new AggregationValue(
                     aggregationValue.getName(),
                     aggregationValue.getUnit(),
+                    aggregationValue.getProbePk(),
                     aggregationValue.getPollutantKey(),
                     aggregationValue.getPollutantgroupKey(),
-                    null,
-                    null,
+                    aggregationValue.getMinDate(),
+                    aggregationValue.getMaxDate(),
                     aggregationValue.getMinValue(),
                     aggregationValue.getMaxValue()));
             return true;

@@ -8,3 +8,4 @@ release.properties
 boris.properties
 *.log
 bundeslaender.properties
+/src/main/resources/de/cismet/cids/custom/udm2020di/indeximport/wa/

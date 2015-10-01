@@ -39,6 +39,10 @@ public class Parameter implements Serializable, Comparable<Parameter> {
 
     @JsonIgnore
     @XmlTransient
+    public static final char UNIT_SEPARATOR = '[';
+
+    @JsonIgnore
+    @XmlTransient
     public static final Pattern UNIT_REGEX = Pattern.compile("(?<=\\[)[^\\[.]+?(?=\\])");
 
     //~ Instance fields --------------------------------------------------------
@@ -249,7 +253,7 @@ public class Parameter implements Serializable, Comparable<Parameter> {
      */
     public String getParameterEinheit() {
         if ((this.parameterEinheit == null) || this.parameterEinheit.isEmpty()) {
-            if ((this.getParameterName() != null) && this.getParameterName().isEmpty()) {
+            if ((this.getParameterName() != null) && !this.getParameterName().isEmpty()) {
                 final Matcher matcher = UNIT_REGEX.matcher(this.getParameterName());
                 if (matcher.find()) {
                     this.parameterEinheit = matcher.group();
@@ -278,9 +282,16 @@ public class Parameter implements Serializable, Comparable<Parameter> {
     public String getParameterNamePlain() {
         final String paramUnit = this.getParameterEinheit();
         if ((paramUnit != null) && !paramUnit.isEmpty()) {
-            return this.getParameterName().replace(paramUnit, "").trim();
-        } else {
-            return this.getParameterName();
+            if ((this.getParameterName() != null) && !this.getParameterName().isEmpty()) {
+                final String tmpName = this.getParameterName().replace(paramUnit, "").trim();
+                final int index = tmpName.indexOf(UNIT_SEPARATOR);
+                if (index != -1) {
+                    return tmpName.substring(0, index).trim();
+                }
+                return tmpName;
+            }
         }
+
+        return this.getParameterName();
     }
 }

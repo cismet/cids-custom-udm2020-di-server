@@ -26,9 +26,15 @@ import org.deegree.io.shpapi.shape_new.ShapeFileWriter;
 import org.deegree.model.feature.FeatureCollection;
 import org.deegree.model.spatialschema.GeometryException;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -38,12 +44,13 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.Random;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import de.cismet.cids.custom.udm2020di.indeximport.boris.BorisImport;
@@ -330,10 +337,6 @@ public class BorisExportAction extends AbstractExportAction {
                 aliasAttributeList,
                 propertyTypesMap);
 
-        final ShapeFile shapeFile = new ShapeFile(
-                featureCollection,
-                name);
-
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
         final ZipOutputStream zipStream = new ZipOutputStream(output);
         this.writeShapeFileToZip(featureCollection,
@@ -341,27 +344,19 @@ public class BorisExportAction extends AbstractExportAction {
             new File(System.getProperty("java.io.tmpdir")),
             zipStream);
 
-        return output.toByteArray();
+        zipStream.flush();
+        zipStream.finish();
+
+        final byte[] result = output.toByteArray();
+
+        zipStream.close();
+        output.close();
+
+        return result;
 
 //        final ShapeFileWriter writer = new ShapeFileWriter(shapeFile);
 //        writer.write();
 //        return shapeFile;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   featureCollection  DOCUMENT ME!
-     * @param   shapeFileName      DOCUMENT ME!
-     * @param   tempDirectory      DOCUMENT ME!
-     * @param   zipStream          DOCUMENT ME!
-     *
-     * @throws  Exception  DOCUMENT ME!
-     */
-    protected void writeShapeFileToZip(final org.deegree.model.feature.FeatureCollection featureCollection,
-            final String shapeFileName,
-            final File tempDirectory,
-            final ZipOutputStream zipStream) throws Exception {
     }
 
     @Override
@@ -376,7 +371,8 @@ public class BorisExportAction extends AbstractExportAction {
      */
     public static void main(final String[] args) {
         try {
-            final Collection<String> standortPks = Arrays.asList(new String[] { "1000066", "1000067", "1000068" });
+            final Collection<String> standortPks = Arrays.asList(
+                    new String[] { "1000066", "1000067", "1000068", "1000069", "1000070", "1000071", "1000072" });
 
             final Collection<Parameter> parameter = Arrays.asList(
                     new Parameter[] {
@@ -389,24 +385,119 @@ public class BorisExportAction extends AbstractExportAction {
                     new ServerActionParameter<Collection<String>>(PARAM_STANDORTE, standortPks),
                     new ServerActionParameter<Collection<Parameter>>(PARAM_PARAMETER, parameter),
                     new ServerActionParameter<String>(PARAM_EXPORTFORMAT, PARAM_EXPORTFORMAT_SHP),
-                    new ServerActionParameter<String>(PARAM_NAME, "terror")
+                    new ServerActionParameter<String>(PARAM_NAME, "boris-shapexport")
                 };
 
-            final ConsoleAppender consoleAppender = new ConsoleAppender();
-            consoleAppender.setThreshold(Priority.DEBUG);
-            BasicConfigurator.configure(consoleAppender);
+            // final ConsoleAppender consoleAppender = new ConsoleAppender();
+            // consoleAppender.setThreshold(Priority.DEBUG);
+            // BasicConfigurator.configure(consoleAppender);
+            BasicConfigurator.configure();
             final BorisExportAction borisExportAction = new BorisExportAction();
 
             final Object result = borisExportAction.execute(null, serverActionParameters);
             // final Path csvFile = Files.write(Paths.get("boris-export.xlsx"), result.toString().getBytes("UTF-8"));
 
-//            final Path file = Files.write(Paths.get("boris-export.xlsx"), (byte[])result);
-//            Logger.getLogger(BorisExportAction.class)
-//                    .info("Export File written to "
-//                        + file.toAbsolutePath().toString());
+            final Path file = Files.write(Paths.get("boris-export.zip"), (byte[])result);
+            System.out.println("Export File written to "
+                        + file.toAbsolutePath().toString());
         } catch (Throwable ex) {
             Logger.getLogger(BorisExportAction.class).fatal(ex.getMessage(), ex);
             System.exit(1);
+        }
+    }
+
+    /**
+     * Creates a shape file with the given features and writes it to the given zip stream.
+     *
+     * @param   featureCollection  the content of the shape file
+     * @param   shapeFileName      the name of the shape file without extension
+     * @param   tempDirectory      a temporary directory that will be used to create the shape file
+     * @param   zipStream          the shape file will be written to this zip stream
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    protected void writeShapeFileToZip(final org.deegree.model.feature.FeatureCollection featureCollection,
+            final String shapeFileName,
+            final File tempDirectory,
+            final ZipOutputStream zipStream) throws Exception {
+        File tmpSubDirectory = null;
+
+        try {
+            String subDirName = null;
+            final String separator = System.getProperty("file.separator");
+            final Random rand = new Random(new Date().getTime());
+
+            do {
+                subDirName = "tmp" + rand.nextInt(Integer.MAX_VALUE);
+                tmpSubDirectory = new File(tempDirectory, subDirName);
+            } while (tmpSubDirectory.exists());
+
+            tmpSubDirectory.mkdirs();
+
+            final ShapeFile shape = new ShapeFile(
+                    featureCollection,
+                    tmpSubDirectory.getAbsoluteFile()
+                            + separator
+                            + shapeFileName);
+            final ShapeFileWriter writer = new ShapeFileWriter(shape);
+            writer.write();
+
+            zipDirectory(tmpSubDirectory, zipStream, "");
+        } finally {
+            if ((tmpSubDirectory != null) && tmpSubDirectory.exists()) {
+                deleteDirectory(tmpSubDirectory);
+            }
+        }
+    }
+
+    /**
+     * Deletes the given directory and its content.
+     *
+     * @param  dir  the directory to delete
+     */
+    private void deleteDirectory(final File dir) {
+        for (final File f : dir.listFiles()) {
+            if (f.isDirectory()) {
+                deleteDirectory(f);
+            } else {
+                f.delete();
+            }
+        }
+
+        dir.delete();
+    }
+
+    /**
+     * Creates a zip file that contains the content of the given directory.
+     *
+     * @param   inputDir  the directory that should be zipped
+     * @param   out       file the zip file that should be created
+     * @param   dirName   the current sub directory within the zip file
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    private void zipDirectory(final File inputDir, final ZipOutputStream out, final String dirName) throws Exception {
+        final int BYTES_ARRAY_LENGTH = 256;
+        final byte[] tmp = new byte[BYTES_ARRAY_LENGTH];
+        int byteCount;
+
+        for (final File f : inputDir.listFiles()) {
+            if (f.isDirectory()) {
+                zipDirectory(f, out, dirName + "/" + f.getName() + "/");
+            } else {
+                final ZipEntry entry = new ZipEntry(dirName + f.getName());
+                out.putNextEntry(entry);
+                final BufferedInputStream bis = new BufferedInputStream(new FileInputStream(f));
+
+                try {
+                    while ((byteCount = bis.read(tmp, 0, BYTES_ARRAY_LENGTH)) != -1) {
+                        out.write(tmp, 0, byteCount);
+                    }
+                } finally {
+                    out.closeEntry();
+                    bis.close();
+                }
+            }
         }
     }
 }

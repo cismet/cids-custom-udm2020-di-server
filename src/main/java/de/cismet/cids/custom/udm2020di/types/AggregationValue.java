@@ -38,7 +38,10 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
 
     @JsonIgnore
     @XmlTransient
-    public static final Pattern UNIT_REGEX = Pattern.compile("(?<=\\[)[^\\[.]+?(?=\\])");
+    public static final char UNIT_SEPARATOR = Parameter.UNIT_SEPARATOR;
+    @JsonIgnore
+    @XmlTransient
+    public static final Pattern UNIT_REGEX = Parameter.UNIT_REGEX;
 
     //~ Instance fields --------------------------------------------------------
 
@@ -73,6 +76,10 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
     @JsonProperty("unit")
     private String unit;
 
+    @JacksonXmlProperty(localName = "probepk")
+    @JsonProperty("probepk")
+    private String probePk;
+
     //~ Constructors -----------------------------------------------------------
 
     /**
@@ -86,6 +93,7 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
      *
      * @param  name               DOCUMENT ME!
      * @param  unit               DOCUMENT ME!
+     * @param  probePk            DOCUMENT ME!
      * @param  pollutantKey       DOCUMENT ME!
      * @param  pollutantgroupKey  DOCUMENT ME!
      * @param  minDate            DOCUMENT ME!
@@ -95,6 +103,7 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
      */
     public AggregationValue(final String name,
             final String unit,
+            final String probePk,
             final String pollutantKey,
             final String pollutantgroupKey,
             final Date minDate,
@@ -103,6 +112,7 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
             final float maxValue) {
         this.name = name;
         this.unit = unit;
+        this.probePk = probePk;
         this.pollutantKey = pollutantKey;
         this.pollutantgroupKey = pollutantgroupKey;
         this.minDate = minDate;
@@ -112,6 +122,24 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * Get the value of probePk.
+     *
+     * @return  the value of probePk
+     */
+    public String getProbePk() {
+        return probePk;
+    }
+
+    /**
+     * Set the value of probePk.
+     *
+     * @param  probePk  new value of probePk
+     */
+    public void setProbePk(final String probePk) {
+        this.probePk = probePk;
+    }
 
     /**
      * Set the value of unit.
@@ -129,13 +157,17 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
     @XmlTransient
     @JsonIgnore
     public String getPlainName() {
-        if (this.getName() != null) {
-            final int index = this.getName().indexOf('[');
-            if (index != -1) {
-                return this.getName().substring(0, index).trim();
+        final String paramUnit = this.getUnit();
+        if ((paramUnit != null) && !paramUnit.isEmpty()) {
+            if ((this.getName() != null) && !this.getName().isEmpty()) {
+                final String tmpName = this.getName().replace(paramUnit, "").trim();
+                final int index = tmpName.indexOf(UNIT_SEPARATOR);
+                if (index != -1) {
+                    return tmpName.substring(0, index).trim();
+                }
+                return tmpName;
             }
         }
-
         return this.getName();
     }
 
@@ -146,7 +178,7 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
      */
     public String getUnit() {
         if ((this.unit == null) || this.unit.isEmpty()) {
-            if ((this.getName() != null) && this.getName().isEmpty()) {
+            if ((this.getName() != null) && !this.getName().isEmpty()) {
                 final Matcher matcher = UNIT_REGEX.matcher(this.getName());
                 if (matcher.find()) {
                     this.unit = matcher.group();
@@ -298,6 +330,7 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
         return new AggregationValue(
                 this.name,
                 this.getUnit(),
+                this.probePk,
                 this.pollutantKey,
                 this.pollutantgroupKey,
                 (this.minDate != null) ? (Date)this.minDate.clone() : null,

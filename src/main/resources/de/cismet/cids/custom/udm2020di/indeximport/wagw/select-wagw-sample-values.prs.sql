@@ -1,30 +1,10 @@
-SELECT STANDORT_PK,
-  (case when PARAMETER_PK IN ('B424', 'B405') then 'B404' 
-        when PARAMETER_PK = 'B418' then 'B407'
-        when PARAMETER_PK = 'B440' then 'B430'
-        when PARAMETER_PK IN ('B442', 'B443', 'B444') then 'B432' 
-        when PARAMETER_PK = 'B444' then 'B433'
-        when PARAMETER_PK = 'B446' then 'B435'
-        when PARAMETER_PK IN ('B449','B450','B451','B452') then 'B437' 
-        when PARAMETER_PK IN ('B453', 'B454') then 'B438' 
-        when PARAMETER_PK IN ('B431','B441') then 'B455' 
-        when PARAMETER_PK IN ('B436','B447','B448') then 'B456' 
-        when PARAMETER_PK IN ('B467','B463','B464','B468','B465','B460','B461','B466','B46A') then 'B462' 
-        else PARAMETER_PK end) PARAMETER_PK,
-  --rtrim(xmlagg (xmlelement (e, PARAMETER_PK || ',')).extract ('//text()'), ',') PARAMETER_PKS,
-  --PROBEN_PKS,
+SELECT MESSSTELLE_PK,
+  PARAMETER_PK,
   MIN(MIN_DATE) AS MIN_DATE,
   MAX(MAX_DATE) AS MAX_DATE,
   MIN(MIN_VALUE) AS MIN_VALUE,
   MAX(MAX_VALUE) AS MAX_VALUE,
-  -- parameter specific normalisation computation
-  /*MIN(case when PARAMETER_PK = 'B434' then 0 
-      else MIN_VALUE end) AS MIN_VALUE,
-  MAX(case when PARAMETER_PK = 'B434' then 0 
-      else MAX_VALUE end) AS MAX_VALUE,*/
-  XMLSerialize(CONTENT XMLRoot(xmlelement("messwert", XMLATTRIBUTES(STANDORT_PK standortPk, PROBEN_PKS probenPks)
-    --xmlagg (xmlelement ("messwerte", XMLATTRIBUTES(PARAMETER_PK parameterPk, PARAMETER_NAME parameterName, 
-    --   MAX_DATE maxDate, MIN_DATE minDate, MIN_VALUE minValue, MAX_VALUE maxValue)))
+  XMLSerialize(CONTENT XMLRoot(xmlelement("messwert", XMLATTRIBUTES(MESSSTELLE_PK messstellePk, PROBEN_PKS probenPks)
     ), VERSION '1.0', STANDALONE YES)) MESSWERTE_XML
 FROM (SELECT DISTINCT T_BIS_STANDORT_D.PK AS STANDORT_PK,
           --T_BIS_MESSWERT_F.PK AS BIS_MESSWERT_FK,

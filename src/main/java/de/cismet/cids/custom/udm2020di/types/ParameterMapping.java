@@ -32,6 +32,10 @@ public class ParameterMapping {
     @JsonProperty("displayname")
     private String displayName;
 
+    @JacksonXmlProperty(localName = "unit")
+    @JsonProperty("unit")
+    private String unit;
+
     @JacksonXmlProperty(localName = "pollutanttagkey")
     @JsonProperty("pollutanttagkey")
     private String pollutantTagKey;
@@ -65,6 +69,24 @@ public class ParameterMapping {
     private String parameterAggregationExpression;
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * Get the value of unit.
+     *
+     * @return  the value of unit
+     */
+    public String getUnit() {
+        return unit;
+    }
+
+    /**
+     * Set the value of unit.
+     *
+     * @param  unit  new value of unit
+     */
+    public void setUnit(final String unit) {
+        this.unit = unit;
+    }
 
     /**
      * Get the value of parameterAggregationExpression.

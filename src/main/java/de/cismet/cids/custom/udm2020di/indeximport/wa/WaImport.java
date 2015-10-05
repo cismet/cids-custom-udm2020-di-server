@@ -33,15 +33,17 @@ import java.sql.Statement;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 import de.cismet.cids.custom.udm2020di.indeximport.OracleImport;
 import de.cismet.cids.custom.udm2020di.types.AggregationValue;
+import de.cismet.cids.custom.udm2020di.types.AggregationValues;
 import de.cismet.cids.custom.udm2020di.types.ParameterMapping;
 import de.cismet.cids.custom.udm2020di.types.ParameterMappings;
-import de.cismet.cids.custom.udm2020di.types.boris.Standort;
+import de.cismet.cids.custom.udm2020di.types.wa.GwMessstelle;
+import de.cismet.cids.custom.udm2020di.types.wa.Messstelle;
+import de.cismet.cids.custom.udm2020di.types.wa.OwMessstelle;
 
 /**
  * DOCUMENT ME!
@@ -61,13 +63,12 @@ public class WaImport extends OracleImport {
     protected final String waSource;
     protected final String getStationsQry;
     protected final PreparedStatement getSampleValuesStmnt;
-    protected final PreparedStatement insertStationStmnt;
+    protected final OraclePreparedStatement insertStationStmnt;
     protected final PreparedStatement deleteStationStmnt;
     protected final OraclePreparedStatement insertSampleValuesStmnt;
-    protected final PreparedStatement insertStationValuesRelStmnt;
-    protected final PreparedStatement insertStationTagsRelStmnt;
+    protected final OraclePreparedStatement insertStationTagsRelStmnt;
     protected final PreparedStatement getTagsStmnt;
-    protected final PreparedStatement updateStationJsonStmnt;
+    protected final OraclePreparedStatement updateStationJsonStmnt;
     protected final ParameterMappings parameterMappings = new ParameterMappings();
 
     //~ Constructors -----------------------------------------------------------
@@ -109,7 +110,7 @@ public class WaImport extends OracleImport {
                             + waSource
                             + "/select-"
                             + waSource
-                            + "-aggregated-sample-values.prs.sql"),
+                            + "-sample-values.prs.sql"),
                 "UTF-8");
 
         getSampleValuesStmnt = this.sourceConnection.prepareStatement(getAggregatedSampleValuesTpl);
@@ -119,16 +120,18 @@ public class WaImport extends OracleImport {
                             + waSource
                             + "/insert-"
                             + waSource
-                            + "-site.prs.sql"),
+                            + "-station.prs.sql"),
                 "UTF-8");
-        insertStationStmnt = this.targetConnection.prepareStatement(insertStationTpl, new String[] { "ID" });
+        insertStationStmnt = (OraclePreparedStatement)this.targetConnection.prepareStatement(
+                insertStationTpl,
+                new String[] { "ID" });
 
         final String deleteBorisStationTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/"
                             + waSource
                             + "/delete-"
                             + waSource
-                            + "-site.prs.sql"),
+                            + "-station.prs.sql"),
                 "UTF-8");
         deleteStationStmnt = this.targetConnection.prepareStatement(deleteBorisStationTpl);
 
@@ -137,24 +140,10 @@ public class WaImport extends OracleImport {
                             + waSource
                             + "/insert-"
                             + waSource
-                            + "-aggregated-sample-values.prs.sql"),
+                            + "-sample-values.prs.sql"),
                 "UTF-8");
         insertSampleValuesStmnt = (OraclePreparedStatement)this.targetConnection.prepareStatement(
                 insertSampleValuesTpl,
-                new String[] { "ID" });
-//        insertSampleValuesStmnt.setExecuteBatch(200);
-//        log.debug ("insertBorisSampleValues Statement Execute Batch Value " +
-//                   insertSampleValuesStmnt.getExecuteBatch());
-
-        final String insertStationSampleValuesRelTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/indeximport/"
-                            + waSource
-                            + "/insert-"
-                            + waSource
-                            + "-site-sample-values-relation.prs.sql"),
-                "UTF-8");
-        insertStationValuesRelStmnt = this.targetConnection.prepareStatement(
-                insertStationSampleValuesRelTpl,
                 new String[] { "ID" });
 
         final String insertStationTagsRelTpl = IOUtils.toString(this.getClass().getResourceAsStream(
@@ -162,9 +151,10 @@ public class WaImport extends OracleImport {
                             + waSource
                             + "/insert-"
                             + waSource
-                            + "-site-tags-relation.prs.sql"),
+                            + "-station-tags-relation.prs.sql"),
                 "UTF-8");
-        insertStationTagsRelStmnt = this.targetConnection.prepareStatement(insertStationTagsRelTpl);
+        insertStationTagsRelStmnt = (OraclePreparedStatement)this.targetConnection.prepareStatement(
+                insertStationTagsRelTpl);
 
         final String getTagsTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/serversearch/"
@@ -180,9 +170,10 @@ public class WaImport extends OracleImport {
                             + waSource
                             + "/update-"
                             + waSource
-                            + "-site-json.prs.sql"),
+                            + "-station-json.prs.sql"),
                 "UTF-8");
-        updateStationJsonStmnt = this.targetConnection.prepareStatement(updateStationJsonTpl);
+        updateStationJsonStmnt = (OraclePreparedStatement)this.targetConnection.prepareStatement(
+                updateStationJsonTpl);
 
         // load and cache mappings
         final String selectParameterMappingsTpl = IOUtils.toString(this.getClass().getResourceAsStream(
@@ -231,7 +222,7 @@ public class WaImport extends OracleImport {
      */
     public void doBootstrap() throws IOException, SQLException {
         if (log.isDebugEnabled()) {
-            log.debug("Cleaning and Bootstrapping " + this.waSource + " Tables");
+            log.debug("Cleaning and Bootstrapping " + this.waSource.toUpperCase() + " Tables");
         }
 
         final String truncateWaTablesTpl = IOUtils.toString(this.getClass().getResourceAsStream(
@@ -246,7 +237,7 @@ public class WaImport extends OracleImport {
         final String insertWaTaggroupsTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/"
                             + waSource
-                            + "/insert-"
+                            + "/bootstrap/insert-"
                             + waSource
                             + "-taggroups.sql"),
                 "UTF-8");
@@ -257,7 +248,7 @@ public class WaImport extends OracleImport {
         this.targetConnection.commit();
         insertWaTaggroups.close();
 
-        log.info("BORIS Tables successfully bootstrapped");
+        log.info(waSource + " Tables successfully bootstrapped");
     }
 
     /**
@@ -269,11 +260,11 @@ public class WaImport extends OracleImport {
      * @throws  IOException   DOCUMENT ME!
      */
     public int doImport() throws SQLException, IOException {
-        final Statement getWAGWStatement = this.sourceConnection.createStatement();
-        // getWAGWStatement.closeOnCompletion();
+        final Statement getStationsStmnt = this.sourceConnection.createStatement();
         long startTime = System.currentTimeMillis();
-        log.info("fetching " + this.waSource + " stations from Source Connection " + this.sourceConnection.getSchema());
-        final ResultSet stationsResultSet = getWAGWStatement.executeQuery(getStationsQry);
+        log.info("fetching " + this.waSource.toUpperCase() + " stations from Source Connection "
+                    + this.sourceConnection.getSchema());
+        final ResultSet stationsResultSet = getStationsStmnt.executeQuery(getStationsQry);
         if (log.isDebugEnabled()) {
             log.debug(this.waSource + " stations fetched in " + ((System.currentTimeMillis() - startTime) / 1000)
                         + "s");
@@ -285,109 +276,133 @@ public class WaImport extends OracleImport {
                 startTime = System.currentTimeMillis();
                 ++i;
 
-                String tmpStr = stationsResultSet.getNString("STANDORT_PK");
-                final String siteSrcPk = tmpStr;
+                String tmpStr = stationsResultSet.getNString("MESSSTELLE_PK");
+                final String stationSrcPk = tmpStr;
                 if (log.isDebugEnabled()) {
-                    log.debug("processing " + this.waSource + " Station #" + (i) + ": " + siteSrcPk);
+                    log.debug("processing " + this.waSource.toUpperCase() + " Station #" + (i) + ": " + stationSrcPk);
                 }
 
                 // key
-                final String siteKey = this.waSource + '.' + tmpStr;
+                final String stationKey = this.waSource.toUpperCase() + '.' + tmpStr;
 
-                tmpStr = stationsResultSet.getNString("STANDORTBEZEICHNUNG");
-                String siteName = ((tmpStr != null) && !tmpStr.isEmpty())
-                    ? tmpStr : stationsResultSet.getNString("STANDORTNUMMER");
-                siteName = ((siteName != null) && !siteName.isEmpty()) ? siteName
-                                                                       : stationsResultSet.getNString("STANDORT_PK");
+                tmpStr = stationsResultSet.getNString("MESSSTELLE_NAME");
+                final String stationName = ((tmpStr != null) && !tmpStr.isEmpty()) ? tmpStr : stationSrcPk;
+
                 // description
-                final String siteDescription = new StringBuilder().append("STANDORTBEZEICHNUNG: ")
-                            .append(stationsResultSet.getNString("STANDORTBEZEICHNUNG"))
+                final String stationDescription = new StringBuilder().append("MESSSTELLEN NAME: ")
+                            .append(stationName)
                             .append('\n')
-                            .append("STANDORTNUMMER: ")
-                            .append(stationsResultSet.getNString("STANDORTNUMMER"))
-                            .append('\n')
-                            .append("STANDORT PK in BORIS: ")
-                            .append(stationsResultSet.getNString("STANDORT_PK"))
+                            .append("MESSSTELLEN TYP: ")
+                            .append(stationsResultSet.getNString("MESSSTELLE_TYP"))
                             .append('\n')
                             .toString();
 
-                // INSITUT TAG for Catalogue
-                tmpStr = stationsResultSet.getNString("INSTITUT");
-                final String siteInstitutTagKey = Integer.toHexString(tmpStr.hashCode());
-                // -> INSERT INSTITUT TAG
-                this.insertUniqueTag(siteInstitutTagKey, tmpStr, tmpStr, "BORIS.INSTITUT");
+                // ZUSTAENDIGE_STELLE TAG for Catalogue
+                tmpStr = stationsResultSet.getNString("ZUSTAENDIGE_STELLE");
+                final String stationResponsiblePartyTagKey = Integer.toHexString(tmpStr.hashCode());
+                // -> INSERT ZUSTAENDIGE_STELLE TAG
+                this.insertUniqueTag(
+                    stationResponsiblePartyTagKey,
+                    tmpStr,
+                    tmpStr,
+                    this.waSource.toUpperCase()
+                            + ".ZUSTAENDIGE_STELLE");
 
-                // LITERATUR TAG for Catalogue
-                tmpStr = stationsResultSet.getNString("LITERATUR");
-                final String siteLiteraturTagKey = Integer.toHexString(tmpStr.hashCode());
-                // -> INSERT LITERATUR TAG
-                this.insertUniqueTag(siteLiteraturTagKey, tmpStr, tmpStr, "BORIS.LITERATUR");
+                final String stationWaterTagKey;
+                if (this.waSource.equalsIgnoreCase(WAGW)) {
+                    // GWK TAG for Catalogue
+                    tmpStr = stationsResultSet.getNString("GWK_NAME");
+                    stationWaterTagKey = Integer.toHexString(tmpStr.hashCode());
+                    // -> INSERT GWK TAG
+                    this.insertUniqueTag(stationWaterTagKey, tmpStr, tmpStr,
+                        this.waSource.toUpperCase()
+                                + ".GWK");
+                } else {
+                    // GWK GEWAESSER for Catalogue
+                    tmpStr = stationsResultSet.getNString("GEWAESSER_NAME");
+                    stationWaterTagKey = Integer.toHexString(tmpStr.hashCode());
+                    // -> INSERT GEWAESSER TAG
+                    this.insertUniqueTag(
+                        stationWaterTagKey,
+                        tmpStr,
+                        tmpStr,
+                        this.waSource.toUpperCase()
+                                + ".GEWAESSER");
+                }
 
                 // GEOM
-                final float siteHochwert = stationsResultSet.getFloat("HOCHWERT");     // X
-                final float siteRechtswert = stationsResultSet.getFloat("RECHTSWERT"); // Y
+                final float stationRechtswert = stationsResultSet.getFloat("XKOORDINATE"); // X
+                final float stationHochwert = stationsResultSet.getFloat("YKOORDINATE");   // Y
                 // -> INSERT GEOM and GET ID!
-                final long siteGeomId = this.insertGeomPoint(siteRechtswert, siteHochwert, 31287, 4326);
-                if (siteGeomId == -1) {
+                final long stationGeomId = this.insertGeomPoint(stationRechtswert, stationHochwert, 31287, 4326);
+                if (stationGeomId == -1) {
                     --i;
                     continue;
                 }
 
-                // SRC JSON CONTENT
-                // final String siteSrcContent = this.xmlClobToJsonString(stationsResultSet.getClob("STANDORT_XML"));
-
-                // -> INSERT SITE
-                final long borisStationId = insertStation(
-                        siteKey,
-                        siteName,
-                        siteDescription,
-                        siteInstitutTagKey,
-                        siteLiteraturTagKey,
-                        siteGeomId,
-                        siteSrcPk,
+                // -> INSERT STATION
+                final long waStationId = insertStation(
+                        stationKey,
+                        stationName,
+                        stationDescription,
+                        stationResponsiblePartyTagKey,
+                        stationWaterTagKey,
+                        stationGeomId,
+                        stationSrcPk,
                         null);
-                if (borisStationId == -1) {
+                if (waStationId == -1) {
                     --i;
                     continue;
                 }
 
                 // PARSE AND UPDATE JSON final ObjectNode jsonObject =
-                // (ObjectNode)XML_MAPPER.readTree(stationsResultSet.getClob("STANDORT_XML") .getCharacterStream());
-
-                final Standort borisStandort = XML_MAPPER.readValue(stationsResultSet.getClob("STANDORT_XML")
-                                .getCharacterStream(),
-                        Standort.class);
+                final Messstelle waMessstelle;
+                if (this.waSource.equalsIgnoreCase(WAGW)) {
+                    waMessstelle = XML_MAPPER.readValue(stationsResultSet.getClob("MESSSTELLE_XML")
+                                    .getCharacterStream(),
+                            GwMessstelle.class);
+                } else {
+                    waMessstelle = XML_MAPPER.readValue(stationsResultSet.getClob("MESSSTELLE_XML")
+                                    .getCharacterStream(),
+                            OwMessstelle.class);
+                }
 
                 // -> SAMPLE VALUES AND TAGS
-                final List<AggregationValue> aggregationValues = new ArrayList<AggregationValue>();
-                borisStandort.setAggregationValues(aggregationValues);
-                final Collection<Long> sampeValueIds = getAndInsertSampleValues(siteSrcPk, aggregationValues);
+                // AggregationValues -> collection impl. that stores only maximum/minimum values!
+                final Collection<AggregationValue> aggregationValues = new AggregationValues();
+                final Collection<Long> sampeValueIds = getAndInsertSampleValues(
+                        waStationId,
+                        stationSrcPk,
+                        aggregationValues);
 
-                // site with at least on supported sample value?
+                // set unique aggregation values
+                waMessstelle.setAggregationValues(new ArrayList<AggregationValue>(aggregationValues));
+
+                // station with at least on supported sample value?
                 if (!sampeValueIds.isEmpty()) {
-                    this.insertStationValuesRelation(borisStationId, sampeValueIds);
-                    this.insertBorisStationTagsRelation(borisStationId);
+                    this.insertWaStationTagsRelation(waStationId);
 
-                    final ObjectNode jsonObject = (ObjectNode)JSON_MAPPER.valueToTree(borisStandort);
-                    this.updateSrcJson(borisStationId, jsonObject);
+                    final ObjectNode jsonObject = (ObjectNode)JSON_MAPPER.valueToTree(waMessstelle);
+                    this.updateSrcJson(waStationId, jsonObject);
                 } else {
-                    log.warn("removing " + this.waSource + " Station #" + (--i) + " '" + siteSrcPk
+                    log.warn("removing " + this.waSource.toUpperCase() + " Station #" + (--i) + " '" + stationSrcPk
                                 + "': no supported sample values found!");
-                    this.deleteStationStmnt.setLong(1, borisStationId);
+                    this.deleteStationStmnt.setLong(1, waStationId);
                     this.deleteStationStmnt.executeUpdate();
                 }
 
-                // save the site
+                // save the station
                 this.targetConnection.commit();
 
                 if (log.isDebugEnabled()) {
-                    log.info(this.waSource + " Station #" + (i) + ": " + siteSrcPk
+                    log.info(this.waSource + " Station #" + (i) + ": " + stationSrcPk
                                 + " with " + sampeValueIds.size()
+                                + " sample values and " + aggregationValues.size()
                                 + " aggregated sample values processed and imported in "
-                                + (System.currentTimeMillis() - startTime) + "ms");
+                                + ((System.currentTimeMillis() - startTime) / 1000) + "s");
                 }
             } catch (Throwable t) {
-                log.error("rolling back " + this.waSource + " Station #" + (i) + ": "
+                log.error("rolling back " + this.waSource.toUpperCase() + " Station #" + (i) + ": "
                             + " due to error: " + t.getMessage(),
                     t);
                 try {
@@ -414,7 +429,6 @@ public class WaImport extends OracleImport {
         this.insertStationStmnt.close();
         this.deleteStationStmnt.close();
         this.insertSampleValuesStmnt.close();
-        this.insertStationValuesRelStmnt.close();
         this.insertStationTagsRelStmnt.close();
         this.updateStationJsonStmnt.close();
         this.getTagsStmnt.close();
@@ -428,39 +442,34 @@ public class WaImport extends OracleImport {
     /**
      * DOCUMENT ME!
      *
-     * @param   borisStationId  DOCUMENT ME!
-     * @param   jsonNode        DOCUMENT ME!
+     * @param   waStationId  DOCUMENT ME!
+     * @param   jsonNode     DOCUMENT ME!
      *
      * @throws  SQLException             DOCUMENT ME!
      * @throws  JsonProcessingException  DOCUMENT ME!
      * @throws  IOException              DOCUMENT ME!
      */
-    protected void updateSrcJson(final long borisStationId, final ObjectNode jsonNode) throws SQLException,
+    protected void updateSrcJson(final long waStationId, final ObjectNode jsonNode) throws SQLException,
         JsonProcessingException,
         IOException {
-        getTagsStmnt.setLong(1, borisStationId);
+        getTagsStmnt.setLong(1, waStationId);
         final ResultSet getTagsResult = getTagsStmnt.executeQuery();
 
         // put the resultset in a containing structure
         jsonNode.putPOJO("tags", getTagsResult);
 
         try {
-            // final String jsonString = this.JSON_MAPPER.writeValueAsString(jsonNode);
-            // updateStationJsonStmnt.setClob(1, new StringReader(jsonString));
-            // updateStationJsonStmnt.setString(1, jsonString);
-            // updateStationJsonStmnt.setCharacterStream(1, new StringReader(jsonString), jsonString.length());
-
             final Clob srcContentClob = this.targetConnection.createClob();
             final Writer clobWriter = srcContentClob.setCharacterStream(1);
             JSON_MAPPER.writeValue(clobWriter, jsonNode);
             updateStationJsonStmnt.setClob(1, srcContentClob);
-            updateStationJsonStmnt.setLong(2, borisStationId);
+            updateStationJsonStmnt.setLong(2, waStationId);
 
             updateStationJsonStmnt.executeUpdate();
             clobWriter.close();
         } catch (Exception ex) {
-            log.error("could not deserialize and update JSON of " + this.waSource + " Station "
-                        + borisStationId + ": " + ex.getMessage(),
+            log.error("could not deserialize and update JSON of " + this.waSource.toUpperCase() + " Station "
+                        + waStationId + ": " + ex.getMessage(),
                 ex);
             getTagsResult.close();
             throw ex;
@@ -468,22 +477,22 @@ public class WaImport extends OracleImport {
 
         getTagsResult.close();
         if (log.isDebugEnabled()) {
-            log.debug("JSON Content of " + this.waSource + " Station " + borisStationId + " successfully updated");
+            log.debug("JSON Content of " + this.waSource.toUpperCase() + " Station " + waStationId
+                        + " successfully updated");
         }
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param   borisStationId  DOCUMENT ME!
+     * @param   waStationId  DOCUMENT ME!
      *
      * @throws  SQLException  DOCUMENT ME!
      */
-    protected void insertBorisStationTagsRelation(final long borisStationId) throws SQLException {
-        this.insertStationTagsRelStmnt.setLong(1, borisStationId);
-        this.insertStationTagsRelStmnt.setLong(2, borisStationId);
-        this.insertStationTagsRelStmnt.setLong(3, borisStationId);
-        this.insertStationTagsRelStmnt.setLong(4, borisStationId);
+    protected void insertWaStationTagsRelation(final long waStationId) throws SQLException {
+        this.insertStationTagsRelStmnt.setLongAtName("STATION_ID", waStationId);
+        // this.insertStationTagsRelStmnt.setLong(2, waStationId); this.insertStationTagsRelStmnt.setLong(3,
+        // waStationId); this.insertStationTagsRelStmnt.setLong(4, waStationId);
 
         this.insertStationTagsRelStmnt.executeUpdate();
         if (log.isDebugEnabled()) {
@@ -494,30 +503,8 @@ public class WaImport extends OracleImport {
     /**
      * DOCUMENT ME!
      *
-     * @param   borisStationId  DOCUMENT ME!
-     * @param   sampeValueIds   DOCUMENT ME!
-     *
-     * @throws  SQLException  DOCUMENT ME!
-     */
-    protected void insertStationValuesRelation(final long borisStationId, final Collection<Long> sampeValueIds)
-            throws SQLException {
-        for (final long sampeValueId : sampeValueIds) {
-            this.insertStationValuesRelStmnt.setLong(1, borisStationId);
-            this.insertStationValuesRelStmnt.setLong(2, sampeValueId);
-            this.insertStationValuesRelStmnt.addBatch();
-        }
-
-        this.insertStationValuesRelStmnt.executeBatch();
-        if (log.isDebugEnabled()) {
-            // this.insertStationValuesRelStmnt.close();
-            log.debug(sampeValueIds.size() + " Station-Values-Relations created");
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   siteSrcPk          DOCUMENT ME!
+     * @param   waStationId        DOCUMENT ME!
+     * @param   stationSrcPk       DOCUMENT ME!
      * @param   aggregationValues  jsonObject DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
@@ -525,85 +512,85 @@ public class WaImport extends OracleImport {
      * @throws  SQLException  DOCUMENT ME!
      * @throws  IOException   DOCUMENT ME!
      */
-    protected Collection<Long> getAndInsertSampleValues(final String siteSrcPk,
-            final List<AggregationValue> aggregationValues) throws SQLException, IOException {
+    protected Collection<Long> getAndInsertSampleValues(final long waStationId,
+            final String stationSrcPk,
+            final Collection<AggregationValue> aggregationValues) throws SQLException, IOException {
+        final long currentTime = System.currentTimeMillis();
         final Collection<Long> sampeValueIds = new HashSet<Long>();
         int i = 0;
         int added = 0;
-
-        // <- GET AGGREGATED SAMPLE VALUES
-        this.getSampleValuesStmnt.setString(1, siteSrcPk);
+        if (log.isDebugEnabled()) {
+            // <- GET SAMPLE VALUES
+            log.debug("searching and inserting sample values for "
+                        + this.waSource.toUpperCase() + " station " + stationSrcPk);
+        }
+        this.getSampleValuesStmnt.setString(1, stationSrcPk);
         final ResultSet sampleValuesResultSet = this.getSampleValuesStmnt.executeQuery();
-        // build the batch insert statements
+        if (log.isDebugEnabled()) {
+            log.debug("sample values for " + this.waSource.toUpperCase() + " station "
+                        + stationSrcPk + " fetched in "
+                        + ((System.currentTimeMillis() - currentTime) / 1000) + "s.");
+        }
+
+        // insert statements
         while (sampleValuesResultSet.next()) {
             final String PARAMETER_PK = sampleValuesResultSet.getString("PARAMETER_PK");
             i++;
             if (this.parameterMappings.containsKey(PARAMETER_PK)) {
                 final AggregationValue aggregationValue = new AggregationValue();
-                aggregationValues.add(aggregationValue);
 
-                final ParameterMapping parameterMapping = this.parameterMappings.get(PARAMETER_PK);
+                // aggregation parameter mapping!
+                final ParameterMapping parameterMapping = this.parameterMappings.getAggregationMapping(PARAMETER_PK);
+
                 // NAME
                 // log.debug(mappedParameters[0]);
                 this.insertSampleValuesStmnt.setStringAtName("NAME", parameterMapping.getDisplayName());
                 aggregationValue.setName(parameterMapping.getDisplayName());
-                // this.insertSampleValuesStmnt.setString(1, mappedParameters[0]);
-// if (log.isDebugEnabled()) {
-// log.debug("["+added+"] " + mappedParameters[1]);
-// }
+
+                // STATION
+                this.insertSampleValuesStmnt.setLongAtName("STATION", waStationId);
+
                 // POLLUTANT
-                this.insertSampleValuesStmnt.setStringAtName("POLLUTANT", parameterMapping.getPollutantTagKey());
+                this.insertSampleValuesStmnt.setLongAtName(
+                    "POLLUTANT_ID",
+                    parameterMapping.getPollutantTagId());
                 aggregationValue.setPollutantKey(parameterMapping.getPollutantTagKey());
-                // this.insertSampleValuesStmnt.setString(2, mappedParameters[1]);
-// if (log.isDebugEnabled()) {
-// log.debug("["+added+"] " + mappedParameters[2]);
 // }
                 // POLLUTANT_GROUP
-                this.insertSampleValuesStmnt.setStringAtName(
-                    "POLLUTANT_GROUP",
-                    parameterMapping.getPollutantGroupKey());
+                this.insertSampleValuesStmnt.setLongAtName(
+                    "POLLUTANT_GROUP_ID",
+                    parameterMapping.getPollutantGroupTagId());
                 aggregationValue.setPollutantgroupKey(parameterMapping.getPollutantGroupKey());
                 // this.insertSampleValuesStmnt.setString(3, mappedParameters[2]);
-// if (log.isDebugEnabled()) {
-// log.debug("["+added+"] " + sampleValuesResultSet.getDate("MIN_DATE"));
-// }
-                final Date minDate = sampleValuesResultSet.getDate("MIN_DATE");
-                this.insertSampleValuesStmnt.setDateAtName("MIN_DATE", minDate);
-                aggregationValue.setMinDate(minDate);
-                // this.insertSampleValuesStmnt.setDate(4, sampleValuesResultSet.getDate("MIN_DATE")); if
-                // (log.isDebugEnabled()) { log.debug("["+added+"] " + sampleValuesResultSet.getDate("MAX_DATE")); }
 
-                final Date maxDate = sampleValuesResultSet.getDate("MAX_DATE");
-                this.insertSampleValuesStmnt.setDateAtName("MAX_DATE", maxDate);
-                aggregationValue.setMaxDate(maxDate);
+                final Date sampleDate = sampleValuesResultSet.getDate("SAMPLE_DATE");
+                // this.insertSampleValuesStmnt.setDateAtName("MIN_DATE", sampleDate);
+                aggregationValue.setMinDate(sampleDate);
+                this.insertSampleValuesStmnt.setDateAtName("MAX_DATE", sampleDate);
+                aggregationValue.setMaxDate(sampleDate);
 
-                // this.insertSampleValuesStmnt.setDate(5, sampleValuesResultSet.getDate("MAX_DATE"));
-// if (log.isDebugEnabled()) {
-// log.debug("["+added+"] " + sampleValuesResultSet.getFloat("MIN_VALUE"));
-// }
-                final float minValue = sampleValuesResultSet.getFloat("MIN_VALUE");
-                this.insertSampleValuesStmnt.setFloatAtName("MIN_VALUE", minValue);
-                aggregationValue.setMinValue(minValue);
-                // this.insertSampleValuesStmnt.setFloat(6, sampleValuesResultSet.getFloat("MIN_VALUE"));
-// if (log.isDebugEnabled()) {
-// log.debug("["+added+"] " + sampleValuesResultSet.getFloat("MAX_VALUE"));
-// }
-                final float maxValue = sampleValuesResultSet.getFloat("MAX_VALUE");
-                this.insertSampleValuesStmnt.setFloatAtName("MAX_VALUE", maxValue);
-                aggregationValue.setMaxValue(maxValue);
-                // this.insertSampleValuesStmnt.setFloat(7, sampleValuesResultSet.getFloat("MAX_VALUE"));
+                final float sampleValue = sampleValuesResultSet.getFloat("SAMPLE_VALUE");
+                // this.insertSampleValuesStmnt.setFloatAtName("MIN_VALUE", sampleValue);
+                aggregationValue.setMinValue(sampleValue);
+                this.insertSampleValuesStmnt.setFloatAtName("MAX_VALUE", sampleValue);
+                aggregationValue.setMaxValue(sampleValue);
 
-                // FIXME: define POJOs
-                final String srcContentJson = this.xmlClobToJsonString(sampleValuesResultSet.getClob("MESSWERTE_XML"));
+                aggregationValue.setProbePk(sampleValuesResultSet.getString("PROBE_PK"));
+                if ((parameterMapping.getUnit() != null) && !parameterMapping.getUnit().isEmpty()) {
+                    aggregationValue.setUnit(parameterMapping.getUnit());
+                }
+
+                // fill the list and eliminate duplicates
+                aggregationValues.add(aggregationValue);
+
+                // FIXME: define POJOs final String srcContentJson =
+                // this.xmlClobToJsonString(sampleValuesResultSet.getClob("MESSWERTE_XML"));
+
                 // SRC_CONTENT
-                // log.debug(srcContentJson);
-                this.insertSampleValuesStmnt.setStringAtName("SRC_CONTENT", srcContentJson);
-                // this.insertSampleValuesStmnt.setString(8, srcContentJson);
-
-                // FIXME: Execute Batch does not work with large updates!!!!!
-                // this.insertSampleValuesStmnt.addBatch();
+                // this.insertSampleValuesStmnt.setStringAtName("SRC_CONTENT", srcContentJson);
 
                 this.insertSampleValuesStmnt.executeUpdate();
+
                 final ResultSet generatedKeys = this.insertSampleValuesStmnt.getGeneratedKeys();
                 if ((null != generatedKeys)) {
                     while (generatedKeys.next()) {
@@ -612,8 +599,9 @@ public class WaImport extends OracleImport {
                     generatedKeys.close();
                     added++;
                 } else {
-                    log.error("could not fetch generated key for inserted samples values for " + this.waSource
-                                + " Station " + siteSrcPk);
+                    log.error("could not fetch generated key for inserted samples values for "
+                                + this.waSource.toUpperCase()
+                                + " Station " + stationSrcPk);
                 }
             }
         }
@@ -621,34 +609,16 @@ public class WaImport extends OracleImport {
         sampleValuesResultSet.close();
 
         if (added > 0) {
-// FIXME: Execute Batch does not work with large updates!!!!!
-//            if (log.isDebugEnabled()) {
-//                log.debug("adding " + added + " of " + i + " sample values for BORIS Station " + siteSrcPk);
-//            }
-//            this.insertSampleValuesStmnt.executeBatch();
-
-//            final ResultSet generatedKeys = this.insertSampleValuesStmnt.getGeneratedKeys();
-//            if ((null != generatedKeys)) {
-//                while (generatedKeys.next()) {
-//                    sampeValueIds.add(generatedKeys.getLong(1));
-//                }
-//                generatedKeys.close();
-//                if (log.isDebugEnabled()) {
-//                    log.debug(added + " of " + i + " sample values added for BORIS Station " + siteSrcPk
-//                    + ", " + sampeValueIds.size() + " IDs generated");
-//                }
-//            } else {
-//                log.error("could not fetch generated key for inserted samples values for BORIS SITE " + siteSrcPk);
-//            }
-
             if (log.isDebugEnabled()) {
-                log.debug(added + " of " + i + " sample values added for " + this.waSource + " Station " + siteSrcPk
-                            + ", " + sampeValueIds.size() + " IDs generated");
+                log.debug(added + " of " + i + " sample values added for " + this.waSource.toUpperCase() + " Station "
+                            + stationSrcPk
+                            + ", " + sampeValueIds.size() + " IDs generated in "
+                            + ((System.currentTimeMillis() - currentTime) / 1000) + "s.");
             }
         } else {
             log.warn("no supported sample values found in " + i + " available sample values for " + this.waSource
-                        + " SITE "
-                        + siteSrcPk);
+                        + " Station " + stationSrcPk + " in "
+                        + ((System.currentTimeMillis() - currentTime) / 1000) + "s.");
         }
 
         return sampeValueIds;
@@ -657,40 +627,41 @@ public class WaImport extends OracleImport {
     /**
      * DOCUMENT ME!
      *
-     * @param   siteKey              DOCUMENT ME!
-     * @param   siteName             DOCUMENT ME!
-     * @param   siteDescription      DOCUMENT ME!
-     * @param   siteLiteraturTagKey  DOCUMENT ME!
-     * @param   siteInstitutTagKey   DOCUMENT ME!
-     * @param   siteGeomId           DOCUMENT ME!
-     * @param   siteSrcPk            DOCUMENT ME!
-     * @param   siteSrcContent       DOCUMENT ME!
+     * @param   stationKey                     DOCUMENT ME!
+     * @param   stationName                    DOCUMENT ME!
+     * @param   stationDescription             DOCUMENT ME!
+     * @param   stationResponsiblePartyTagKey  DOCUMENT ME!
+     * @param   stationWaterTagKey             DOCUMENT ME!
+     * @param   stationGeomId                  DOCUMENT ME!
+     * @param   stationSrcPk                   DOCUMENT ME!
+     * @param   stationSrcContent              DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  SQLException  DOCUMENT ME!
      */
-    protected long insertStation(final String siteKey,
-            final String siteName,
-            final String siteDescription,
-            final String siteLiteraturTagKey,
-            final String siteInstitutTagKey,
-            final long siteGeomId,
-            final String siteSrcPk,
-            final String siteSrcContent) throws SQLException {
+    protected long insertStation(final String stationKey,
+            final String stationName,
+            final String stationDescription,
+            final String stationResponsiblePartyTagKey,
+            final String stationWaterTagKey,
+            final long stationGeomId,
+            final String stationSrcPk,
+            final String stationSrcContent) throws SQLException {
         if (log.isDebugEnabled()) {
-            log.debug("inserting " + this.waSource + " Station " + siteKey + ": '" + siteName + "'");
+            log.debug("inserting " + this.waSource.toUpperCase() + " Station " + stationKey + ": '" + stationName
+                        + "'");
         }
         final long startTime = System.currentTimeMillis();
 
-        this.insertStationStmnt.setString(1, siteKey);
-        this.insertStationStmnt.setString(2, siteName);
-        this.insertStationStmnt.setString(3, siteDescription);
-        this.insertStationStmnt.setLong(4, siteGeomId);
-        this.insertStationStmnt.setString(5, siteLiteraturTagKey);
-        this.insertStationStmnt.setString(6, siteInstitutTagKey);
-        this.insertStationStmnt.setString(7, siteSrcPk);
-        this.insertStationStmnt.setString(8, siteSrcContent);
+        this.insertStationStmnt.setStringAtName("KEY", stationKey);
+        this.insertStationStmnt.setStringAtName("NAME", stationName);
+        this.insertStationStmnt.setStringAtName("DESCRIPTION", stationDescription);
+        this.insertStationStmnt.setLongAtName("GEOMETRY", stationGeomId);
+        this.insertStationStmnt.setStringAtName("ZUSTAENDIGE_STELLE", stationResponsiblePartyTagKey);
+        this.insertStationStmnt.setStringAtName("GEW_NAME", stationWaterTagKey);
+        this.insertStationStmnt.setStringAtName("SRC_MESSSTELLE_PK", stationSrcPk);
+        this.insertStationStmnt.setStringAtName("SRC_CONTENT", stationSrcContent);
 
         this.insertStationStmnt.executeUpdate();
         final ResultSet generatedStationKeysRs = this.insertStationStmnt.getGeneratedKeys();
@@ -699,11 +670,11 @@ public class WaImport extends OracleImport {
         if ((null != generatedStationKeysRs) && generatedStationKeysRs.next()) {
             generatedKey = generatedStationKeysRs.getLong(1);
         } else {
-            log.error("could not fetch generated key for inserted " + this.waSource + " Station!");
+            log.error("could not fetch generated key for inserted " + this.waSource.toUpperCase() + " Station!");
         }
         if (log.isDebugEnabled()) {
-            // this.insertStationStmnt.close();
-            log.debug(this.waSource + " station " + siteKey + " inserted in " + (System.currentTimeMillis() - startTime)
+            log.debug(this.waSource + " Station " + stationKey + " inserted in "
+                        + (System.currentTimeMillis() - startTime)
                         + "ms, new ID is "
                         + generatedKey);
         }
@@ -718,35 +689,35 @@ public class WaImport extends OracleImport {
     public static void main(final String[] args) {
         final Logger logger = Logger.getLogger(WaImport.class);
         final String waSource = WAOW;
-        WaImport borisImport = null;
+        WaImport waImport = null;
         try {
             if (args.length > 0) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("loading " + waSource + " properties from: " + args[0]);
+                    logger.debug("loading " + waSource.toUpperCase() + " properties from: " + args[0]);
                 }
-                borisImport = new WaImport(FileSystems.getDefault().getPath(args[0]),
+                waImport = new WaImport(FileSystems.getDefault().getPath(args[0]),
                         waSource);
             } else {
-                borisImport = new WaImport(waSource);
+                waImport = new WaImport(waSource);
             }
 
             final long startTime = System.currentTimeMillis();
-            logger.info("Starting " + waSource + " Import ......");
+            logger.info("Starting " + waSource.toUpperCase() + " Import ......");
 
-            borisImport.doBootstrap();
-            final int stations = borisImport.doImport();
+            waImport.doBootstrap();
+            final int stations = waImport.doImport();
 
-            logger.info(stations + " " + waSource + " Stations successfully imported in "
+            logger.info(stations + " " + waSource.toUpperCase() + " Stations successfully imported in "
                         + ((System.currentTimeMillis() - startTime) / 1000 / 60) + "m");
         } catch (Exception ex) {
-            logger.error("could not create " + waSource + " import instance: " + ex.getMessage(), ex);
+            logger.error("could not create " + waSource.toUpperCase() + " import instance: " + ex.getMessage(), ex);
         } finally {
             try {
-                if (borisImport != null) {
+                if (waImport != null) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("closing source connection");
                     }
-                    borisImport.sourceConnection.close();
+                    waImport.sourceConnection.close();
                 }
             } catch (SQLException ex) {
                 logger.error("could not close source connection", ex);
@@ -754,11 +725,11 @@ public class WaImport extends OracleImport {
             }
 
             try {
-                if (borisImport != null) {
+                if (waImport != null) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("closing target connection");
                     }
-                    borisImport.targetConnection.close();
+                    waImport.targetConnection.close();
                 }
             } catch (SQLException ex) {
                 logger.error("could not close target connection", ex);

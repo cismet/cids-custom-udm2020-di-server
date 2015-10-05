@@ -12,9 +12,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 import de.cismet.cids.custom.udm2020di.serializers.FlexibleFloatDeserializer;
+import de.cismet.cids.custom.udm2020di.types.AggregationValue;
 
 /**
  * DOCUMENT ME!
@@ -70,7 +74,11 @@ public class Messstelle {
         using = FlexibleFloatDeserializer.class,
         as = float.class
     )
-    private Float yKoordinate;
+    private float yKoordinate;
+
+    @JacksonXmlProperty(localName = "aggregationvalues")
+    @JsonProperty("aggregationvalues")
+    private List<AggregationValue> aggregationValues;
 
     //~ Methods ----------------------------------------------------------------
 
@@ -90,6 +98,28 @@ public class Messstelle {
      */
     public void setName(final String name) {
         this.name = name;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public List<AggregationValue> getAggregationValues() {
+        return aggregationValues;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  aggregationValues  DOCUMENT ME!
+     */
+    public void setAggregationValues(final List<AggregationValue> aggregationValues) {
+        this.aggregationValues = aggregationValues;
+
+        if ((this.aggregationValues != null) && !this.aggregationValues.isEmpty()) {
+            Collections.sort(this.aggregationValues);
+        }
     }
 
     /**
@@ -205,7 +235,7 @@ public class Messstelle {
      *
      * @return  the value of yKoordinate
      */
-    public Float getyKoordinate() {
+    public float getyKoordinate() {
         return yKoordinate;
     }
 
@@ -214,7 +244,7 @@ public class Messstelle {
      *
      * @param  yKoordinate  new value of yKoordinate
      */
-    public void setyKoordinate(final Float yKoordinate) {
+    public void setyKoordinate(final float yKoordinate) {
         this.yKoordinate = yKoordinate;
     }
 }

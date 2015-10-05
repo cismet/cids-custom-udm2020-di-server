@@ -24,7 +24,7 @@ import de.cismet.cids.custom.udm2020di.serializers.FlexibleFloatDeserializer;
  */
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GwMesstelle extends Messstelle {
+public class GwMessstelle extends Messstelle {
 
     //~ Instance fields --------------------------------------------------------
 

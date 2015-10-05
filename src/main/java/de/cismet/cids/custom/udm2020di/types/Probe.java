@@ -25,7 +25,7 @@ public class Probe implements Comparable<Probe> {
 
     @Override
     public int compareTo(final Probe o) {
-        throw new UnsupportedOperationException("Not supported yet.");    // To change body of generated methods, choose
-                                                                          // Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 }

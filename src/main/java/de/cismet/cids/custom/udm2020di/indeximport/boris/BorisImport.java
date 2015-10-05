@@ -66,7 +66,7 @@ public class BorisImport extends OracleImport {
     protected final PreparedStatement insertSiteTagsRel;
     protected final PreparedStatement getTags;
     protected final PreparedStatement updateSiteJson;
-    protected final HashMap<String, ParameterMapping> parameterMappings = new HashMap<String, ParameterMapping>();
+    protected final ParameterMappings parameterMappings = new ParameterMappings();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -193,7 +193,7 @@ public class BorisImport extends OracleImport {
         this.executeBatchStatement(targetConnection, truncateBorisTablesTpl);
 
         final String insertBorisTaggroupsTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/indeximport/boris/insert-boris-taggroups.sql"),
+                    "/de/cismet/cids/custom/udm2020di/indeximport/boris/bootstrap/insert-boris-taggroups.sql"),
                 "UTF-8");
 
         final Statement insertBorisTaggroups = this.targetConnection.createStatement();
@@ -306,7 +306,10 @@ public class BorisImport extends OracleImport {
                 // -> SAMPLE VALUES AND TAGS
                 // AggregationValues -> collection impl. that stores only maximum/minimum values!
                 final Collection<AggregationValue> aggregationValues = new AggregationValues();
-                final Collection<Long> sampeValueIds = getAndInsertSampleValues(siteSrcPk, aggregationValues);
+                final Collection<Long> sampeValueIds = getAndInsertSampleValues(
+                        borisSiteId,
+                        siteSrcPk,
+                        aggregationValues);
 
                 // set unique aggregation values
                 borisStandort.setAggregationValues(new ArrayList<AggregationValue>(aggregationValues));
@@ -346,7 +349,7 @@ public class BorisImport extends OracleImport {
             }
 
             // test mode:
-            // break;
+            break;
         }
         if (log.isDebugEnabled()) {
             // clean up
@@ -463,6 +466,7 @@ public class BorisImport extends OracleImport {
     /**
      * DOCUMENT ME!
      *
+     * @param   borisSiteId        DOCUMENT ME!
      * @param   siteSrcPk          DOCUMENT ME!
      * @param   aggregationValues  jsonObject DOCUMENT ME!
      *
@@ -471,7 +475,8 @@ public class BorisImport extends OracleImport {
      * @throws  SQLException  DOCUMENT ME!
      * @throws  IOException   DOCUMENT ME!
      */
-    protected Collection<Long> getAndInsertSampleValues(final String siteSrcPk,
+    protected Collection<Long> getAndInsertSampleValues(final long borisSiteId,
+            final String siteSrcPk,
             final Collection<AggregationValue> aggregationValues) throws SQLException, IOException {
         final Collection<Long> sampeValueIds = new HashSet<Long>();
         int i = 0;
@@ -487,15 +492,19 @@ public class BorisImport extends OracleImport {
             if (this.parameterMappings.containsKey(PARAMETER_PK)) {
                 final AggregationValue aggregationValue = new AggregationValue();
 
-                final ParameterMapping parameterMapping = this.parameterMappings.get(PARAMETER_PK);
+                // aggregation parameter mapping!
+                final ParameterMapping parameterMapping = this.parameterMappings.getAggregationMapping(PARAMETER_PK);
+
                 // NAME
                 // log.debug(mappedParameters[0]);
                 this.insertSampleValues.setStringAtName("NAME", parameterMapping.getDisplayName());
                 aggregationValue.setName(parameterMapping.getDisplayName());
-                // this.insertSampleValues.setString(1, mappedParameters[0]);
-// if (log.isDebugEnabled()) {
-// log.debug("["+added+"] " + mappedParameters[1]);
-// }
+                // this.insertSampleValues.setString(1, mappedParameters[0]); if (log.isDebugEnabled()) {
+                // log.debug("["+added+"] " + mappedParameters[1]); }
+
+                // SITE
+                this.insertSampleValues.setLongAtName("SITE", borisSiteId);
+
                 // POLLUTANT
                 this.insertSampleValues.setStringAtName("POLLUTANT", parameterMapping.getPollutantTagKey());
                 aggregationValue.setPollutantKey(parameterMapping.getPollutantTagKey());
@@ -662,18 +671,18 @@ public class BorisImport extends OracleImport {
     public static void main(final String[] args) {
         final Logger logger = Logger.getLogger(BorisImport.class);
 
-        final ScriptEngineManager manager = new ScriptEngineManager();
-        final ScriptEngine engine = manager.getEngineByName("js");
-        try {
-            final float x = 25.55f;
-            final Object result = engine.eval(x + "/4");
-            System.out.println(Float.valueOf(result.toString()));
-        } catch (ScriptException ex) {
-            logger.error(ex);
-            System.exit(1);
-        }
-
-        System.exit(0);
+//        final ScriptEngineManager manager = new ScriptEngineManager();
+//        final ScriptEngine engine = manager.getEngineByName("js");
+//        try {
+//            final float x = 25.55f;
+//            final Object result = engine.eval(x + "/4");
+//            System.out.println(Float.valueOf(result.toString()));
+//        } catch (ScriptException ex) {
+//            logger.error(ex);
+//            System.exit(1);
+//        }
+//
+//        System.exit(0);
 
         BorisImport borisImport = null;
         try {

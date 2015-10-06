@@ -299,35 +299,43 @@ public class WaImport extends OracleImport {
 
                 // ZUSTAENDIGE_STELLE TAG for Catalogue
                 tmpStr = stationsResultSet.getNString("ZUSTAENDIGE_STELLE");
-                final String stationResponsiblePartyTagKey = Integer.toHexString(tmpStr.hashCode());
-                // -> INSERT ZUSTAENDIGE_STELLE TAG
-                this.insertUniqueTag(
-                    stationResponsiblePartyTagKey,
-                    tmpStr,
-                    tmpStr,
-                    this.waSource.toUpperCase()
-                            + ".ZUSTAENDIGE_STELLE");
+                String stationResponsiblePartyTagKey = null;
 
-                final String stationWaterTagKey;
+                if ((tmpStr != null) && !tmpStr.isEmpty()) {
+                    stationResponsiblePartyTagKey = Integer.toHexString(tmpStr.hashCode());
+                    // -> INSERT ZUSTAENDIGE_STELLE TAG
+                    this.insertUniqueTag(
+                        stationResponsiblePartyTagKey,
+                        tmpStr,
+                        tmpStr,
+                        this.waSource.toUpperCase()
+                                + ".ZUSTAENDIGE_STELLE");
+                }
+
+                String stationWaterTagKey = null;
                 if (this.waSource.equalsIgnoreCase(WAGW)) {
                     // GWK TAG for Catalogue
                     tmpStr = stationsResultSet.getNString("GWK_NAME");
-                    stationWaterTagKey = Integer.toHexString(tmpStr.hashCode());
-                    // -> INSERT GWK TAG
-                    this.insertUniqueTag(stationWaterTagKey, tmpStr, tmpStr,
-                        this.waSource.toUpperCase()
-                                + ".GWK");
+                    if ((tmpStr != null) && !tmpStr.isEmpty()) {
+                        stationWaterTagKey = Integer.toHexString(tmpStr.hashCode());
+                        // -> INSERT GWK TAG
+                        this.insertUniqueTag(stationWaterTagKey, tmpStr, tmpStr,
+                            this.waSource.toUpperCase()
+                                    + ".GWK");
+                    }
                 } else {
                     // GWK GEWAESSER for Catalogue
                     tmpStr = stationsResultSet.getNString("GEWAESSER_NAME");
-                    stationWaterTagKey = Integer.toHexString(tmpStr.hashCode());
-                    // -> INSERT GEWAESSER TAG
-                    this.insertUniqueTag(
-                        stationWaterTagKey,
-                        tmpStr,
-                        tmpStr,
-                        this.waSource.toUpperCase()
-                                + ".GEWAESSER");
+                    if ((tmpStr != null) && !tmpStr.isEmpty()) {
+                        stationWaterTagKey = Integer.toHexString(tmpStr.hashCode());
+                        // -> INSERT GEWAESSER TAG
+                        this.insertUniqueTag(
+                            stationWaterTagKey,
+                            tmpStr,
+                            tmpStr,
+                            this.waSource.toUpperCase()
+                                    + ".GEWAESSER");
+                    }
                 }
 
                 // GEOM

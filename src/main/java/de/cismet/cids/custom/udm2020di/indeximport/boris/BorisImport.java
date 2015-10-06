@@ -349,7 +349,7 @@ public class BorisImport extends OracleImport {
             }
 
             // test mode:
-            break;
+            // break;
         }
         if (log.isDebugEnabled()) {
             // clean up

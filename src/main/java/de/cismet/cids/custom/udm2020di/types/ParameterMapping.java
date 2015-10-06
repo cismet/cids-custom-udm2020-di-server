@@ -32,6 +32,10 @@ public class ParameterMapping {
     @JsonProperty("displayname")
     private String displayName;
 
+    @JacksonXmlProperty(localName = "unit")
+    @JsonProperty("unit")
+    private String unit;
+
     @JacksonXmlProperty(localName = "pollutanttagkey")
     @JsonProperty("pollutanttagkey")
     private String pollutantTagKey;
@@ -56,7 +60,69 @@ public class ParameterMapping {
     @JsonProperty("pollutantgrouptagname")
     private String pollutantGroupTagName;
 
+    @JacksonXmlProperty(localName = "parameteraggregationpk")
+    @JsonProperty("parameteraggregationpk")
+    private String parameterAggregationPk;
+
+    @JacksonXmlProperty(localName = "parameteraggregationexpression")
+    @JsonProperty("parameteraggregationexpression")
+    private String parameterAggregationExpression;
+
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * Get the value of unit.
+     *
+     * @return  the value of unit
+     */
+    public String getUnit() {
+        return unit;
+    }
+
+    /**
+     * Set the value of unit.
+     *
+     * @param  unit  new value of unit
+     */
+    public void setUnit(final String unit) {
+        this.unit = unit;
+    }
+
+    /**
+     * Get the value of parameterAggregationExpression.
+     *
+     * @return  the value of parameterAggregationExpression
+     */
+    public String getParameterAggregationExpression() {
+        return parameterAggregationExpression;
+    }
+
+    /**
+     * Set the value of parameterAggregationExpression.
+     *
+     * @param  parameterAggregationExpression  new value of parameterAggregationExpression
+     */
+    public void setParameterAggregationExpression(final String parameterAggregationExpression) {
+        this.parameterAggregationExpression = parameterAggregationExpression;
+    }
+
+    /**
+     * Get the value of parameterAggregationPk.
+     *
+     * @return  the value of parameterAggregationPk
+     */
+    public String getParameterAggregationPk() {
+        return parameterAggregationPk;
+    }
+
+    /**
+     * Set the value of parameterAggregationPk.
+     *
+     * @param  parameterAggregationPk  new value of parameterAggregationPk
+     */
+    public void setParameterAggregationPk(final String parameterAggregationPk) {
+        this.parameterAggregationPk = parameterAggregationPk;
+    }
 
     /**
      * Get the value of parameterPk.

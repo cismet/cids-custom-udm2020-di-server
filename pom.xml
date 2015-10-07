@@ -90,6 +90,12 @@
             <groupId>de.cismet.commons</groupId>
             <artifactId>oracle-11g-geometry-factory</artifactId>
             <version>1.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>de.cismet.commons</groupId>
+                    <artifactId>cismet-commons</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>de.cismet</groupId>

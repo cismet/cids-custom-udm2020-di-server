@@ -31,6 +31,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,8 +40,10 @@ import java.util.Map;
 import de.cismet.cids.custom.udm2020di.indeximport.OracleImport;
 import de.cismet.cids.custom.udm2020di.types.AggregationValue;
 import de.cismet.cids.custom.udm2020di.types.AggregationValues;
+import de.cismet.cids.custom.udm2020di.types.Parameter;
 import de.cismet.cids.custom.udm2020di.types.ParameterMapping;
 import de.cismet.cids.custom.udm2020di.types.ParameterMappings;
+import de.cismet.cids.custom.udm2020di.types.eprtr.Address;
 import de.cismet.cids.custom.udm2020di.types.eprtr.Installation;
 
 /**
@@ -54,9 +57,9 @@ public class EprtrImport extends OracleImport {
     //~ Instance fields --------------------------------------------------------
 
     protected final String getInstallationsStatementTpl;
-    protected final PreparedStatement getReleasesStmnt;
+    protected final OraclePreparedStatement getReleasesStmnt;
     protected final OraclePreparedStatement insertInstallationStmnt;
-    protected final PreparedStatement deleteInstallationStmnt;
+    protected final OraclePreparedStatement deleteInstallationStmnt;
     protected final OraclePreparedStatement insertReleaseStmnt;
     protected final OraclePreparedStatement insertInstallationTagsRelStmnt;
     protected final OraclePreparedStatement getTagsStnmt;
@@ -94,7 +97,8 @@ public class EprtrImport extends OracleImport {
                     "/de/cismet/cids/custom/udm2020di/indeximport/eprtr/select-eprtr-releases.prs.sql"),
                 "UTF-8");
 
-        getReleasesStmnt = this.sourceConnection.prepareStatement(getEprtrReleasesTpl);
+        getReleasesStmnt = (OraclePreparedStatement)this.sourceConnection.prepareStatement(
+                getEprtrReleasesTpl);
 
         final String insertEprtrInstallationTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/eprtr/insert-eprtr-installation.prs.sql"),
@@ -106,7 +110,8 @@ public class EprtrImport extends OracleImport {
         final String deleteEprtrInstallationTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/eprtr/delete-eprtr-installation.prs.sql"),
                 "UTF-8");
-        deleteInstallationStmnt = this.targetConnection.prepareStatement(deleteEprtrInstallationTpl);
+        deleteInstallationStmnt = (OraclePreparedStatement)this.targetConnection.prepareStatement(
+                deleteEprtrInstallationTpl);
 
         final String insertEprtrSampleValuesTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/eprtr/insert-eprtr-releases.prs.sql"),
@@ -265,7 +270,6 @@ public class EprtrImport extends OracleImport {
      */
     public int doImport() throws SQLException, IOException {
         final Statement getInstallationsStatement = this.sourceConnection.createStatement();
-        // getInstallationsStatement.closeOnCompletion();
         long startTime = System.currentTimeMillis();
         log.info("fetching EPRTR installations from Source Connection " + this.sourceConnection.getSchema());
         final ResultSet installationsResultSet = getInstallationsStatement.executeQuery(getInstallationsStatementTpl);
@@ -279,103 +283,99 @@ public class EprtrImport extends OracleImport {
                 startTime = System.currentTimeMillis();
                 ++i;
 
-                String tmpStr = installationsResultSet.getNString("STANDORT_PK");
-                final String installationSrcPk = tmpStr;
+                final long installationSrcPk = installationsResultSet.getLong("ERAS_ID");
                 if (log.isDebugEnabled()) {
                     log.debug("processing EPRTR Installation #" + (i) + ": " + installationSrcPk);
                 }
 
                 // key
-                final String installationKey = "EPRTR." + tmpStr;
+                final String installationKey = "EPRTR." + installationSrcPk;
 
-                tmpStr = installationsResultSet.getNString("STANDORTBEZEICHNUNG");
-                String installationName = ((tmpStr != null) && !tmpStr.isEmpty())
-                    ? tmpStr : installationsResultSet.getNString("STANDORTNUMMER");
-                installationName = ((installationName != null) && !installationName.isEmpty())
-                    ? installationName : installationsResultSet.getNString("STANDORT_PK");
+                String tmpStr = installationsResultSet.getNString("NAME");
+                final String installationName = ((tmpStr != null) && !tmpStr.isEmpty())
+                    ? tmpStr : String.valueOf(installationSrcPk);
                 // description
-                final String installationDescription = new StringBuilder().append("STANDORTBEZEICHNUNG: ")
-                            .append(installationsResultSet.getNString("STANDORTBEZEICHNUNG"))
-                            .append('\n')
-                            .append("STANDORTNUMMER: ")
-                            .append(installationsResultSet.getNString("STANDORTNUMMER"))
-                            .append('\n')
-                            .append("STANDORT PK in EPRTR: ")
-                            .append(installationsResultSet.getNString("STANDORT_PK"))
-                            .append('\n')
-                            .toString();
+                final String installationDescription = installationName;
 
-                // INSITUT TAG for Catalogue
-                tmpStr = installationsResultSet.getNString("INSTITUT");
-                final String installationInstitutTagKey = Integer.toHexString(tmpStr.hashCode());
-                // -> INSERT INSTITUT TAG
-                this.insertUniqueTag(installationInstitutTagKey, tmpStr, tmpStr, "EPRTR.INSTITUT");
+                // NACE CODE TAG for Catalogue
+                tmpStr = installationsResultSet.getNString("NACE_ID");
+                final String installationNaceTagKey = tmpStr;
+                final String installationNaceTagName = this.getReferenceValue(installationNaceTagKey);
+                // -> INSERT NACE TAG
+                this.insertUniqueTag(
+                    installationNaceTagKey,
+                    installationNaceTagName,
+                    installationNaceTagName,
+                    "k73nnukdrw9ipc");
 
-                // LITERATUR TAG for Catalogue
-                tmpStr = installationsResultSet.getNString("LITERATUR");
-                final String installationLiteraturTagKey = Integer.toHexString(tmpStr.hashCode());
-                // -> INSERT LITERATUR TAG
-                this.insertUniqueTag(installationLiteraturTagKey, tmpStr, tmpStr, "EPRTR.LITERATUR");
+                // RIVER_CATCHMENT TAG for Catalogue
+                tmpStr = installationsResultSet.getNString("RIVER_CATCHMENT");
+                final String installationCatchmentTagKey = tmpStr;
+                final String installationCatchmentTagName = this.getReferenceValue(installationCatchmentTagKey);
+                // -> INSERT RIVER_CATCHMENT TAG
+                this.insertUniqueTag(
+                    installationCatchmentTagKey,
+                    installationCatchmentTagName,
+                    installationNaceTagName,
+                    "6ear7vjaxz728j");
 
                 // GEOM
-                final float installationHochwert = installationsResultSet.getFloat("HOCHWERT");     // X
-                final float installationRechtswert = installationsResultSet.getFloat("RECHTSWERT"); // Y
+                final float installationLon = installationsResultSet.getFloat("LONGITUDE");
+                final float installationLat = installationsResultSet.getFloat("LATITUDE");
                 // -> INSERT GEOM and GET ID!
                 final long installationGeomId = this.insertGeomPoint(
-                        installationRechtswert,
-                        installationHochwert,
-                        31287,
+                        installationLon,
+                        installationLat,
+                        4326,
                         4326);
                 if (installationGeomId == -1) {
                     --i;
                     continue;
                 }
 
-                // SRC JSON CONTENT final String installationSrcContent =
-                // this.xmlClobToJsonString(installationsResultSet.getClob("STANDORT_XML"));
-
-                // -> INSERT SITE
+                // -> INSERT Installation
                 final long eprtrInstallationId = insertInstallation(
                         installationKey,
                         installationName,
                         installationDescription,
-                        installationInstitutTagKey,
-                        installationLiteraturTagKey,
+                        installationNaceTagKey,
+                        installationCatchmentTagKey,
                         installationGeomId,
-                        installationSrcPk,
-                        null);
+                        installationSrcPk);
                 if (eprtrInstallationId == -1) {
                     --i;
                     continue;
                 }
 
-                // PARSE AND UPDATE JSON final ObjectNode jsonObject =
-                // (ObjectNode)XML_MAPPER.readTree(installationsResultSet.getClob("STANDORT_XML")
-                // .getCharacterStream());
-
                 final Installation eprtrInstallation = XML_MAPPER.readValue(installationsResultSet.getClob(
-                            "STANDORT_XML").getCharacterStream(),
+                            "INSTALLATION_XML").getCharacterStream(),
                         Installation.class);
+                this.updateInstallationReferenceValues(eprtrInstallation);
 
                 // -> SAMPLE VALUES AND TAGS
                 // AggregationValues -> collection impl. that stores only maximum/minimum values!
                 final Collection<AggregationValue> aggregationValues = new AggregationValues();
-                final Collection<Long> releaseIds = getAndInsertSampleValues(
+                final Collection<Long> releaseIds = getAndInsertReleases(
                         eprtrInstallationId,
                         installationSrcPk,
                         aggregationValues);
 
-                // set unique aggregation values FIXME:       eprtrInstallation.setAggregationValues(new
-                // ArrayList<AggregationValue>(aggregationValues)); installation with at least on supported sample
-                // value?
+                // set unique aggregation values
+                eprtrInstallation.setAggregationValues(new ArrayList<AggregationValue>(aggregationValues));
+
                 if (!releaseIds.isEmpty()) {
                     this.insertEprtrInstallationTagsRelation(eprtrInstallationId);
 
-                    final ObjectNode jsonObject = (ObjectNode)JSON_MAPPER.valueToTree(eprtrInstallation);
-                    this.updateSrcJson(eprtrInstallationId, jsonObject);
+                    final ObjectNode jsonObject 
+                            = (ObjectNode)JSON_MAPPER.valueToTree(eprtrInstallation);
+                    final ObjectNode jsonObjectConfidential 
+                            = (ObjectNode)JSON_MAPPER.valueToTree(
+                                    this.inferRestrictedActivities(eprtrInstallation));
+
+                    this.updateSrcJson(eprtrInstallationId, jsonObject, jsonObjectConfidential);
                 } else {
                     log.warn("removing EPRTR Installation #" + (--i) + " '" + installationSrcPk
-                                + "': no supported sample values found!");
+                                + "': no supported releases found!");
                     this.deleteInstallationStmnt.setLong(1, eprtrInstallationId);
                     this.deleteInstallationStmnt.executeUpdate();
 
@@ -391,7 +391,7 @@ public class EprtrImport extends OracleImport {
                 if (log.isDebugEnabled()) {
                     log.info("EPRTR Installation #" + (i) + ": " + installationSrcPk
                                 + " with " + releaseIds.size()
-                                + " aggregated sample values processed and imported in "
+                                + " aggregated releases processed and imported in "
                                 + (System.currentTimeMillis() - startTime) + "ms");
                 }
             } catch (Throwable t) {
@@ -429,6 +429,11 @@ public class EprtrImport extends OracleImport {
 
         return i;
     }
+    
+    // TODO
+    protected Installation inferRestrictedActivities(final Installation installation) {
+        return installation;
+    }
 
     /**
      * DOCUMENT ME!
@@ -440,31 +445,37 @@ public class EprtrImport extends OracleImport {
      * @throws  JsonProcessingException  DOCUMENT ME!
      * @throws  IOException              DOCUMENT ME!
      */
-    protected void updateSrcJson(final long eprtrInstallationId, final ObjectNode jsonNode) throws SQLException,
+    protected void updateSrcJson(
+            final long eprtrInstallationId, 
+            final ObjectNode jsonNode, 
+            final ObjectNode jsonObjectConfidential) throws SQLException,
         JsonProcessingException,
         IOException {
-        getTagsStnmt.setLong(1, eprtrInstallationId);
+        getTagsStnmt.setLongAtName("INSTALLATION_ID", eprtrInstallationId);
         final ResultSet getTagsResult = getTagsStnmt.executeQuery();
 
         // put the resultset in a containing structure
         jsonNode.putPOJO("tags", getTagsResult);
 
         try {
-            // final String jsonString = this.JSON_MAPPER.writeValueAsString(jsonNode);
-            // updateInstallationJson.setClob(1, new StringReader(jsonString));
-            // updateInstallationJson.setString(1, jsonString);
-            // updateInstallationJson.setCharacterStream(1, new StringReader(jsonString), jsonString.length());
-
             final Clob srcContentClob = this.targetConnection.createClob();
             final Writer clobWriter = srcContentClob.setCharacterStream(1);
             JSON_MAPPER.writeValue(clobWriter, jsonNode);
+            
+            final Clob srcContentConfidentialClob = this.targetConnection.createClob();
+            final Writer clobConfidentialWriter = srcContentConfidentialClob.setCharacterStream(1);
+            JSON_MAPPER.writeValue(clobConfidentialWriter, jsonObjectConfidential);
+            
             updateInstallationJsonStnmt.setClob(1, srcContentClob);
-            updateInstallationJsonStnmt.setLong(2, eprtrInstallationId);
+            updateInstallationJsonStnmt.setClob(2, srcContentConfidentialClob);
+            updateInstallationJsonStnmt.setLong(3, eprtrInstallationId);
 
             updateInstallationJsonStnmt.executeUpdate();
+            
             clobWriter.close();
+            clobConfidentialWriter.close();
         } catch (Exception ex) {
-            log.error("could not deserialize and update JSON of Eprtr Installation "
+            log.error("could not deserialize and update JSON of EPRTR Installation "
                         + eprtrInstallationId + ": " + ex.getMessage(),
                 ex);
             getTagsResult.close();
@@ -485,11 +496,7 @@ public class EprtrImport extends OracleImport {
      * @throws  SQLException  DOCUMENT ME!
      */
     protected void insertEprtrInstallationTagsRelation(final long eprtrInstallationId) throws SQLException {
-        this.insertInstallationTagsRelStmnt.setLong(1, eprtrInstallationId);
-        this.insertInstallationTagsRelStmnt.setLong(2, eprtrInstallationId);
-        this.insertInstallationTagsRelStmnt.setLong(3, eprtrInstallationId);
-        this.insertInstallationTagsRelStmnt.setLong(4, eprtrInstallationId);
-
+        this.insertInstallationTagsRelStmnt.setLongAtName("STATION_ID", eprtrInstallationId);
         this.insertInstallationTagsRelStmnt.executeUpdate();
         if (log.isDebugEnabled()) {
             log.debug("InstallationTagsRelation created");
@@ -508,88 +515,77 @@ public class EprtrImport extends OracleImport {
      * @throws  SQLException  DOCUMENT ME!
      * @throws  IOException   DOCUMENT ME!
      */
-    protected Collection<Long> getAndInsertSampleValues(final long eprtrInstallationId,
-            final String installationSrcPk,
+    protected Collection<Long> getAndInsertReleases(final long eprtrInstallationId,
+            final long installationSrcPk,
             final Collection<AggregationValue> aggregationValues) throws SQLException, IOException {
         final Collection<Long> sampeValueIds = new HashSet<Long>();
         int i = 0;
         int added = 0;
 
         // <- GET AGGREGATED SAMPLE VALUES
-        this.getReleasesStmnt.setString(1, installationSrcPk);
-        final ResultSet sampleValuesResultSet = this.getReleasesStmnt.executeQuery();
-        // build the batch insert statements
-        while (sampleValuesResultSet.next()) {
-            final String PARAMETER_PK = sampleValuesResultSet.getString("PARAMETER_PK");
+        this.getReleasesStmnt.setLongAtName("INSTALLATION_ERAS_ID", installationSrcPk);
+        final ResultSet releasesResultSet = this.getReleasesStmnt.executeQuery();
+
+        while (releasesResultSet.next()) {
+            final String POLLUTANT_KEY = releasesResultSet.getString("POLLUTANT_KEY");
             i++;
-            if (this.parameterMappings.containsKey(PARAMETER_PK)) {
+            if (this.parameterMappings.containsKey(POLLUTANT_KEY)) {
                 final AggregationValue aggregationValue = new AggregationValue();
 
                 // aggregation parameter mapping!
-                final ParameterMapping parameterMapping = this.parameterMappings.getAggregationMapping(PARAMETER_PK);
+                final ParameterMapping parameterMapping = this.parameterMappings.getAggregationMapping(POLLUTANT_KEY);
+
+                // KEY and SCR_ID
+                final long RELEASE_ID = releasesResultSet.getLong("RELEASE_ID");
+                this.insertReleaseStmnt.setStringAtName("KEY", String.valueOf(RELEASE_ID));
+                this.insertReleaseStmnt.setStringAtName("SRC_RELEASE_ID", String.valueOf(RELEASE_ID));
 
                 // NAME
                 // log.debug(mappedParameters[0]);
                 this.insertReleaseStmnt.setStringAtName("NAME", parameterMapping.getDisplayName());
                 aggregationValue.setName(parameterMapping.getDisplayName());
-                // this.insertSampleValues.setString(1, mappedParameters[0]); if (log.isDebugEnabled()) {
-                // log.debug("["+added+"] " + mappedParameters[1]); }
 
-                // SITE
-                this.insertReleaseStmnt.setLongAtName("SITE", eprtrInstallationId);
+                // RELEASE_TYPE
+                final String RELEASE_TYPE = releasesResultSet.getString("RELEASE_TYPE");
+                this.insertReleaseStmnt.setStringAtName("RELEASE_TYPE", RELEASE_TYPE);
+
+                // NOTIFICATION_PERIOD
+                final String NOTIFICATION_PERIOD = releasesResultSet.getString("NOTIFICATION_PERIOD");
+                this.insertReleaseStmnt.setStringAtName("NOTIFICATION_PERIOD", NOTIFICATION_PERIOD);
+
+                // INSTALLATION
+                this.insertReleaseStmnt.setLongAtName("INSTALLATION", eprtrInstallationId);
 
                 // POLLUTANT
                 this.insertReleaseStmnt.setStringAtName("POLLUTANT", parameterMapping.getPollutantTagKey());
                 aggregationValue.setPollutantKey(parameterMapping.getPollutantTagKey());
-                // this.insertSampleValues.setString(2, mappedParameters[1]);
-// if (log.isDebugEnabled()) {
-// log.debug("["+added+"] " + mappedParameters[2]);
-// }
+
                 // POLLUTANT_GROUP
                 this.insertReleaseStmnt.setStringAtName("POLLUTANT_GROUP", parameterMapping.getPollutantGroupKey());
                 aggregationValue.setPollutantgroupKey(parameterMapping.getPollutantGroupKey());
-                // this.insertSampleValues.setString(3, mappedParameters[2]);
-// if (log.isDebugEnabled()) {
-// log.debug("["+added+"] " + sampleValuesResultSet.getDate("MIN_DATE"));
-// }
-                final Date minDate = sampleValuesResultSet.getDate("MIN_DATE");
+
+                // MIN_DATE
+                final Date minDate = releasesResultSet.getDate("MIN_DATE");
                 this.insertReleaseStmnt.setDateAtName("MIN_DATE", minDate);
                 aggregationValue.setMinDate(minDate);
-                // this.insertSampleValues.setDate(4, sampleValuesResultSet.getDate("MIN_DATE")); if
-                // (log.isDebugEnabled()) { log.debug("["+added+"] " + sampleValuesResultSet.getDate("MAX_DATE")); }
 
-                final Date maxDate = sampleValuesResultSet.getDate("MAX_DATE");
+                // MAX_DATE
+                final Date maxDate = releasesResultSet.getDate("MAX_DATE");
                 this.insertReleaseStmnt.setDateAtName("MAX_DATE", maxDate);
                 aggregationValue.setMaxDate(maxDate);
 
-                // this.insertSampleValues.setDate(5, sampleValuesResultSet.getDate("MAX_DATE"));
-// if (log.isDebugEnabled()) {
-// log.debug("["+added+"] " + sampleValuesResultSet.getFloat("MIN_VALUE"));
-// }
-                final float minValue = sampleValuesResultSet.getFloat("MIN_VALUE");
-                this.insertReleaseStmnt.setFloatAtName("MIN_VALUE", minValue);
-                aggregationValue.setMinValue(minValue);
-                // this.insertSampleValues.setFloat(6, sampleValuesResultSet.getFloat("MIN_VALUE"));
-// if (log.isDebugEnabled()) {
-// log.debug("["+added+"] " + sampleValuesResultSet.getFloat("MAX_VALUE"));
-// }
-                final float maxValue = sampleValuesResultSet.getFloat("MAX_VALUE");
-                this.insertReleaseStmnt.setFloatAtName("MAX_VALUE", maxValue);
-                aggregationValue.setMaxValue(maxValue);
-                // this.insertSampleValues.setFloat(7, sampleValuesResultSet.getFloat("MAX_VALUE"));
+                // VALUE
+                final float QUANTITY_RELEASED = releasesResultSet.getFloat("QUANTITY_RELEASED");
+                this.insertReleaseStmnt.setFloatAtName("VALUE", QUANTITY_RELEASED);
+                aggregationValue.setMinValue(QUANTITY_RELEASED);
+                aggregationValue.setMaxValue(QUANTITY_RELEASED);
+
+                // SRC_CONTENT
+                final String srcContentJson = this.xmlClobToJsonString(releasesResultSet.getClob("ACTIVITIES_XML"));
+                this.insertReleaseStmnt.setStringAtName("SRC_CONTENT", srcContentJson);
 
                 // fill the list and eliminate duplicates
                 aggregationValues.add(aggregationValue);
-
-                // FIXME: define POJOs
-                final String srcContentJson = this.xmlClobToJsonString(sampleValuesResultSet.getClob("MESSWERTE_XML"));
-                // SRC_CONTENT
-                // log.debug(srcContentJson);
-                this.insertReleaseStmnt.setStringAtName("SRC_CONTENT", srcContentJson);
-                // this.insertSampleValues.setString(8, srcContentJson);
-
-                // FIXME: Execute Batch does not work with large updates!!!!!
-                // this.insertSampleValues.addBatch();
 
                 this.insertReleaseStmnt.executeUpdate();
                 final ResultSet generatedKeys = this.insertReleaseStmnt.getGeneratedKeys();
@@ -600,41 +596,21 @@ public class EprtrImport extends OracleImport {
                     generatedKeys.close();
                     added++;
                 } else {
-                    log.error("could not fetch generated key for inserted samples values for EPRTR SITE "
+                    log.error("could not fetch generated key for inserted releases for EPRTR Installation "
                                 + installationSrcPk);
                 }
             }
         }
 
-        sampleValuesResultSet.close();
+        releasesResultSet.close();
 
         if (added > 0) {
-// FIXME: Execute Batch does not work with large updates!!!!!
-//            if (log.isDebugEnabled()) {
-//                log.debug("adding " + added + " of " + i + " sample values for EPRTR Installation " + installationSrcPk);
-//            }
-//            this.insertSampleValues.executeBatch();
-
-//            final ResultSet generatedKeys = this.insertSampleValues.getGeneratedKeys();
-//            if ((null != generatedKeys)) {
-//                while (generatedKeys.next()) {
-//                    sampeValueIds.add(generatedKeys.getLong(1));
-//                }
-//                generatedKeys.close();
-//                if (log.isDebugEnabled()) {
-//                    log.debug(added + " of " + i + " sample values added for EPRTR Installation " + installationSrcPk
-//                    + ", " + sampeValueIds.size() + " IDs generated");
-//                }
-//            } else {
-//                log.error("could not fetch generated key for inserted samples values for EPRTR SITE " + installationSrcPk);
-//            }
-
             if (log.isDebugEnabled()) {
-                log.debug(added + " of " + i + " sample values added for EPRTR Installation " + installationSrcPk
+                log.debug(added + " of " + i + " releases added for EPRTR Installation " + installationSrcPk
                             + ", " + sampeValueIds.size() + " IDs generated");
             }
         } else {
-            log.warn("no supported sample values found in " + i + " available sample values for EPRTR SITE "
+            log.warn("no supported releases found in " + i + " available releases for EPRTR Installation "
                         + installationSrcPk);
         }
 
@@ -647,11 +623,10 @@ public class EprtrImport extends OracleImport {
      * @param   installationKey              DOCUMENT ME!
      * @param   installationName             DOCUMENT ME!
      * @param   installationDescription      DOCUMENT ME!
-     * @param   installationLiteraturTagKey  DOCUMENT ME!
-     * @param   installationInstitutTagKey   DOCUMENT ME!
+     * @param   installationNaceTagKey       DOCUMENT ME!
+     * @param   installationCatchmentTagKey  DOCUMENT ME!
      * @param   installationGeomId           DOCUMENT ME!
      * @param   installationSrcPk            DOCUMENT ME!
-     * @param   installationSrcContent       DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
@@ -660,24 +635,22 @@ public class EprtrImport extends OracleImport {
     protected long insertInstallation(final String installationKey,
             final String installationName,
             final String installationDescription,
-            final String installationLiteraturTagKey,
-            final String installationInstitutTagKey,
+            final String installationNaceTagKey,
+            final String installationCatchmentTagKey,
             final long installationGeomId,
-            final String installationSrcPk,
-            final String installationSrcContent) throws SQLException {
+            final long installationSrcPk) throws SQLException {
         if (log.isDebugEnabled()) {
             log.debug("inserting EPRTR Installation " + installationKey + ": '" + installationName + "'");
         }
         final long startTime = System.currentTimeMillis();
 
-        this.insertInstallationStmnt.setString(1, installationKey);
-        this.insertInstallationStmnt.setString(2, installationName);
-        this.insertInstallationStmnt.setString(3, installationDescription);
-        this.insertInstallationStmnt.setLong(4, installationGeomId);
-        this.insertInstallationStmnt.setString(5, installationLiteraturTagKey);
-        this.insertInstallationStmnt.setString(6, installationInstitutTagKey);
-        this.insertInstallationStmnt.setString(7, installationSrcPk);
-        this.insertInstallationStmnt.setString(8, installationSrcContent);
+        this.insertInstallationStmnt.setStringAtName("KEY", installationKey);
+        this.insertInstallationStmnt.setStringAtName("NAME", installationName);
+        this.insertInstallationStmnt.setStringAtName("DESCRIPTION", installationDescription);
+        this.insertInstallationStmnt.setLongAtName("GEOMETRY", installationGeomId);
+        this.insertInstallationStmnt.setStringAtName("NACE_CLASS", installationNaceTagKey);
+        this.insertInstallationStmnt.setStringAtName("RIVER_CATCHMENT", installationCatchmentTagKey);
+        this.insertInstallationStmnt.setLongAtName("SRC_ERAS_ID", installationSrcPk);
 
         this.insertInstallationStmnt.executeUpdate();
         final ResultSet generatedInstallationKeysRs = this.insertInstallationStmnt.getGeneratedKeys();
@@ -686,7 +659,7 @@ public class EprtrImport extends OracleImport {
         if ((null != generatedInstallationKeysRs) && generatedInstallationKeysRs.next()) {
             generatedKey = generatedInstallationKeysRs.getLong(1);
         } else {
-            log.error("could not fetch generated key for inserted EPRTR SITE!");
+            log.error("could not fetch generated key for inserted EPRTR Installation!");
         }
         if (log.isDebugEnabled()) {
             // this.insertInstallation.close();
@@ -696,6 +669,35 @@ public class EprtrImport extends OracleImport {
                         + generatedKey);
         }
         return generatedKey;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  installation  DOCUMENT ME!
+     */
+    protected void updateInstallationReferenceValues(final Installation installation) {
+        if (installation.getAddresses() != null) {
+            for (final Address address : installation.getAddresses()) {
+                address.setCity(this.getReferenceValue(address.getCity()));
+                address.setDistrict(this.getReferenceValue(address.getDistrict()));
+                address.setRegion(this.getReferenceValue(address.getRegion()));
+            }
+        }
+
+        if (installation.getReleaseParameters() != null) {
+            final HashMap<String, Parameter> uniqueReleaseParameters = new HashMap<String, Parameter>();
+            for (final Parameter parameter : installation.getReleaseParameters()) {
+                final String key = parameter.getParameterPk();
+                if (!uniqueReleaseParameters.containsKey(key)) {
+                    parameter.setParameterName(this.getReferenceValue(key));
+                    uniqueReleaseParameters.put(key, parameter);
+                }
+            }
+
+            installation.setReleaseParameters(
+                new ArrayList<Parameter>(uniqueReleaseParameters.values()));
+        }
     }
 
     /**

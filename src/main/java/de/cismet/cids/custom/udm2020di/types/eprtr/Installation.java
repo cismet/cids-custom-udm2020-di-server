@@ -92,6 +92,7 @@ public class Installation {
     @JacksonXmlProperty
     private List<Address> addresses;
 
-    @JacksonXmlProperty
-    private List<Parameter> parameters;
+    @JacksonXmlProperty(localName = "releaseparameters")
+    @JsonProperty("releaseparameters")
+    private List<Parameter> releaseParameters;
 }

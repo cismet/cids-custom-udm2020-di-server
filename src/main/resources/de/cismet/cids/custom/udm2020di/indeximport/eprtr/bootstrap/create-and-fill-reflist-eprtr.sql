@@ -2388,3 +2388,536 @@ Insert into UIMDI02.CSX_REFLIST_EPRTR (KEY,NAME,DESCRIPTION,GROUP_KEY,GROUP_NAME
 Insert into UIMDI02.CSX_REFLIST_EPRTR (KEY,NAME,DESCRIPTION,GROUP_KEY,GROUP_NAME,GROUP_DESCRIPTION) values ('30.20-0','Schienenfahrzeugbau',null,'k73nnukdrw9ipc','Wirtschaftszweige','Liste von Wirtschaftszweigen basierend auf der von Statistik Austria veröffentlichten ÖNACE 2008 Liste.');
 Insert into UIMDI02.CSX_REFLIST_EPRTR (KEY,NAME,DESCRIPTION,GROUP_KEY,GROUP_NAME,GROUP_DESCRIPTION) values ('30.1','Schiff- und Bootsbau',null,'k73nnukdrw9ipc','Wirtschaftszweige','Liste von Wirtschaftszweigen basierend auf der von Statistik Austria veröffentlichten ÖNACE 2008 Liste.');
 Insert into UIMDI02.CSX_REFLIST_EPRTR (KEY,NAME,DESCRIPTION,GROUP_KEY,GROUP_NAME,GROUP_DESCRIPTION) values ('23.69-0','Herstellung von Erzeugnissen aus Beton, Zement und Gips a.n.g.',null,'k73nnukdrw9ipc','Wirtschaftszweige','Liste von Wirtschaftszweigen basierend auf der von Statistik Austria veröffentlichten ÖNACE 2008 Liste.');
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('e9e2kir4ut5swq', 'Rohöleinsatz', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('yfe6avgrjya3nh', 'Erdgaskondensate', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('hme9y77ea4i9sb', 'Elektrische Energie', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('2tfdpiv2z8qih4', 'Wärme', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('jzfhdvkprcyqmw', 'Kokereikoks', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('47fk38bcgg5zdp', 'Steinkohle', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('ndfqsizy7md7hh', 'Braunkohle', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('7jfugvqmwrjg87', 'Steinkohlenbriketts', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('qrfx68famvtnc4', 'Braunkohlenbriketts', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('9xf3vi5xczyx4s', 'Sinter', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('s5f7jvuj35858k', 'Roheisen', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('cbga98i8tahbch', 'Rohstahl', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('vhgeyi9vienk37', 'warmgewalzte Stahlerzeugnisse', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('epginvyh9iws7z', 'geschmiedete Eisenmetalle', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('xvgnc8n6yn33xs', 'beschichtete Stahlerzeugnisse', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('g3gr3jdtptb93k', 'Gusserzeugnisse', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('d4chju887ennvw', 'Edelmetalle', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('xack97xvwitxmp', 'Aluminium, Aluminiumlegierungen oder Produkte aus Aluminium', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('ggcqyinimn35rh', 'Blei, Bleilegierungen oder Produkte aus Blei', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('zncunvc7cs9eha', 'Zink, Zinklegierungen oder Produkte aus Zink', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('iucyc73t3xhkk4', 'Zinn, Zinnlegierungen oder Produkte aus Zinn', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('32c33isgs3nvcv', 'Kupfer, Kupferlegierungen oder Produkte aus Kupfer', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('k8c7rvg5h7w3gp', 'sonstige Nichteisenmetalle', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('6edbf77r9b4c8d', 'Aluminium-Druckgussteile', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('pkde6iweygcica', 'Magnesium-Druckgussteile', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('8sdiuvk3pkht3y', 'sonstiger Leichtmetallguss', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('rydni8bqeqrz7s', 'Schwermetallguss', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('a6dr9i2c5uz7bp', 'funktionelle Schicht von Metallen oder Kunststoffen (chemisches Verfahren)', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('ucdvxvqzuy7g3d', 'funktionelle Schicht von Metallen oder Kunststoffen (elektrolytisches Verfahren)', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('didzm8fnj5fn67', 'Erze', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('wqd5ci6ba9kxwy', 'Steine und Erden', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('fwd82vux2du52s', 'Kohle', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('y4ecq8jkrh2esj', 'Rohöl', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('iaegfi99gnakwd', 'Erdgas', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('3gej5vyv7sfvm6', 'sonstige Bergbauprodukte', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('knept8piwwp3ry', 'Zementklinker', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('5uetijd7m2vchr', 'Branntkalk', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('n2ew8v4uc65imj', 'Erzeugnisse aus Asbest', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('78e2w8tg4batdc', 'Asbest', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('ree6mjh5tfizg6', 'Flachglas', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('akfabv8sijs7ky', 'Behälterglas', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('tsfdz8xe9pygcr', 'Haushaltsglas', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('cyfhqjm3yt8ngj', 'Mineralwolle/Glaswolle', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('v6fmewcqpydx79', 'Spezialglas', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('fcfq483de4m5b6', 'Glasfaser', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('yifutjrz58te3u', 'sonstiges Glas', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('hqfyhwgnvc3k7n', 'Steinwolle', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('2wf3787bkg8vxf', 'sonstige mineralische Stoffe oder Mineralfasern', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('j4f7wjvybmg329', 'feuerfeste keramische Werkstoffe', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('5agbkwkk2rncs2', 'Fliesen', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('nggfa9a9rvwiwu', 'Ziegel und sonstige Baukeramik', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('7ngizjzwgz3tnm', 'geblähte mineralische Erzeugnisse', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('qugnpwqi76bzsf', 'feuerfeste Sinterprodukte', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('92gsd9e7xahah8', 'Düngemittel', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('s8gv4j5unergm2', 'Pflanzenschutzmittel', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('cegzswuhdiznru', 'Biozide', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('vkg5g9i54n6xhm', 'Explosivstoffe', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('esg87j9stte5mf', 'Feuerwerksmaterial', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('xyhcvwyfixkec8', 'behandelte Abfallmenge', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('g6hgj9n393ukg2', 'beseitigte Abfallmenge', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('2chkakdqy7zv8q', 'deponierte Abfallmenge', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('jihpyw4dqb93cm', 'Input an tierischen Abfällen', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('4qhtn9s2fgfc4b', 'produziertes Tierkörpermehl', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('mwhxdkhn6kpi75', 'produziertes Tierkörperfett', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('64h23w8bvqutxw', 'gereinigte Abwassermenge (Summe aller Teilströme)', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('qah6r9wyku4z3q', 'verkaufsfähiger Zellstoff als Adt (air dry ton)', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('9giagkmmbzaath', 'verkaufsfähiges Papier, Pappe', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('snid6xb925igxb', 'sonstige primäre Holzprodukte (wie Spanplatten, Faserplatten und Sperrholz)', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('buihu92wr9sn25', 'behandelte Holzprodukte', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('u2imjkrjhdxxsw', 'Geflügel', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('d8iq9xf78h75wq', 'Schweine', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('xeiux96uxndenh', 'Säue', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('gkiynkvhnsmksb', 'Fische', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('zsi4cxj6dwsvh4', 'Muscheln', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('iyi73aas4223mw', 'Tierkörper', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('36jbrkzft68cdp', 'Getränke', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('mcjffxp4jbgihh', 'Nahrungsmittel', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('6iji6aerafmt87', 'Milchprodukte', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('pqjnuk5dzjvzc4', 'verarbeitete Milch', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('8wjsixt2qp3a4s', 'vorbehandelte Textilien oder Textilerzeugnisse', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('r4jv9aipfubg8k', 'gefärbte Textilien oder Textilerzeugnisse', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('bajzxk9b6yjnch', 'Leder', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('ugj5mxxyv4qx37', 'sonstige Ledererzeugnisse', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('dnj9canmk8y57z', 'organischer Lösungsmittelverbrauch', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('wukc2mdacc6exs', 'Hartbrandkohle', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('f2kgqx3w3hek3k', 'Elektrographit', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('y8kkfasjsmjvtd', 'Schiffe', '', '34cpy8rt352zyg', 'Produkte', 'Liste von Produkten für E-PRTR.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('akcq3jka89wvk6', 'Methan (CH4)', 'CH4', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('tscurwaxyd36cx', 'Kohlenmonoxid (CO)', 'CO', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('cycyf8zkpiccgr', 'Kohlendioxid (CO2)', 'CO2', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('v6c36jp9enhm8f', 'Teilfluorierte Kohlenwasserstoffe (HFKWs)', 'HFCS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('fcc7uwev5srtcc', 'Distickoxid (N2O)', 'N2O', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('yidbi85iuww432', 'Ammoniak (NH3)', 'NH3', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('hqde9jt7j27a7u', 'flüchtige organische Verbindungen ohne Methan (NMVOC)', 'NMVOC', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('2wdixwiua7cjxm', 'Stickoxide (NO/NO2)', 'NOX', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('j4dnm89g2bkr3f', 'Perfluorierte Kohlenwasserstoffe (PFKWs)', 'PFCS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('5adscjx5rfr2s8', 'Schwefelhexafluorid (SF6)', 'SF6', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('ngdv2wnsgjz8w2', 'Schwefeloxide (SOx/SO2)', 'SOX', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('7ndzq9de7p7hnt', 'Gesamtstickstoff', 'TOTAL - NITROGEN', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('qud5fj33wufpsm', 'Gesamtphosphor', 'TOTAL - PHOSPHORUS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('92d85wsqmykyie', 'Teilhalogenierte Fluorchlorkohlenwasserstoffe (HFCKW)', 'HCFCS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('s8ect9hdc4u6m8', 'Fluorchlorkohlenwasserstoffe (FCKWs)', 'CFCS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('ceegij7z385cr2', 'Halone', 'HALONS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('vkej8wwntdamht', 'Arsen und Verbindungen (als As)', 'AS AND COMPOUNDS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('esepw9mbihitmm', 'Cadmium und Verbindungen (als Cd)', 'CD AND COMPOUNDS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('xyetmkbx9mp4de', 'Chrom und Verbindungen (als Cr)', 'CR AND COMPOUNDS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('g6exbw2kyryag8', 'Kupfer und Verbindungen (als Cu)', 'CU AND COMPOUNDS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('2ce2z9q9pv5j8w', 'Quecksilber und Verbindungen (als Hg)', 'HG AND COMPOUNDS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('jie6qkfwe2drct', 'Nickel und Verbindungen (als Ni)', 'NI AND COMPOUNDS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('4qfaew6i56i24h', 'Blei und Verbindungen (als Pb)', 'PB AND COMPOUNDS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('mwfd49u7vas88b', 'Zink und Verbindungen (als Zn)', 'ZN AND COMPOUNDS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('64fhtkjukeyhx4', 'Alachlor', 'ALACHLOR', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('qafmhxahbi8p3w', 'Aldrin', 'ALDRIN', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('9gfq79y52pdytp', 'Atrazin', 'ATRAZINE', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('snfuwkpsrtm6xh', 'Chlordan', 'CLORDANE', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('bufykxefgxwc3b', 'Chlordecon', 'CHLORDECONE', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('u2f4a943733ms4', 'Chlorfenvinphos', 'CHLORFENVINPHOS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('d8f7zktqw8btww', 'Chloralkane, C10-C13', 'CHLORO-ALKANES (C10-13)', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('xegbpxidncg4np', 'Chlorpyrifos', 'CHLORPYRIFOS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('gkgfd982dgrash', 'DDT', 'DDT', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('zsgi4kxn4kwjia', '1,2-Dichlorethan (EDC)', 'DICHLOROETHANE-1,2 (DCE)', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('iygnsxnbtq6rm4', 'Dichlormethan (DCM)', 'DICHLOROMETHANE (DCM)', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('36gshacyivb2dv', 'Dieldrin', 'DIELDRIN', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('mcgv7k3k9zj8hp', 'Diuron', 'DIURON', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('6igzvxr9y5rh9d', 'Endosulfan', 'ENDOSULPHAN', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('pqg5kagwp9zpda', 'Endrin', 'ENDRIN', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('8wg9ak7jfd6y4y', 'Halogenierte organische Verbindungen (als AOX)', 'HALOGENATED ORGANIC COMPOUNDS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('r4hcyxv76ie68s', 'Heptachlor', 'HEPTACHLOR', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('bahgpakuvnpccp', 'Hexachlorbenzol (HCB)', 'HEXACHLOROBENZENE (HCB)', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('ughkdmbhksum4d', 'Hexachlorbutadien (HCBD)', 'HEXACHLOROBUTADIENE (HCBD)', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('dnhp3xz6bw4t77', '1,2,3,4,5,6-Hexachlorcyclohexan (HCH)', 'HEXACHLOROCYCLOHEXANE(HCH)', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('wuhtsaqs2294xy', 'Lindan', 'LINDANE', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('f2hxgmffr7ia3s', 'Mirex', 'MIREX', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('y8h26x54hbpjtj', 'PCDD + PCDF (Dioxine + Furane) (als Teq)', 'PCDD+PCDF (DIOXINS+FURANS)', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('ieh6vauq8fxrxd', 'Pentachlorbenzol', 'PENTACHLOROBENZENE', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('3kiajmjdxj42n6', 'Pentachlorphenol (PCP)', 'PENTACHLOROPHENOL (PCP)', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('ksid9x92nqc8sy', 'Polychlorierte Biphenyle (PCBs)', 'POLYCHLORINATED BIPHENYLS (PCBS)', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('5yihyaypduihir', 'Simazin', 'SIMAZINE', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('n6imnmpb4yspnj', 'Tetrachlorethen (PER)', 'TETRACHLOROETHYLENE (PER)', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('8circydyt4xyec', 'Tetrachlormethan (TCM)', 'TETRACHLOROMETHANE (TCM)', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('riiu3a4mi876h6', 'Trichlorbenzole (TCB) (alle Isomere)', 'TRICHLOROBENZENES (TCB)', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('aqiyrmtaadgcmy', '1,1,1-Trichlorethan', 'TRICHLOROETHANE-1,1,1 (TCE)', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('twi4fyhwzhmmdr', '1,1,2,2-Tetrachlorethan', 'TETRACHLOROETHANE-1,1,2,2', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('c4i76a8jqmvthj', 'Trichlorethylen', 'TRICHLOROETHYLENE (TRI)', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('wajbumw8fr2489', 'Trichlormethan', 'TRICHLOROMETHANE', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('fgjfiymu6wbac6', 'Toxaphen', 'TOXAPHENE', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('ynji9bchv2gj4u', 'Vinylchlorid', 'VINYL CHLORIDE', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('hujnxm26k6qr8n', 'Anthracen', 'ANTHRACENE', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('22jsmyrtcav2yf', 'Benzol', 'BENZENE', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('j8jwcbgf3e5839', 'Bromierte Diphenylether (PBDE)', 'BROMINATED DIPHENYLETHER', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('5ejz2m64sjbht2', 'Nonylphenol und Nonylphenolethoxylate (NP/NPEs)', 'NP/NPES', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('nkj5qyvrhpjpxu', 'Ethylbenzol', 'ETHYLBENZENE', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('7sj9fbkd8tqypm', 'Ethylenoxid', 'ETHYLENE OXIDE', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('qykc5na2xxy6tf', 'Isoproturon', 'ISOPROTURON', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('96kgtyzpn36fi8', 'Naphthalin', 'NAPHTHALENE', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('tckkibqcd8emn2', 'Zinnorganische Verbindungen (als Gesamt-Sn)', 'ORGANOTIN - COMPOUNDS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('cikp8ney5cntsu', 'Di-(2-ethylhexyl)phthalat (DEHP)', 'DEHP', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('vqktwy5mugt4im', 'Phenole (als Gesamt-C)', 'PHENOLS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('ewkxmbuajk4anf', 'polyzyklische aromatische Kohlenwasserstoffe (PAK)', 'POLYCYCLIC AROMATIC HYDROCARBONS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('x4k3bnixaq9jd8', 'Toluol', 'TOLUENE', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('hak6zy9jzvhrh2', 'Tributylzinn und Verbindungen', 'TRIBUTYLTIN AND COMPOUNDS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('2gmaqbx8qzn29q', 'Triphenylzinn und Verbindungen', 'TRIPHENYLTIN AND COMPOUNDS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('jnmeennvf5w8dm', 'Gesamter organischer Kohlenstoff (TOC) (als Gesamt-C oder CSB/3)', 'TOTAL ORGANIC CARBON (TOC)', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('4umh4zdh694h5b', 'Trifluralin', 'TRIFLURALIN', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('m2mmtb36wecp85', 'Xylole', 'XYLENES', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('68mrhnstmihyyw', 'Chloride (als Gesamt-Cl)', 'CHLORIDES', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('qemu7zhgcnr64q', 'Chlor und anorganische Verbindungen (als HCl)', 'CHLORINE AND INORGANIC COMPOUNDS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('9kmywb743sxfuh', 'Asbest', 'ASBESTOS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('ssm4knwrsw7myb', 'Cyanide (als Gesamt-CN)', 'CYANIDES', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('bym8azmeh3ft35', 'Fluoride (als Gesamt-F)', 'FLUORIDES', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('u6nbzcb287k4tw', 'Fluor und anorganische Verbindungen (als HF)', 'FLUORINE AND INORGANIC COMPOUNDS', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('ecnfpn2pybvaxq', 'Cyanwasserstoff (HCN)', 'HCN', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('xinjdzrcpf2jph', 'Feinstaub (PM10)', 'PM10', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('gqnn4cfzekartb', 'Octylphenole und Octylphenolethoxylate', 'OCTYLPHENOLS AND OCTYLPHENOL ETHOXYLATES', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('zwnssn6m5qf2i4', 'Fluoranthen', 'FLUORANTHENE', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('i4nwgzvauup8nw', 'Isodrin', 'ISODRIN', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('4anz7cjxjyvhep', 'Hexabrombiphenyl', 'HEXABROMOBIPHENYL', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');
+
+INSERT INTO CSX_REFLIST_EPRTR (KEY, NAME, DESCRIPTION, GROUP_KEY, GROUP_NAME, GROUP_DESCRIPTION) 
+VALUES ('mgn5vpaka45pih', 'Benzo(g,h,i)perylen', 'BENZO(G,H,I)PERYLENE', '78chnv6zszehdi', 'Liste von Schadstoffen', 'Liste von Schadstoffen für E-PRTR Meldungen, gemäß der Verordnung Nr. 166/2006 des Europäischen Parlaments und des Rates vom 18. Januar 2006 über die Schaffung eines Europäischen Schadstofffreisetzungs- und -verbringungsregisters.');

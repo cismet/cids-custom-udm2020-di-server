@@ -325,6 +325,11 @@ public class BorisImport extends OracleImport {
                                 + "': no supported sample values found!");
                     this.deleteSite.setLong(1, borisSiteId);
                     this.deleteSite.executeUpdate();
+
+                    if (siteGeomId != -1) {
+                        this.deleteGeomStmnt.setLong(1, siteGeomId);
+                        this.deleteGeomStmnt.executeUpdate();
+                    }
                 }
 
                 // save the site
@@ -357,11 +362,12 @@ public class BorisImport extends OracleImport {
         }
         this.getSampleValues.close();
 
-        this.insertGenericGeom.close();
-        this.insertUniqueTag.close();
+        this.insertGenericGeomStmnt.close();
+        this.insertUniqueTagStmnt.close();
 
         this.insertSite.close();
         this.deleteSite.close();
+        this.deleteGeomStmnt.close();
         this.insertSampleValues.close();
         this.insertSiteValuesRel.close();
         this.insertSiteTagsRel.close();

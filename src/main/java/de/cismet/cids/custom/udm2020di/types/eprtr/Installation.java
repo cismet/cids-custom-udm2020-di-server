@@ -20,6 +20,9 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import de.cismet.cids.custom.udm2020di.serializers.FlexibleFloatDeserializer;
+import de.cismet.cids.custom.udm2020di.types.AggregationValue;
+import de.cismet.cids.custom.udm2020di.types.Parameter;
+import de.cismet.cids.custom.udm2020di.types.Tag;
 
 /**
  * DOCUMENT ME!
@@ -76,7 +79,19 @@ public class Installation {
     )
     private float latitude;
 
+    @JacksonXmlProperty
+    private List<Tag> tags;
+
+    @JacksonXmlProperty(localName = "aggregationvalues")
+    @JsonProperty("aggregationvalues")
+    private List<AggregationValue> aggregationValues;
+
+    @JacksonXmlProperty
     private List<Activity> activities;
 
+    @JacksonXmlProperty
     private List<Address> addresses;
+
+    @JacksonXmlProperty
+    private List<Parameter> parameters;
 }

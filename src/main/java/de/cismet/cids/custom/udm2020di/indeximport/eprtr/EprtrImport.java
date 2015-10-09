@@ -54,14 +54,13 @@ public class EprtrImport extends OracleImport {
     //~ Instance fields --------------------------------------------------------
 
     protected final String getInstallationsStatementTpl;
-    protected final PreparedStatement getSampleValues;
-    protected final PreparedStatement insertInstallationStmnt;
+    protected final PreparedStatement getReleasesStmnt;
+    protected final OraclePreparedStatement insertInstallationStmnt;
     protected final PreparedStatement deleteInstallationStmnt;
-    protected final OraclePreparedStatement insertSampleValues;
-    protected final PreparedStatement insertInstallationValuesRel;
-    protected final PreparedStatement insertInstallationTagsRel;
-    protected final PreparedStatement getTags;
-    protected final PreparedStatement updateInstallationJson;
+    protected final OraclePreparedStatement insertReleaseStmnt;
+    protected final OraclePreparedStatement insertInstallationTagsRelStmnt;
+    protected final OraclePreparedStatement getTagsStnmt;
+    protected final OraclePreparedStatement updateInstallationJsonStnmt;
     protected final ParameterMappings parameterMappings = new ParameterMappings();
     protected final Map<String, String> reflistMap;
 
@@ -95,53 +94,43 @@ public class EprtrImport extends OracleImport {
                     "/de/cismet/cids/custom/udm2020di/indeximport/eprtr/select-eprtr-releases.prs.sql"),
                 "UTF-8");
 
-        getSampleValues = this.sourceConnection.prepareStatement(getEprtrReleasesTpl);
+        getReleasesStmnt = this.sourceConnection.prepareStatement(getEprtrReleasesTpl);
 
         final String insertEprtrInstallationTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/eprtr/insert-eprtr-installation.prs.sql"),
                 "UTF-8");
-        insertInstallationStmnt = null;
-        // this.targetConnection.prepareStatement(
-        // insertEprtrInstallationTpl,
-        // new String[] { "ID" });
+        insertInstallationStmnt = (OraclePreparedStatement)this.targetConnection.prepareStatement(
+                insertEprtrInstallationTpl,
+                new String[] { "ID" });
 
         final String deleteEprtrInstallationTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/eprtr/delete-eprtr-installation.prs.sql"),
                 "UTF-8");
-        deleteInstallationStmnt = null; // this.targetConnection.prepareStatement(deleteEprtrInstallationTpl);
+        deleteInstallationStmnt = this.targetConnection.prepareStatement(deleteEprtrInstallationTpl);
 
         final String insertEprtrSampleValuesTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/eprtr/insert-eprtr-releases.prs.sql"),
                 "UTF-8");
-        insertSampleValues = null;
-        // (OraclePreparedStatement)this.targetConnection.prepareStatement(
-        // insertEprtrSampleValuesTpl,
-        // new String[] { "ID" });
-// insertSampleValues.setExecuteBatch(200);
-// log.debug ("insertEprtrSampleValues Statement Execute Batch Value " +
-// insertSampleValues.getExecuteBatch());
-
-        final String insertEprtrInstallationSampleValuesRelTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/indeximport/eprtr/insert-eprtr-installation-release-relation.prs.sql"),
-                "UTF-8");
-        insertInstallationValuesRel = null; // this.targetConnection.prepareStatement(
-        // insertEprtrInstallationSampleValuesRelTpl,
-        // new String[] { "ID" });
+        insertReleaseStmnt = (OraclePreparedStatement)this.targetConnection.prepareStatement(
+                insertEprtrSampleValuesTpl,
+                new String[] { "ID" });
 
         final String insertEprtrInstallationTagsRelTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/eprtr/insert-eprtr-installation-tags-relation.prs.sql"),
                 "UTF-8");
-        insertInstallationTagsRel = null; // this.targetConnection.prepareStatement(insertEprtrInstallationTagsRelTpl);
+        insertInstallationTagsRelStmnt = (OraclePreparedStatement)this.targetConnection.prepareStatement(
+                insertEprtrInstallationTagsRelTpl);
 
         final String getTagsTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/serversearch/eprtr/get-eprtr-tags.prs.sql"),
                 "UTF-8");
-        getTags = null; // this.targetConnection.prepareStatement(getTagsTpl);
+        getTagsStnmt = (OraclePreparedStatement)this.targetConnection.prepareStatement(getTagsTpl);
 
         final String updateInstallationJsonTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/eprtr/update-eprtr-installation-json.prs.sql"),
                 "UTF-8");
-        updateInstallationJson = null; // this.targetConnection.prepareStatement(updateInstallationJsonTpl);
+        updateInstallationJsonStnmt = (OraclePreparedStatement)this.targetConnection.prepareStatement(
+                updateInstallationJsonTpl);
 
         // load and cache mappings
         final String selectEprtrParameterMappingsTpl = IOUtils.toString(this.getClass().getResourceAsStream(
@@ -202,10 +191,10 @@ public class EprtrImport extends OracleImport {
      * @throws  IOException   DOCUMENT ME!
      * @throws  SQLException  DOCUMENT ME!
      */
-    protected Map<String, String> initEprtrReflist() throws IOException, SQLException {
+    protected final Map<String, String> initEprtrReflist() throws IOException, SQLException {
         final long startTime = System.currentTimeMillis();
 
-        final HashMap<String, String> reflistMap = new HashMap<String, String>();
+        final HashMap<String, String> eprtrReflist = new HashMap<String, String>();
 
         final String selectEprtrReflistTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/eprtr/select-eprtr-reflist.sql"),
@@ -214,7 +203,7 @@ public class EprtrImport extends OracleImport {
         final ResultSet eprtrReflistResultSet = selectEprtrReflistStmnt.executeQuery(selectEprtrReflistTpl);
 
         while (eprtrReflistResultSet.next()) {
-            reflistMap.put(
+            eprtrReflist.put(
                 eprtrReflistResultSet.getString(1),
                 eprtrReflistResultSet.getString(2));
         }
@@ -223,11 +212,11 @@ public class EprtrImport extends OracleImport {
         eprtrReflistResultSet.close();
 
         if (log.isDebugEnabled()) {
-            log.debug(reflistMap.size() + " reference value mappings cached in "
+            log.debug(eprtrReflist.size() + " reference value mappings cached in "
                         + ((System.currentTimeMillis() - startTime) / 1000) + "s");
         }
 
-        return reflistMap;
+        return eprtrReflist;
     }
 
     /**
@@ -237,6 +226,7 @@ public class EprtrImport extends OracleImport {
      * @throws  SQLException  DOCUMENT ME!
      */
     public void doBootstrap() throws IOException, SQLException {
+        final long startTime = System.currentTimeMillis();
         if (log.isDebugEnabled()) {
             log.debug("Cleaning and Bootstrapping EPRTR Tables");
         }
@@ -261,7 +251,8 @@ public class EprtrImport extends OracleImport {
         this.targetConnection.commit();
         insertEprtrTaggroups.close();
 
-        log.info("EPRTR Tables successfully bootstrapped");
+        log.info("EPRTR Tables successfully bootstrapped in "
+                    + ((System.currentTimeMillis() - startTime) / 1000) + "s");
     }
 
     /**
@@ -369,7 +360,7 @@ public class EprtrImport extends OracleImport {
                 // -> SAMPLE VALUES AND TAGS
                 // AggregationValues -> collection impl. that stores only maximum/minimum values!
                 final Collection<AggregationValue> aggregationValues = new AggregationValues();
-                final Collection<Long> sampeValueIds = getAndInsertSampleValues(
+                final Collection<Long> releaseIds = getAndInsertSampleValues(
                         eprtrInstallationId,
                         installationSrcPk,
                         aggregationValues);
@@ -377,8 +368,7 @@ public class EprtrImport extends OracleImport {
                 // set unique aggregation values FIXME:       eprtrInstallation.setAggregationValues(new
                 // ArrayList<AggregationValue>(aggregationValues)); installation with at least on supported sample
                 // value?
-                if (!sampeValueIds.isEmpty()) {
-                    this.insertInstallationValuesRelation(eprtrInstallationId, sampeValueIds);
+                if (!releaseIds.isEmpty()) {
                     this.insertEprtrInstallationTagsRelation(eprtrInstallationId);
 
                     final ObjectNode jsonObject = (ObjectNode)JSON_MAPPER.valueToTree(eprtrInstallation);
@@ -388,6 +378,11 @@ public class EprtrImport extends OracleImport {
                                 + "': no supported sample values found!");
                     this.deleteInstallationStmnt.setLong(1, eprtrInstallationId);
                     this.deleteInstallationStmnt.executeUpdate();
+
+                    if (installationGeomId != -1) {
+                        this.deleteGeomStmnt.setLong(1, installationGeomId);
+                        this.deleteGeomStmnt.executeUpdate();
+                    }
                 }
 
                 // save the installation
@@ -395,7 +390,7 @@ public class EprtrImport extends OracleImport {
 
                 if (log.isDebugEnabled()) {
                     log.info("EPRTR Installation #" + (i) + ": " + installationSrcPk
-                                + " with " + sampeValueIds.size()
+                                + " with " + releaseIds.size()
                                 + " aggregated sample values processed and imported in "
                                 + (System.currentTimeMillis() - startTime) + "ms");
                 }
@@ -418,18 +413,16 @@ public class EprtrImport extends OracleImport {
             // clean up
             log.debug("closing connections ....");
         }
-        this.getSampleValues.close();
-
-        this.insertGenericGeom.close();
-        this.insertUniqueTag.close();
-
+        this.getReleasesStmnt.close();
+        this.insertGenericGeomStmnt.close();
+        this.insertUniqueTagStmnt.close();
+        this.deleteGeomStmnt.close();
         this.insertInstallationStmnt.close();
         this.deleteInstallationStmnt.close();
-        this.insertSampleValues.close();
-        this.insertInstallationValuesRel.close();
-        this.insertInstallationTagsRel.close();
-        this.updateInstallationJson.close();
-        this.getTags.close();
+        this.insertReleaseStmnt.close();
+        this.insertInstallationTagsRelStmnt.close();
+        this.updateInstallationJsonStnmt.close();
+        this.getTagsStnmt.close();
 
         this.sourceConnection.close();
         this.targetConnection.close();
@@ -450,8 +443,8 @@ public class EprtrImport extends OracleImport {
     protected void updateSrcJson(final long eprtrInstallationId, final ObjectNode jsonNode) throws SQLException,
         JsonProcessingException,
         IOException {
-        getTags.setLong(1, eprtrInstallationId);
-        final ResultSet getTagsResult = getTags.executeQuery();
+        getTagsStnmt.setLong(1, eprtrInstallationId);
+        final ResultSet getTagsResult = getTagsStnmt.executeQuery();
 
         // put the resultset in a containing structure
         jsonNode.putPOJO("tags", getTagsResult);
@@ -465,10 +458,10 @@ public class EprtrImport extends OracleImport {
             final Clob srcContentClob = this.targetConnection.createClob();
             final Writer clobWriter = srcContentClob.setCharacterStream(1);
             JSON_MAPPER.writeValue(clobWriter, jsonNode);
-            updateInstallationJson.setClob(1, srcContentClob);
-            updateInstallationJson.setLong(2, eprtrInstallationId);
+            updateInstallationJsonStnmt.setClob(1, srcContentClob);
+            updateInstallationJsonStnmt.setLong(2, eprtrInstallationId);
 
-            updateInstallationJson.executeUpdate();
+            updateInstallationJsonStnmt.executeUpdate();
             clobWriter.close();
         } catch (Exception ex) {
             log.error("could not deserialize and update JSON of Eprtr Installation "
@@ -492,37 +485,14 @@ public class EprtrImport extends OracleImport {
      * @throws  SQLException  DOCUMENT ME!
      */
     protected void insertEprtrInstallationTagsRelation(final long eprtrInstallationId) throws SQLException {
-        this.insertInstallationTagsRel.setLong(1, eprtrInstallationId);
-        this.insertInstallationTagsRel.setLong(2, eprtrInstallationId);
-        this.insertInstallationTagsRel.setLong(3, eprtrInstallationId);
-        this.insertInstallationTagsRel.setLong(4, eprtrInstallationId);
+        this.insertInstallationTagsRelStmnt.setLong(1, eprtrInstallationId);
+        this.insertInstallationTagsRelStmnt.setLong(2, eprtrInstallationId);
+        this.insertInstallationTagsRelStmnt.setLong(3, eprtrInstallationId);
+        this.insertInstallationTagsRelStmnt.setLong(4, eprtrInstallationId);
 
-        this.insertInstallationTagsRel.executeUpdate();
+        this.insertInstallationTagsRelStmnt.executeUpdate();
         if (log.isDebugEnabled()) {
             log.debug("InstallationTagsRelation created");
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   eprtrInstallationId  DOCUMENT ME!
-     * @param   sampeValueIds        DOCUMENT ME!
-     *
-     * @throws  SQLException  DOCUMENT ME!
-     */
-    protected void insertInstallationValuesRelation(final long eprtrInstallationId,
-            final Collection<Long> sampeValueIds) throws SQLException {
-        for (final long sampeValueId : sampeValueIds) {
-            this.insertInstallationValuesRel.setLong(1, eprtrInstallationId);
-            this.insertInstallationValuesRel.setLong(2, sampeValueId);
-            this.insertInstallationValuesRel.addBatch();
-        }
-
-        this.insertInstallationValuesRel.executeBatch();
-        if (log.isDebugEnabled()) {
-            // this.insertInstallationValuesRel.close();
-            log.debug(sampeValueIds.size() + " Installation-Values-Relations created");
         }
     }
 
@@ -546,8 +516,8 @@ public class EprtrImport extends OracleImport {
         int added = 0;
 
         // <- GET AGGREGATED SAMPLE VALUES
-        this.getSampleValues.setString(1, installationSrcPk);
-        final ResultSet sampleValuesResultSet = this.getSampleValues.executeQuery();
+        this.getReleasesStmnt.setString(1, installationSrcPk);
+        final ResultSet sampleValuesResultSet = this.getReleasesStmnt.executeQuery();
         // build the batch insert statements
         while (sampleValuesResultSet.next()) {
             final String PARAMETER_PK = sampleValuesResultSet.getString("PARAMETER_PK");
@@ -560,36 +530,36 @@ public class EprtrImport extends OracleImport {
 
                 // NAME
                 // log.debug(mappedParameters[0]);
-                this.insertSampleValues.setStringAtName("NAME", parameterMapping.getDisplayName());
+                this.insertReleaseStmnt.setStringAtName("NAME", parameterMapping.getDisplayName());
                 aggregationValue.setName(parameterMapping.getDisplayName());
                 // this.insertSampleValues.setString(1, mappedParameters[0]); if (log.isDebugEnabled()) {
                 // log.debug("["+added+"] " + mappedParameters[1]); }
 
                 // SITE
-                this.insertSampleValues.setLongAtName("SITE", eprtrInstallationId);
+                this.insertReleaseStmnt.setLongAtName("SITE", eprtrInstallationId);
 
                 // POLLUTANT
-                this.insertSampleValues.setStringAtName("POLLUTANT", parameterMapping.getPollutantTagKey());
+                this.insertReleaseStmnt.setStringAtName("POLLUTANT", parameterMapping.getPollutantTagKey());
                 aggregationValue.setPollutantKey(parameterMapping.getPollutantTagKey());
                 // this.insertSampleValues.setString(2, mappedParameters[1]);
 // if (log.isDebugEnabled()) {
 // log.debug("["+added+"] " + mappedParameters[2]);
 // }
                 // POLLUTANT_GROUP
-                this.insertSampleValues.setStringAtName("POLLUTANT_GROUP", parameterMapping.getPollutantGroupKey());
+                this.insertReleaseStmnt.setStringAtName("POLLUTANT_GROUP", parameterMapping.getPollutantGroupKey());
                 aggregationValue.setPollutantgroupKey(parameterMapping.getPollutantGroupKey());
                 // this.insertSampleValues.setString(3, mappedParameters[2]);
 // if (log.isDebugEnabled()) {
 // log.debug("["+added+"] " + sampleValuesResultSet.getDate("MIN_DATE"));
 // }
                 final Date minDate = sampleValuesResultSet.getDate("MIN_DATE");
-                this.insertSampleValues.setDateAtName("MIN_DATE", minDate);
+                this.insertReleaseStmnt.setDateAtName("MIN_DATE", minDate);
                 aggregationValue.setMinDate(minDate);
                 // this.insertSampleValues.setDate(4, sampleValuesResultSet.getDate("MIN_DATE")); if
                 // (log.isDebugEnabled()) { log.debug("["+added+"] " + sampleValuesResultSet.getDate("MAX_DATE")); }
 
                 final Date maxDate = sampleValuesResultSet.getDate("MAX_DATE");
-                this.insertSampleValues.setDateAtName("MAX_DATE", maxDate);
+                this.insertReleaseStmnt.setDateAtName("MAX_DATE", maxDate);
                 aggregationValue.setMaxDate(maxDate);
 
                 // this.insertSampleValues.setDate(5, sampleValuesResultSet.getDate("MAX_DATE"));
@@ -597,14 +567,14 @@ public class EprtrImport extends OracleImport {
 // log.debug("["+added+"] " + sampleValuesResultSet.getFloat("MIN_VALUE"));
 // }
                 final float minValue = sampleValuesResultSet.getFloat("MIN_VALUE");
-                this.insertSampleValues.setFloatAtName("MIN_VALUE", minValue);
+                this.insertReleaseStmnt.setFloatAtName("MIN_VALUE", minValue);
                 aggregationValue.setMinValue(minValue);
                 // this.insertSampleValues.setFloat(6, sampleValuesResultSet.getFloat("MIN_VALUE"));
 // if (log.isDebugEnabled()) {
 // log.debug("["+added+"] " + sampleValuesResultSet.getFloat("MAX_VALUE"));
 // }
                 final float maxValue = sampleValuesResultSet.getFloat("MAX_VALUE");
-                this.insertSampleValues.setFloatAtName("MAX_VALUE", maxValue);
+                this.insertReleaseStmnt.setFloatAtName("MAX_VALUE", maxValue);
                 aggregationValue.setMaxValue(maxValue);
                 // this.insertSampleValues.setFloat(7, sampleValuesResultSet.getFloat("MAX_VALUE"));
 
@@ -615,14 +585,14 @@ public class EprtrImport extends OracleImport {
                 final String srcContentJson = this.xmlClobToJsonString(sampleValuesResultSet.getClob("MESSWERTE_XML"));
                 // SRC_CONTENT
                 // log.debug(srcContentJson);
-                this.insertSampleValues.setStringAtName("SRC_CONTENT", srcContentJson);
+                this.insertReleaseStmnt.setStringAtName("SRC_CONTENT", srcContentJson);
                 // this.insertSampleValues.setString(8, srcContentJson);
 
                 // FIXME: Execute Batch does not work with large updates!!!!!
                 // this.insertSampleValues.addBatch();
 
-                this.insertSampleValues.executeUpdate();
-                final ResultSet generatedKeys = this.insertSampleValues.getGeneratedKeys();
+                this.insertReleaseStmnt.executeUpdate();
+                final ResultSet generatedKeys = this.insertReleaseStmnt.getGeneratedKeys();
                 if ((null != generatedKeys)) {
                     while (generatedKeys.next()) {
                         sampeValueIds.add(generatedKeys.getLong(1));
@@ -752,11 +722,13 @@ public class EprtrImport extends OracleImport {
             logger.info("EPRTR Indeximport successfully initialized and bootstrapped in "
                         + ((System.currentTimeMillis() - startTime) / 1000) + "s");
 
-            logger.info("Starting EPRTR Import ......");
-            final int installations = eprtrImport.doImport();
-
-            logger.info(installations + " EPRTR Installations successfully imported in "
-                        + ((System.currentTimeMillis() - startTime) / 1000 / 60) + "m");
+            /*
+             * logger.info("Starting EPRTR Import ......"); final int installations = eprtrImport.doImport();
+             *
+             * logger.info(installations + " EPRTR Installations successfully imported in "         +
+             * ((System.currentTimeMillis() - startTime) / 1000 / 60) + "m");
+             *
+             */
         } catch (Exception ex) {
             logger.error("could not create EPRTR import instance: " + ex.getMessage(), ex);
         } finally {

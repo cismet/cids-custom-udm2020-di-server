@@ -41,8 +41,9 @@ public class OracleImport extends OracleExport {
     //~ Instance fields --------------------------------------------------------
 
     protected Connection targetConnection = null;
-    protected PreparedStatement insertUniqueTag = null;
-    protected PreparedStatement insertGenericGeom = null;
+    protected PreparedStatement insertUniqueTagStmnt = null;
+    protected PreparedStatement insertGenericGeomStmnt = null;
+    protected PreparedStatement deleteGeomStmnt = null;
     protected final ScriptEngine engine;
 
     //~ Constructors -----------------------------------------------------------
@@ -133,12 +134,19 @@ public class OracleImport extends OracleExport {
             final String insertUniqueTagTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                         "/de/cismet/cids/custom/udm2020di/indeximport/insert-unique-tag.prs.sql"),
                     "UTF-8");
-            this.insertUniqueTag = targetConnection.prepareStatement(insertUniqueTagTpl, new String[] { "ID" });
+            this.insertUniqueTagStmnt = targetConnection.prepareStatement(insertUniqueTagTpl, new String[] { "ID" });
 
             final String insertGeomStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                         "/de/cismet/cids/custom/udm2020di/indeximport/insert-generic-geom.prs.sql"),
                     "UTF-8");
-            this.insertGenericGeom = targetConnection.prepareStatement(insertGeomStatementTpl, new String[] { "ID" });
+            this.insertGenericGeomStmnt = targetConnection.prepareStatement(
+                    insertGeomStatementTpl,
+                    new String[] { "ID" });
+
+            final String deleteGeomStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                        "/de/cismet/cids/custom/udm2020di/indeximport/delete-geom.prs.sql"),
+                    "UTF-8");
+            this.deleteGeomStmnt = targetConnection.prepareStatement(deleteGeomStatementTpl);
         } catch (SQLException sqeex) {
             log.error("Could not prepare generic statements:" + sqeex.getMessage(), sqeex);
             throw sqeex;
@@ -161,13 +169,13 @@ public class OracleImport extends OracleExport {
             final String name,
             final String description,
             final String taggroupkey) throws SQLException {
-        assert insertUniqueTag != null : "Statement not yet prepared";
+        assert insertUniqueTagStmnt != null : "Statement not yet prepared";
 
-        this.insertUniqueTag.setString(1, key);
-        this.insertUniqueTag.setString(2, name);
-        this.insertUniqueTag.setString(3, description);
-        this.insertUniqueTag.setString(4, taggroupkey);
-        this.insertUniqueTag.executeUpdate();
+        this.insertUniqueTagStmnt.setString(1, key);
+        this.insertUniqueTagStmnt.setString(2, name);
+        this.insertUniqueTagStmnt.setString(3, description);
+        this.insertUniqueTagStmnt.setString(4, taggroupkey);
+        this.insertUniqueTagStmnt.executeUpdate();
 
         // does not work with MERGE Statements !!!!!
         // ResultSet generatedKeys = this.insertGenericGeom.getGeneratedKeys();
@@ -193,15 +201,15 @@ public class OracleImport extends OracleExport {
      */
     protected long insertGeomPoint(final float X, final float Y, final int sourceSRS, final int targetSRS)
             throws SQLException {
-        assert insertGenericGeom != null : "Statement not yet prepared";
+        assert insertGenericGeomStmnt != null : "Statement not yet prepared";
 
-        this.insertGenericGeom.setString(
+        this.insertGenericGeomStmnt.setString(
             1,
             new StringBuilder().append("POINT(").append(X).append(' ').append(Y).append(')').toString());
-        this.insertGenericGeom.setFloat(2, sourceSRS);
-        this.insertGenericGeom.setFloat(3, targetSRS);
-        this.insertGenericGeom.executeUpdate();
-        final ResultSet generatedKeys = this.insertGenericGeom.getGeneratedKeys();
+        this.insertGenericGeomStmnt.setFloat(2, sourceSRS);
+        this.insertGenericGeomStmnt.setFloat(3, targetSRS);
+        this.insertGenericGeomStmnt.executeUpdate();
+        final ResultSet generatedKeys = this.insertGenericGeomStmnt.getGeneratedKeys();
         long generatedKey = -1;
 
         if ((null != generatedKeys) && generatedKeys.next()) {

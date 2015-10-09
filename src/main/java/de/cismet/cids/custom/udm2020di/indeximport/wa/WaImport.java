@@ -397,6 +397,11 @@ public class WaImport extends OracleImport {
                                 + "': no supported sample values found!");
                     this.deleteStationStmnt.setLong(1, waStationId);
                     this.deleteStationStmnt.executeUpdate();
+
+                    if (stationGeomId != -1) {
+                        this.deleteGeomStmnt.setLong(1, stationGeomId);
+                        this.deleteGeomStmnt.executeUpdate();
+                    }
                 }
 
                 // save the station
@@ -430,10 +435,9 @@ public class WaImport extends OracleImport {
             log.debug("closing connections ....");
         }
         this.getSampleValuesStmnt.close();
-
-        this.insertGenericGeom.close();
-        this.insertUniqueTag.close();
-
+        this.insertGenericGeomStmnt.close();
+        this.insertUniqueTagStmnt.close();
+        this.deleteGeomStmnt.close();
         this.insertStationStmnt.close();
         this.deleteStationStmnt.close();
         this.insertSampleValuesStmnt.close();

@@ -17,7 +17,7 @@ import java.util.TreeMap;
 /**
  * DOCUMENT ME!
  *
- * @author   pd
+ * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
 public class AggregationValues extends AbstractCollection<AggregationValue> {
@@ -73,9 +73,15 @@ public class AggregationValues extends AbstractCollection<AggregationValue> {
                                                                                       : maxDate;
         minDate = ((minDate == null) || aggregationValue.getMinDate().before(minDate)) ? aggregationValue.getMinDate()
                                                                                        : minDate;
+        // group EPRTR aggregation values by release type
+        final String aggregationKey =
+            ((aggregationValue.getReleaseType() != null)
+                        && !aggregationValue.getReleaseType().isEmpty())
+            ? (aggregationValue.getReleaseType() + '.' + aggregationValue.getPollutantKey())
+            : aggregationValue.getPollutantKey();
 
-        if (aggregationValues.containsKey(aggregationValue.getPollutantKey())) {
-            final AggregationValue existingAggregationValue = aggregationValues.get(aggregationValue.getPollutantKey());
+        if (aggregationValues.containsKey(aggregationKey)) {
+            final AggregationValue existingAggregationValue = aggregationValues.get(aggregationKey);
 
             // set new max values and corresponding date of max value (not max date!)
             if (aggregationValue.getMaxValue() > existingAggregationValue.getMaxValue()) {
@@ -98,11 +104,13 @@ public class AggregationValues extends AbstractCollection<AggregationValue> {
 
             return false;
         } else {
-            aggregationValues.put(aggregationValue.getPollutantKey(),
+            aggregationValues.put(
+                aggregationKey,
                 new AggregationValue(
                     aggregationValue.getName(),
                     aggregationValue.getUnit(),
                     aggregationValue.getProbePk(),
+                    aggregationValue.getReleaseType(),
                     aggregationValue.getPollutantKey(),
                     aggregationValue.getPollutantgroupKey(),
                     aggregationValue.getMinDate(),

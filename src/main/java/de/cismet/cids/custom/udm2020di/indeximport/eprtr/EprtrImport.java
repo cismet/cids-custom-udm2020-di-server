@@ -26,7 +26,6 @@ import java.nio.file.StandardOpenOption;
 
 import java.sql.Clob;
 import java.sql.Date;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -35,7 +34,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import de.cismet.cids.custom.udm2020di.indeximport.OracleImport;
 import de.cismet.cids.custom.udm2020di.types.AggregationValue;
@@ -43,6 +44,7 @@ import de.cismet.cids.custom.udm2020di.types.AggregationValues;
 import de.cismet.cids.custom.udm2020di.types.Parameter;
 import de.cismet.cids.custom.udm2020di.types.ParameterMapping;
 import de.cismet.cids.custom.udm2020di.types.ParameterMappings;
+import de.cismet.cids.custom.udm2020di.types.eprtr.Activity;
 import de.cismet.cids.custom.udm2020di.types.eprtr.Address;
 import de.cismet.cids.custom.udm2020di.types.eprtr.Installation;
 
@@ -65,7 +67,9 @@ public class EprtrImport extends OracleImport {
     protected final OraclePreparedStatement getTagsStnmt;
     protected final OraclePreparedStatement updateInstallationJsonStnmt;
     protected final ParameterMappings parameterMappings = new ParameterMappings();
-    protected final Map<String, String> reflistMap;
+    protected final Map<String, String> reflistMap = new HashMap<String, String>();
+    protected final List<String> productsReflist = new ArrayList<String>();
+    protected final Random random = new Random();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -160,7 +164,7 @@ public class EprtrImport extends OracleImport {
             log.debug(this.parameterMappings.size() + " parameter mappings cached");
         }
 
-        this.reflistMap = this.initEprtrReflist();
+        this.initEprtrReflists();
     }
 
     /**
@@ -191,15 +195,11 @@ public class EprtrImport extends OracleImport {
     /**
      * DOCUMENT ME!
      *
-     * @return  DOCUMENT ME!
-     *
      * @throws  IOException   DOCUMENT ME!
      * @throws  SQLException  DOCUMENT ME!
      */
-    protected final Map<String, String> initEprtrReflist() throws IOException, SQLException {
+    protected final void initEprtrReflists() throws IOException, SQLException {
         final long startTime = System.currentTimeMillis();
-
-        final HashMap<String, String> eprtrReflist = new HashMap<String, String>();
 
         final String selectEprtrReflistTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/eprtr/select-eprtr-reflist.sql"),
@@ -208,20 +208,32 @@ public class EprtrImport extends OracleImport {
         final ResultSet eprtrReflistResultSet = selectEprtrReflistStmnt.executeQuery(selectEprtrReflistTpl);
 
         while (eprtrReflistResultSet.next()) {
-            eprtrReflist.put(
+            this.reflistMap.put(
                 eprtrReflistResultSet.getString(1),
                 eprtrReflistResultSet.getString(2));
         }
 
-        selectEprtrReflistStmnt.close();
         eprtrReflistResultSet.close();
+        selectEprtrReflistStmnt.close();
 
-        if (log.isDebugEnabled()) {
-            log.debug(eprtrReflist.size() + " reference value mappings cached in "
-                        + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+        final String selectProductsReflistTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                    "/de/cismet/cids/custom/udm2020di/indeximport/eprtr/select-eprtr-reflist-products.sql"),
+                "UTF-8");
+        final Statement selectEprtrProductsStmnt = this.targetConnection.createStatement();
+        final ResultSet eprtrProductsResultSet = selectEprtrProductsStmnt.executeQuery(selectProductsReflistTpl);
+
+        while (eprtrProductsResultSet.next()) {
+            this.productsReflist.add(
+                eprtrProductsResultSet.getString(2));
         }
 
-        return eprtrReflist;
+        eprtrProductsResultSet.close();
+        selectEprtrProductsStmnt.close();
+
+        if (log.isDebugEnabled()) {
+            log.debug(this.reflistMap.size() + " reference value mappings cached in "
+                        + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+        }
     }
 
     /**
@@ -278,7 +290,7 @@ public class EprtrImport extends OracleImport {
         }
         int i = 0;
 
-        while (installationsResultSet.next()) {
+        while (installationsResultSet.next() && (i < 25)) {
             try {
                 startTime = System.currentTimeMillis();
                 ++i;
@@ -366,11 +378,9 @@ public class EprtrImport extends OracleImport {
                 if (!releaseIds.isEmpty()) {
                     this.insertEprtrInstallationTagsRelation(eprtrInstallationId);
 
-                    final ObjectNode jsonObject 
-                            = (ObjectNode)JSON_MAPPER.valueToTree(eprtrInstallation);
-                    final ObjectNode jsonObjectConfidential 
-                            = (ObjectNode)JSON_MAPPER.valueToTree(
-                                    this.inferRestrictedActivities(eprtrInstallation));
+                    final ObjectNode jsonObject = (ObjectNode)JSON_MAPPER.valueToTree(eprtrInstallation);
+                    final ObjectNode jsonObjectConfidential = (ObjectNode)JSON_MAPPER.valueToTree(
+                            this.inferRestrictedActivities(eprtrInstallation));
 
                     this.updateSrcJson(eprtrInstallationId, jsonObject, jsonObjectConfidential);
                 } else {
@@ -429,28 +439,52 @@ public class EprtrImport extends OracleImport {
 
         return i;
     }
-    
-    // TODO
-    protected Installation inferRestrictedActivities(final Installation installation) {
-        return installation;
+    /**
+     * TODO.
+     *
+     * @param   installation  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  CloneNotSupportedException  DOCUMENT ME!
+     */
+    protected Installation inferRestrictedActivities(final Installation installation)
+            throws CloneNotSupportedException {
+        final Installation restrictedInstallation = new Installation();
+        restrictedInstallation.setErasId(installation.getErasId());
+        final List<Activity> activities = installation.getActivities();
+        if ((activities != null) && !activities.isEmpty()) {
+            final ArrayList<Activity> restrictedActivities = new ArrayList<Activity>(activities.size());
+            for (final Activity activity : activities) {
+                final Activity restrictedActivity = (Activity)activity.clone();
+                restrictedActivity.setProduct(
+                    this.productsReflist.get(random.nextInt(this.productsReflist.size())));
+                restrictedActivity.setProductionVolume(random.nextInt(5000000));
+                restrictedActivity.setOperatingHours(random.nextInt(8760));
+                restrictedActivities.add(restrictedActivity);
+            }
+
+            restrictedInstallation.setActivities(restrictedActivities);
+        }
+
+        return restrictedInstallation;
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param   eprtrInstallationId  DOCUMENT ME!
-     * @param   jsonNode             DOCUMENT ME!
+     * @param   eprtrInstallationId     DOCUMENT ME!
+     * @param   jsonNode                DOCUMENT ME!
+     * @param   jsonObjectConfidential  DOCUMENT ME!
      *
      * @throws  SQLException             DOCUMENT ME!
      * @throws  JsonProcessingException  DOCUMENT ME!
      * @throws  IOException              DOCUMENT ME!
      */
     protected void updateSrcJson(
-            final long eprtrInstallationId, 
-            final ObjectNode jsonNode, 
-            final ObjectNode jsonObjectConfidential) throws SQLException,
-        JsonProcessingException,
-        IOException {
+            final long eprtrInstallationId,
+            final ObjectNode jsonNode,
+            final ObjectNode jsonObjectConfidential) throws SQLException, JsonProcessingException, IOException {
         getTagsStnmt.setLongAtName("INSTALLATION_ID", eprtrInstallationId);
         final ResultSet getTagsResult = getTagsStnmt.executeQuery();
 
@@ -461,17 +495,19 @@ public class EprtrImport extends OracleImport {
             final Clob srcContentClob = this.targetConnection.createClob();
             final Writer clobWriter = srcContentClob.setCharacterStream(1);
             JSON_MAPPER.writeValue(clobWriter, jsonNode);
-            
+
             final Clob srcContentConfidentialClob = this.targetConnection.createClob();
             final Writer clobConfidentialWriter = srcContentConfidentialClob.setCharacterStream(1);
             JSON_MAPPER.writeValue(clobConfidentialWriter, jsonObjectConfidential);
-            
+
             updateInstallationJsonStnmt.setClob(1, srcContentClob);
             updateInstallationJsonStnmt.setClob(2, srcContentConfidentialClob);
             updateInstallationJsonStnmt.setLong(3, eprtrInstallationId);
+            updateInstallationJsonStnmt.setLong(4, eprtrInstallationId);
+            updateInstallationJsonStnmt.setLong(5, eprtrInstallationId);
 
             updateInstallationJsonStnmt.executeUpdate();
-            
+
             clobWriter.close();
             clobConfidentialWriter.close();
         } catch (Exception ex) {
@@ -496,7 +532,7 @@ public class EprtrImport extends OracleImport {
      * @throws  SQLException  DOCUMENT ME!
      */
     protected void insertEprtrInstallationTagsRelation(final long eprtrInstallationId) throws SQLException {
-        this.insertInstallationTagsRelStmnt.setLongAtName("STATION_ID", eprtrInstallationId);
+        this.insertInstallationTagsRelStmnt.setLongAtName("INSTALLATION_ID", eprtrInstallationId);
         this.insertInstallationTagsRelStmnt.executeUpdate();
         if (log.isDebugEnabled()) {
             log.debug("InstallationTagsRelation created");
@@ -534,6 +570,7 @@ public class EprtrImport extends OracleImport {
 
                 // aggregation parameter mapping!
                 final ParameterMapping parameterMapping = this.parameterMappings.getAggregationMapping(POLLUTANT_KEY);
+                aggregationValue.setUnit(parameterMapping.getUnit());
 
                 // KEY and SCR_ID
                 final long RELEASE_ID = releasesResultSet.getLong("RELEASE_ID");
@@ -548,6 +585,7 @@ public class EprtrImport extends OracleImport {
                 // RELEASE_TYPE
                 final String RELEASE_TYPE = releasesResultSet.getString("RELEASE_TYPE");
                 this.insertReleaseStmnt.setStringAtName("RELEASE_TYPE", RELEASE_TYPE);
+                aggregationValue.setReleaseType(RELEASE_TYPE);
 
                 // NOTIFICATION_PERIOD
                 final String NOTIFICATION_PERIOD = releasesResultSet.getString("NOTIFICATION_PERIOD");
@@ -557,20 +595,20 @@ public class EprtrImport extends OracleImport {
                 this.insertReleaseStmnt.setLongAtName("INSTALLATION", eprtrInstallationId);
 
                 // POLLUTANT
-                this.insertReleaseStmnt.setStringAtName("POLLUTANT", parameterMapping.getPollutantTagKey());
+                this.insertReleaseStmnt.setLongAtName("POLLUTANT_ID", parameterMapping.getPollutantTagId());
                 aggregationValue.setPollutantKey(parameterMapping.getPollutantTagKey());
 
                 // POLLUTANT_GROUP
-                this.insertReleaseStmnt.setStringAtName("POLLUTANT_GROUP", parameterMapping.getPollutantGroupKey());
+                this.insertReleaseStmnt.setLongAtName("POLLUTANT_GROUP_ID", parameterMapping.getPollutantGroupTagId());
                 aggregationValue.setPollutantgroupKey(parameterMapping.getPollutantGroupKey());
 
                 // MIN_DATE
-                final Date minDate = releasesResultSet.getDate("MIN_DATE");
+                final Date minDate = releasesResultSet.getDate("START_DATE");
                 this.insertReleaseStmnt.setDateAtName("MIN_DATE", minDate);
                 aggregationValue.setMinDate(minDate);
 
                 // MAX_DATE
-                final Date maxDate = releasesResultSet.getDate("MAX_DATE");
+                final Date maxDate = releasesResultSet.getDate("END_DATE");
                 this.insertReleaseStmnt.setDateAtName("MAX_DATE", maxDate);
                 aggregationValue.setMaxDate(maxDate);
 
@@ -661,13 +699,14 @@ public class EprtrImport extends OracleImport {
         } else {
             log.error("could not fetch generated key for inserted EPRTR Installation!");
         }
+
         if (log.isDebugEnabled()) {
-            // this.insertInstallation.close();
             log.debug("EPRTR installation " + installationKey + " inserted in "
                         + (System.currentTimeMillis() - startTime)
                         + "ms, new ID is "
                         + generatedKey);
         }
+
         return generatedKey;
     }
 
@@ -677,12 +716,25 @@ public class EprtrImport extends OracleImport {
      * @param  installation  DOCUMENT ME!
      */
     protected void updateInstallationReferenceValues(final Installation installation) {
+        if ((installation.getNaceClass() != null)
+                    && !installation.getNaceClass().isEmpty()) {
+            installation.setNaceClass(this.getReferenceValue(installation.getNaceClass()));
+        }
+
+        if ((installation.getRiverCatchment() != null)
+                    && !installation.getRiverCatchment().isEmpty()) {
+            installation.setRiverCatchment(this.getReferenceValue(installation.getRiverCatchment()));
+        }
+
         if (installation.getAddresses() != null) {
             for (final Address address : installation.getAddresses()) {
                 address.setCity(this.getReferenceValue(address.getCity()));
                 address.setDistrict(this.getReferenceValue(address.getDistrict()));
                 address.setRegion(this.getReferenceValue(address.getRegion()));
             }
+        } else {
+            log.warn("EPRTR Installation '" + installation.getName()
+                        + "' without addresses!");
         }
 
         if (installation.getReleaseParameters() != null) {
@@ -697,6 +749,9 @@ public class EprtrImport extends OracleImport {
 
             installation.setReleaseParameters(
                 new ArrayList<Parameter>(uniqueReleaseParameters.values()));
+        } else {
+            log.warn("EPRTR Installation '" + installation.getName()
+                        + "' without release parameters!");
         }
     }
 
@@ -724,13 +779,11 @@ public class EprtrImport extends OracleImport {
             logger.info("EPRTR Indeximport successfully initialized and bootstrapped in "
                         + ((System.currentTimeMillis() - startTime) / 1000) + "s");
 
-            /*
-             * logger.info("Starting EPRTR Import ......"); final int installations = eprtrImport.doImport();
-             *
-             * logger.info(installations + " EPRTR Installations successfully imported in "         +
-             * ((System.currentTimeMillis() - startTime) / 1000 / 60) + "m");
-             *
-             */
+            logger.info("Starting EPRTR Import ......");
+            final int installations = eprtrImport.doImport();
+
+            logger.info(installations + " EPRTR Installations successfully imported in "
+                        + ((System.currentTimeMillis() - startTime) / 1000 / 60) + "m");
         } catch (Exception ex) {
             logger.error("could not create EPRTR import instance: " + ex.getMessage(), ex);
         } finally {

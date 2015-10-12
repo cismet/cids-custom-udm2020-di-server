@@ -8,6 +8,7 @@
 package de.cismet.cids.custom.udm2020di.types;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
@@ -29,6 +30,7 @@ import javax.xml.bind.annotation.XmlTransient;
  * @version  $Revision$, $Date$
  */
 @JacksonXmlRootElement
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Parameter implements Serializable, Comparable<Parameter> {
 
     //~ Static fields/initializers ---------------------------------------------

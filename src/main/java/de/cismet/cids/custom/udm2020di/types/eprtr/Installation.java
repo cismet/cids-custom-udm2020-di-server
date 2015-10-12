@@ -82,6 +82,9 @@ public class Installation {
     @JacksonXmlProperty
     private List<Tag> tags;
 
+    @JacksonXmlProperty
+    private List<Notification> notifications;
+
     @JacksonXmlProperty(localName = "aggregationvalues")
     @JsonProperty("aggregationvalues")
     private List<AggregationValue> aggregationValues;

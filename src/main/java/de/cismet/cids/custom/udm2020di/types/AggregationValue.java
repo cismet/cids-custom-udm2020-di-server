@@ -80,6 +80,10 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
     @JsonProperty("probepk")
     private String probePk;
 
+    @JacksonXmlProperty(localName = "releasetype")
+    @JsonProperty("releasetype")
+    private String releaseType;
+
     //~ Constructors -----------------------------------------------------------
 
     /**
@@ -94,6 +98,7 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
      * @param  name               DOCUMENT ME!
      * @param  unit               DOCUMENT ME!
      * @param  probePk            DOCUMENT ME!
+     * @param  releaseType        DOCUMENT ME!
      * @param  pollutantKey       DOCUMENT ME!
      * @param  pollutantgroupKey  DOCUMENT ME!
      * @param  minDate            DOCUMENT ME!
@@ -104,6 +109,7 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
     public AggregationValue(final String name,
             final String unit,
             final String probePk,
+            final String releaseType,
             final String pollutantKey,
             final String pollutantgroupKey,
             final Date minDate,
@@ -113,6 +119,7 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
         this.name = name;
         this.unit = unit;
         this.probePk = probePk;
+        this.releaseType = releaseType;
         this.pollutantKey = pollutantKey;
         this.pollutantgroupKey = pollutantgroupKey;
         this.minDate = minDate;
@@ -314,6 +321,24 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
         this.maxValue = maxValue;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getReleaseType() {
+        return releaseType;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  releaseType  DOCUMENT ME!
+     */
+    public void setReleaseType(final String releaseType) {
+        this.releaseType = releaseType;
+    }
+
     @Override
     public int compareTo(final AggregationValue aggregationValue) {
         return this.getName().compareTo(aggregationValue.getName());
@@ -331,6 +356,7 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
                 this.name,
                 this.getUnit(),
                 this.probePk,
+                this.releaseType,
                 this.pollutantKey,
                 this.pollutantgroupKey,
                 (this.minDate != null) ? (Date)this.minDate.clone() : null,

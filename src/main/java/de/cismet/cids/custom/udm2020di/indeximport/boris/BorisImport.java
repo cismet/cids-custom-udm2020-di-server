@@ -410,6 +410,8 @@ public class BorisImport extends OracleImport {
             JSON_MAPPER.writeValue(clobWriter, jsonNode);
             updateSiteJson.setClob(1, srcContentClob);
             updateSiteJson.setLong(2, borisSiteId);
+            updateSiteJson.setLong(3, borisSiteId);
+            updateSiteJson.setLong(4, borisSiteId);
 
             updateSiteJson.executeUpdate();
             clobWriter.close();

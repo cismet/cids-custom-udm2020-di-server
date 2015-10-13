@@ -79,7 +79,6 @@ public class BorisExportAction extends AbstractExportAction {
 
     public static final String TASK_NAME = "borisExportAction";
     public static final String PARAM_STANDORTE = "standorte";
-    public static final String PARAM_PARAMETER = "parameter";
     public static final int BORIS_EPSG = 31287;
 
     //~ Instance fields --------------------------------------------------------

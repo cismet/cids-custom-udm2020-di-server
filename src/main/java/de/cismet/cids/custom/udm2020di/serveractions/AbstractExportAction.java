@@ -47,6 +47,7 @@ public abstract class AbstractExportAction extends OracleExport implements Serve
     public static final String PARAM_EXPORTFORMAT_XLSX = "exportFormatXlsx";
     public static final String PARAM_EXPORTFORMAT_SHP = "exportFormatShp";
     public static final String PARAM_NAME = "name";
+    public static final String PARAM_PARAMETER = "parameter";
 
     //~ Constructors -----------------------------------------------------------
 

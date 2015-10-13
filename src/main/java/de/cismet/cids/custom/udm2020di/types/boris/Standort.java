@@ -222,6 +222,9 @@ public class Standort {
      */
     public void setStandortparameter(final List<Standortparameter> standortparameter) {
         this.standortparameter = standortparameter;
+        if ((this.standortparameter != null) && !this.standortparameter.isEmpty()) {
+            Collections.sort(this.standortparameter);
+        }
     }
 
     /**
@@ -240,7 +243,6 @@ public class Standort {
      */
     public void setProbenparameter(final List<Probenparameter> probenparameter) {
         this.probenparameter = probenparameter;
-
         if ((this.probenparameter != null) && !this.probenparameter.isEmpty()) {
             Collections.sort(this.probenparameter);
         }

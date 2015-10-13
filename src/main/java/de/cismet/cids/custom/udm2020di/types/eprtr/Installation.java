@@ -12,9 +12,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -58,6 +61,13 @@ public class Installation {
     )
     private String naceClass;
 
+    @JsonProperty("obligatedparty")
+    @JacksonXmlProperty(
+        isAttribute = true,
+        localName = "obligatedparty"
+    )
+    private String obligatedParty;
+
     @JsonProperty("rivercatchment")
     @JacksonXmlProperty(
         isAttribute = true,
@@ -80,16 +90,20 @@ public class Installation {
     private float latitude;
 
     @JacksonXmlProperty
+    @Setter(AccessLevel.NONE)
     private List<Tag> tags;
 
     @JacksonXmlProperty
+    @Setter(AccessLevel.NONE)
     private List<Notification> notifications;
 
     @JacksonXmlProperty(localName = "aggregationvalues")
     @JsonProperty("aggregationvalues")
+    @Setter(AccessLevel.NONE)
     private List<AggregationValue> aggregationValues;
 
     @JacksonXmlProperty
+    @Setter(AccessLevel.NONE)
     private List<Activity> activities;
 
     @JacksonXmlProperty
@@ -97,5 +111,68 @@ public class Installation {
 
     @JacksonXmlProperty(localName = "releaseparameters")
     @JsonProperty("releaseparameters")
+    @Setter(AccessLevel.NONE)
     private List<Parameter> releaseParameters;
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  tags  DOCUMENT ME!
+     */
+    public void setTags(final List<Tag> tags) {
+        this.tags = tags;
+        if ((this.tags != null) && !this.tags.isEmpty()) {
+            Collections.sort(this.tags);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  notifications  DOCUMENT ME!
+     */
+    public void setNotifications(final List<Notification> notifications) {
+        this.notifications = notifications;
+        if ((this.notifications != null) && !this.notifications.isEmpty()) {
+            Collections.sort(this.notifications);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  aggregationValues  DOCUMENT ME!
+     */
+    public void setAggregationValues(final List<AggregationValue> aggregationValues) {
+        this.aggregationValues = aggregationValues;
+        if ((this.aggregationValues != null) && !this.aggregationValues.isEmpty()) {
+            Collections.sort(this.aggregationValues);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  activities  DOCUMENT ME!
+     */
+    public void setActivities(final List<Activity> activities) {
+        this.activities = activities;
+        if ((this.activities != null) && !this.activities.isEmpty()) {
+            Collections.sort(this.activities);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  releaseParameters  DOCUMENT ME!
+     */
+    public void setReleaseParameters(final List<Parameter> releaseParameters) {
+        this.releaseParameters = releaseParameters;
+        if ((this.releaseParameters != null) && !this.releaseParameters.isEmpty()) {
+            Collections.sort(this.releaseParameters);
+        }
+    }
 }

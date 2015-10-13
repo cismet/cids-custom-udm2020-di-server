@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @AllArgsConstructor
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Notification {
+public class Notification implements Comparable<Notification> {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -70,4 +70,11 @@ public class Notification {
         localName = "reportingenddate"
     )
     private Date reportingEndDate;
+
+    //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public int compareTo(final Notification notification) {
+        return this.getMnemonic().compareTo(notification.getMnemonic());
+    }
 }

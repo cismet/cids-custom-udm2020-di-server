@@ -476,6 +476,8 @@ public class WaImport extends OracleImport {
             JSON_MAPPER.writeValue(clobWriter, jsonNode);
             updateStationJsonStmnt.setClob(1, srcContentClob);
             updateStationJsonStmnt.setLong(2, waStationId);
+            updateStationJsonStmnt.setLong(3, waStationId);
+            updateStationJsonStmnt.setLong(4, waStationId);
 
             updateStationJsonStmnt.executeUpdate();
             clobWriter.close();

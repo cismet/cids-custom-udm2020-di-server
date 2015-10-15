@@ -128,7 +128,7 @@ public class FilterByTagsSearch extends AbstractCidsServerSearch {
 //                String objectIdConstantsStatement = this.selectObjectIdConstantsTpl.replace(
 //                        "%CLASS_ID%",
 //                        classId.toString());
-//                objectIdConstantsStatement 
+//                objectIdConstantsStatement
 //                        = objectIdConstantsStatement.replace("%OBJECT_ID%", objectId.toString());
 //                objectIdConstantsBuilder.append(objectIdConstantsStatement);
                 objectIdsBuilder.append(objectId);
@@ -137,7 +137,7 @@ public class FilterByTagsSearch extends AbstractCidsServerSearch {
 //                    objectIdConstantsBuilder.append('\n');
 //                    objectIdConstantsBuilder.append(" UNION ");
 //                    objectIdConstantsBuilder.append('\n');
-                   objectIdsBuilder.append(',');
+                    objectIdsBuilder.append(',');
                 }
             }
 
@@ -169,8 +169,8 @@ public class FilterByTagsSearch extends AbstractCidsServerSearch {
     public Collection<Node> performServerSearch() throws SearchException {
         final long startTime = System.currentTimeMillis();
 
-        if (this.nodes != null && !this.nodes.isEmpty()
-                && this.filterTagIds != null && this.filterTagIds.isEmpty()) {
+        if ((this.nodes != null) && !this.nodes.isEmpty()
+                    && (this.filterTagIds != null) && !this.filterTagIds.isEmpty()) {
             log.info("filtering " + nodes.size() + " nodes by "
                         + filterTagIds.size() + " tags");
 
@@ -234,8 +234,8 @@ public class FilterByTagsSearch extends AbstractCidsServerSearch {
                 log.error("active local server " + DOMAIN + "not found"); // NOI18N
             }
         } else {
-            log.warn("missing parameters, returning returning unmodified node collection of size"
-                            + this.nodes.size());
+            log.warn("missing parameters, returning returning unmodified node collection of size "
+                        + this.nodes.size());
         }
 
         return nodes;

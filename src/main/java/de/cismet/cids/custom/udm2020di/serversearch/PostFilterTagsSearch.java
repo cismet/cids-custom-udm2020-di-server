@@ -130,7 +130,7 @@ public class PostFilterTagsSearch extends AbstractCidsServerSearch {
                         log.warn("no post filter tags found!");
                     } else {
                         log.info(resultSet.length + " post filter tags found in "
-                                    + (System.currentTimeMillis() + startTime) + "ms");
+                                    + (System.currentTimeMillis() - startTime) + "ms");
 
                         return Arrays.asList(resultSet);
                     }

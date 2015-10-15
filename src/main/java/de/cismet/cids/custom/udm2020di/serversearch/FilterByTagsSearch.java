@@ -5,7 +5,7 @@
 *              ... and it just works.
 *
 ****************************************************/
-package de.cismet.cids.custom.udm2020di.serversearches;
+package de.cismet.cids.custom.udm2020di.serversearch;
 
 import Sirius.server.middleware.interfaces.domainserver.MetaService;
 import Sirius.server.middleware.types.MetaObject;
@@ -121,29 +121,30 @@ public class FilterByTagsSearch extends AbstractCidsServerSearch {
             i++;
             final Collection<Integer> objectIds = objectIdMap.get(classId);
             final StringBuilder objectIdsBuilder = new StringBuilder();
-            final StringBuilder objectIdConstantsBuilder = new StringBuilder();
+//            final StringBuilder objectIdConstantsBuilder = new StringBuilder();
             final Iterator<Integer> objectIdsIterator = objectIds.iterator();
             while (objectIdsIterator.hasNext()) {
                 final Integer objectId = objectIdsIterator.next();
-                String objectIdConstantsStatement = this.selectObjectIdConstantsTpl.replace(
-                        "%CLASS_ID%",
-                        classId.toString());
-                objectIdConstantsStatement = objectIdConstantsStatement.replace("%OBJECT_ID%", objectId.toString());
-                objectIdConstantsBuilder.append(objectIdConstantsStatement);
-                objectIdsBuilder.append('\'').append(objectId).append('\'');
+//                String objectIdConstantsStatement = this.selectObjectIdConstantsTpl.replace(
+//                        "%CLASS_ID%",
+//                        classId.toString());
+//                objectIdConstantsStatement 
+//                        = objectIdConstantsStatement.replace("%OBJECT_ID%", objectId.toString());
+//                objectIdConstantsBuilder.append(objectIdConstantsStatement);
+                objectIdsBuilder.append(objectId);
 
                 if (objectIdsIterator.hasNext()) {
-                    objectIdConstantsBuilder.append('\n');
-                    objectIdConstantsBuilder.append(" UNION ");
-                    objectIdConstantsBuilder.append('\n');
-                    objectIdsBuilder.append(',');
+//                    objectIdConstantsBuilder.append('\n');
+//                    objectIdConstantsBuilder.append(" UNION ");
+//                    objectIdConstantsBuilder.append('\n');
+                   objectIdsBuilder.append(',');
                 }
             }
 
+//            String filterByTagsStatement = this.filterByTagsTpl.replace(
+//                    "%OBJECT_ID_CONSTANTS%",
+//                    objectIdConstantsBuilder);
             String filterByTagsStatement = this.filterByTagsTpl.replace(
-                    "%OBJECT_ID_CONSTANTS%",
-                    objectIdConstantsBuilder);
-            filterByTagsStatement = filterByTagsStatement.replace(
                     "%CLASS_ID%",
                     classId.toString());
             filterByTagsStatement = filterByTagsStatement.replace(
@@ -168,12 +169,8 @@ public class FilterByTagsSearch extends AbstractCidsServerSearch {
     public Collection<Node> performServerSearch() throws SearchException {
         final long startTime = System.currentTimeMillis();
 
-        if ((this.nodes != null) || !this.nodes.isEmpty()) {
-            if ((this.filterTagIds == null) || this.filterTagIds.isEmpty()) {
-                log.warn("no filter tags provided, returning unmodified node collection of size"
-                            + this.nodes.size());
-            }
-
+        if (this.nodes != null && !this.nodes.isEmpty()
+                && this.filterTagIds != null && this.filterTagIds.isEmpty()) {
             log.info("filtering " + nodes.size() + " nodes by "
                         + filterTagIds.size() + " tags");
 
@@ -192,8 +189,8 @@ public class FilterByTagsSearch extends AbstractCidsServerSearch {
                                     + (System.currentTimeMillis() - startTime) + " ms");
                         nodes.clear();
                     } else if (resultSet.size() == nodes.size()) {
-                        log.warn("no nodes filtered by " + filterTagIds.size() + "tags in "
-                                    + (System.currentTimeMillis() + startTime) + "ms");
+                        log.warn("no nodes filtered by " + filterTagIds.size() + " tags in "
+                                    + (System.currentTimeMillis() - startTime) + "ms");
                     } else {
                         log.info(resultSet.size() + " nodes of "
                                     + nodes.size() + " nodes remaining after applying "
@@ -237,9 +234,10 @@ public class FilterByTagsSearch extends AbstractCidsServerSearch {
                 log.error("active local server " + DOMAIN + "not found"); // NOI18N
             }
         } else {
-            log.warn("missing parameters, returning empty collection");
+            log.warn("missing parameters, returning returning unmodified node collection of size"
+                            + this.nodes.size());
         }
 
-        return this.nodes;
+        return nodes;
     }
 }

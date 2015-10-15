@@ -83,7 +83,8 @@ public class PostFilterTagsSearch extends AbstractCidsServerSearch {
             final StringBuilder objectIdsBuilder = new StringBuilder();
             final Iterator<Integer> objectIdsIterator = objectIds.iterator();
             while (objectIdsIterator.hasNext()) {
-                objectIdsBuilder.append('\'').append(objectIdsIterator.next()).append('\'');
+                // objectIdsBuilder.append('\'').append(objectIdsIterator.next()).append('\'');
+                objectIdsBuilder.append(objectIdsIterator.next());
                 if (objectIdsIterator.hasNext()) {
                     objectIdsBuilder.append(',');
                 }
@@ -111,8 +112,8 @@ public class PostFilterTagsSearch extends AbstractCidsServerSearch {
     public Collection performServerSearch() throws SearchException {
         final long startTime = System.currentTimeMillis();
 
-        if ((this.objectIdMap != null) || !this.objectIdMap.isEmpty()) {
-            log.info("performing search object tags of "
+        if ((this.objectIdMap != null) && !this.objectIdMap.isEmpty()) {
+            log.info("performing search for object tags of "
                         + this.objectIdMap.size() + " different classes.");
 
             final String postfilterTagsSearchStatement = this.createPostfilterTagsSearchStatement(this.objectIdMap);

@@ -33,7 +33,7 @@ public class GwMessstelle extends Messstelle {
 
     @JacksonXmlProperty(
         isAttribute = true,
-        localName = "gwkkame"
+        localName = "gwkname"
     )
     @JsonProperty("gwkname")
     private String gwkName;

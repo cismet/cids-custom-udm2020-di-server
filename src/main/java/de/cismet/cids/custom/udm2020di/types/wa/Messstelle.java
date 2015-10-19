@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import de.cismet.cids.custom.udm2020di.serializers.FlexibleFloatDeserializer;
 import de.cismet.cids.custom.udm2020di.types.AggregationValue;
+import de.cismet.cids.custom.udm2020di.types.boris.Probenparameter;
 
 /**
  * DOCUMENT ME!
@@ -80,7 +81,29 @@ public class Messstelle {
     @JsonProperty("aggregationvalues")
     private List<AggregationValue> aggregationValues;
 
+    @JacksonXmlProperty(localName = "probenparameter")
+    @JsonProperty("probenparameter")
+    private List<Probenparameter> probenparameter;
+
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public List<Probenparameter> getProbenparameter() {
+        return probenparameter;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  probenparameter  DOCUMENT ME!
+     */
+    public void setProbenparameter(final List<Probenparameter> probenparameter) {
+        this.probenparameter = probenparameter;
+    }
 
     /**
      * Get the value of name.

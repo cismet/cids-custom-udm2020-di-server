@@ -8,7 +8,6 @@
 package de.cismet.cids.custom.udm2020di.serversearch;
 
 import Sirius.server.middleware.interfaces.domainserver.MetaService;
-import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
 
@@ -25,7 +24,6 @@ import java.math.BigDecimal;
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -48,7 +46,7 @@ public class FilterByTagsSearch extends AbstractCidsServerSearch {
 
     protected static final String DOMAIN = "UDM2020-DI";
 
-    protected static final Logger log = Logger.getLogger(FilterByTagsSearch.class);
+    protected static final Logger LOG = Logger.getLogger(FilterByTagsSearch.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -171,12 +169,12 @@ public class FilterByTagsSearch extends AbstractCidsServerSearch {
 
         if ((this.nodes != null) && !this.nodes.isEmpty()
                     && (this.filterTagIds != null) && !this.filterTagIds.isEmpty()) {
-            log.info("filtering " + nodes.size() + " nodes by "
+            LOG.info("filtering " + nodes.size() + " nodes by "
                         + filterTagIds.size() + " tags");
 
             final String searchStatement = this.createFilterByTagsSearchStatement(nodes, filterTagIds);
-            if (log.isDebugEnabled()) {
-                log.debug(searchStatement);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(searchStatement);
             }
 
             final MetaService metaService = (MetaService)getActiveLocalServers().get(DOMAIN);
@@ -185,14 +183,14 @@ public class FilterByTagsSearch extends AbstractCidsServerSearch {
                     final ArrayList<ArrayList> resultSet = metaService.performCustomSearch(searchStatement);
 
                     if (resultSet.isEmpty()) {
-                        log.warn("all nodes filtered by " + filterTagIds.size() + " tags in "
+                        LOG.warn("all nodes filtered by " + filterTagIds.size() + " tags in "
                                     + (System.currentTimeMillis() - startTime) + " ms");
                         nodes.clear();
                     } else if (resultSet.size() == nodes.size()) {
-                        log.warn("no nodes filtered by " + filterTagIds.size() + " tags in "
+                        LOG.warn("no nodes filtered by " + filterTagIds.size() + " tags in "
                                     + (System.currentTimeMillis() - startTime) + "ms");
                     } else {
-                        log.info(resultSet.size() + " nodes of "
+                        LOG.info(resultSet.size() + " nodes of "
                                     + nodes.size() + " nodes remaining after applying "
                                     + filterTagIds.size() + " filter tags in "
                                     + (System.currentTimeMillis() + startTime) + "ms");
@@ -228,13 +226,13 @@ public class FilterByTagsSearch extends AbstractCidsServerSearch {
                         }
                     }
                 } catch (RemoteException ex) {
-                    log.error(ex.getMessage(), ex);
+                    LOG.error(ex.getMessage(), ex);
                 }
             } else {
-                log.error("active local server " + DOMAIN + "not found"); // NOI18N
+                LOG.error("active local server " + DOMAIN + "not found"); // NOI18N
             }
         } else {
-            log.warn("missing parameters, returning returning unmodified node collection of size "
+            LOG.warn("missing parameters, returning returning unmodified node collection of size "
                         + this.nodes.size());
         }
 

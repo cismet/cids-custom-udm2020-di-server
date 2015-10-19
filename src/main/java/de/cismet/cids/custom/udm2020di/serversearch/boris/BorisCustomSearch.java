@@ -228,7 +228,7 @@ public class BorisCustomSearch extends AbstractCidsServerSearch implements Custo
         }
 
         log.info(result.size() + " objects found in "
-                    + (System.currentTimeMillis() + startTime) + "ms");
+                    + (System.currentTimeMillis() - startTime) + "ms");
         return result;
     }
 }

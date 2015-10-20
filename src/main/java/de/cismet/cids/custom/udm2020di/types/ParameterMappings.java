@@ -31,7 +31,8 @@ public class ParameterMappings extends HashMap<String, ParameterMapping> {
                     && !value.getParameterAggregationPk().isEmpty()
                     && (value.getParameterPk() != null)
                     && !value.getParameterPk().isEmpty()
-                    && !parameterMappingMappings.containsKey(value.getParameterAggregationPk())) {
+                    && !value.getParameterPk().equalsIgnoreCase(value.getParameterAggregationPk())
+                    && !parameterMappingMappings.containsKey(key)) {
             parameterMappingMappings.put(key, value.getParameterAggregationPk());
         }
 
@@ -44,11 +45,18 @@ public class ParameterMappings extends HashMap<String, ParameterMapping> {
      * @param   key  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
+     *
+     * @throws  CloneNotSupportedException  DOCUMENT ME!
      */
-    public ParameterMapping getAggregationMapping(final String key) {
+    public ParameterMapping getAggregationMapping(final String key) throws CloneNotSupportedException {
         if (parameterMappingMappings.containsKey(key)
+                    && super.containsKey(key)
                     && super.containsKey(parameterMappingMappings.get(key))) {
-            return super.get(this.parameterMappingMappings.get(key));
+            final ParameterMapping sourceMapping = super.get(key);
+            final ParameterMapping targetMapping = super.get(this.parameterMappingMappings.get(key)).clone();
+            targetMapping.setParameterAggregationExpression(
+                sourceMapping.getParameterAggregationExpression());
+            return targetMapping;
         } else {
             return super.get(key);
         }

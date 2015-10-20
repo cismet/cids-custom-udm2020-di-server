@@ -54,8 +54,8 @@ public class WaImport extends OracleImport {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    protected static final String WAOW = "waow";
-    protected static final String WAGW = "wagw";
+    public static final String WAOW = "waow";
+    public static final String WAGW = "wagw";
 
     //~ Instance fields --------------------------------------------------------
 

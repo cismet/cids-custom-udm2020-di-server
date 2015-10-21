@@ -33,12 +33,7 @@ import java.sql.Statement;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 
 import de.cismet.cids.custom.udm2020di.indeximport.OracleImport;
 import de.cismet.cids.custom.udm2020di.types.AggregationValue;
@@ -480,12 +475,15 @@ public class BorisImport extends OracleImport {
      *
      * @return  DOCUMENT ME!
      *
-     * @throws  SQLException  DOCUMENT ME!
-     * @throws  IOException   DOCUMENT ME!
+     * @throws  SQLException                DOCUMENT ME!
+     * @throws  IOException                 DOCUMENT ME!
+     * @throws  CloneNotSupportedException  DOCUMENT ME!
      */
     protected Collection<Long> getAndInsertSampleValues(final long borisSiteId,
             final String siteSrcPk,
-            final Collection<AggregationValue> aggregationValues) throws SQLException, IOException {
+            final Collection<AggregationValue> aggregationValues) throws SQLException,
+        IOException,
+        CloneNotSupportedException {
         final Collection<Long> sampeValueIds = new HashSet<Long>();
         int i = 0;
         int added = 0;

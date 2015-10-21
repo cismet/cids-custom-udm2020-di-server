@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 //@JsonIgnoreProperties(ignoreUnknown = true)
-public class ParameterMapping {
+public class ParameterMapping implements Cloneable {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -67,6 +67,53 @@ public class ParameterMapping {
     @JacksonXmlProperty(localName = "parameteraggregationexpression")
     @JsonProperty("parameteraggregationexpression")
     private String parameterAggregationExpression;
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new ParameterMapping object.
+     */
+    public ParameterMapping() {
+    }
+
+    /**
+     * Creates a new ParameterMapping object.
+     *
+     * @param  parameterPk                     DOCUMENT ME!
+     * @param  displayName                     DOCUMENT ME!
+     * @param  unit                            DOCUMENT ME!
+     * @param  pollutantTagKey                 DOCUMENT ME!
+     * @param  pollutantGroupTagKey            DOCUMENT ME!
+     * @param  pollutantTagId                  DOCUMENT ME!
+     * @param  pollutantGroupTagId             DOCUMENT ME!
+     * @param  pollutantTagName                DOCUMENT ME!
+     * @param  pollutantGroupTagName           DOCUMENT ME!
+     * @param  parameterAggregationPk          DOCUMENT ME!
+     * @param  parameterAggregationExpression  DOCUMENT ME!
+     */
+    public ParameterMapping(final String parameterPk,
+            final String displayName,
+            final String unit,
+            final String pollutantTagKey,
+            final String pollutantGroupTagKey,
+            final long pollutantTagId,
+            final long pollutantGroupTagId,
+            final String pollutantTagName,
+            final String pollutantGroupTagName,
+            final String parameterAggregationPk,
+            final String parameterAggregationExpression) {
+        this.parameterPk = parameterPk;
+        this.displayName = displayName;
+        this.unit = unit;
+        this.pollutantTagKey = pollutantTagKey;
+        this.pollutantGroupTagKey = pollutantGroupTagKey;
+        this.pollutantTagId = pollutantTagId;
+        this.pollutantGroupTagId = pollutantGroupTagId;
+        this.pollutantTagName = pollutantTagName;
+        this.pollutantGroupTagName = pollutantGroupTagName;
+        this.parameterAggregationPk = parameterAggregationPk;
+        this.parameterAggregationExpression = parameterAggregationExpression;
+    }
 
     //~ Methods ----------------------------------------------------------------
 
@@ -266,5 +313,21 @@ public class ParameterMapping {
      */
     public void setPollutantGroupTagName(final String pollutantGroupTagName) {
         this.pollutantGroupTagName = pollutantGroupTagName;
+    }
+
+    @Override
+    public ParameterMapping clone() throws CloneNotSupportedException {
+        return new ParameterMapping(
+                parameterPk,
+                displayName,
+                unit,
+                pollutantTagKey,
+                pollutantGroupTagKey,
+                pollutantTagId,
+                pollutantGroupTagId,
+                pollutantTagName,
+                pollutantGroupTagName,
+                parameterAggregationPk,
+                parameterAggregationExpression);
     }
 }

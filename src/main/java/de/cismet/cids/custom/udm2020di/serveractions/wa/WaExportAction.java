@@ -146,8 +146,9 @@ public abstract class WaExportAction extends AbstractExportAction {
             String tmpDecodeString = this.decodeSampleValuesStatementTpl.replace(
                     "%PARAMETER_PK%",
                     parameter.getParameterPk());
-            final String parameterName = (parameter.getParameterName().length() > 30)
-                ? parameter.getParameterName().substring(0, 30) : parameter.getParameterName();
+            // ORACLE: column name length restriction
+            final String parameterName = (parameter.getParameterName().length() > 28)
+                ? parameter.getParameterName().substring(0, 28) : parameter.getParameterName();
             tmpDecodeString = tmpDecodeString.replace("%PARAMETER_NAME%", parameterName);
             decodeBuilder.append(tmpDecodeString);
             if (parametersIterator.hasNext()) {

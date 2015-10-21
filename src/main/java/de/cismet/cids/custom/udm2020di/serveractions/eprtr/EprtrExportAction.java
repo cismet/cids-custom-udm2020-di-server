@@ -5,7 +5,7 @@
 *              ... and it just works.
 *
 ****************************************************/
-package de.cismet.cids.custom.udm2020di.serveractions.wa;
+package de.cismet.cids.custom.udm2020di.serveractions.eprtr;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -13,6 +13,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
 
 import org.deegree.datatypes.Types;
 import org.deegree.datatypes.UnknownTypeException;
@@ -24,12 +26,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -37,10 +44,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipOutputStream;
 
-import de.cismet.cids.custom.udm2020di.indeximport.wa.WaImport;
+import de.cismet.cids.custom.udm2020di.indeximport.eprtr.EprtrImport;
 import de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction;
 import de.cismet.cids.custom.udm2020di.types.Parameter;
 
+import de.cismet.cids.server.actions.ServerAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
 
 import de.cismet.cismap.commons.features.DefaultFeatureServiceFeature;
@@ -56,56 +64,45 @@ import de.cismet.cismap.commons.tools.SimpleFeatureCollection;
  * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
-public abstract class WaExportAction extends AbstractExportAction {
+@org.openide.util.lookup.ServiceProvider(service = ServerAction.class)
+public class EprtrExportAction extends AbstractExportAction {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    public static final String WAOW = WaImport.WAOW;
-    public static final String WAGW = WaImport.WAGW;
-
-    public static final String PARAM_MESSSTELLEN = "messstellen";
-    public static final int WA_EPSG = 31287;
+    public static final String TASK_NAME = "eprtrExportAction";
+    public static final String PARAM_INSTALLATIONS = "installations";
+    public static final int EPSG = 4326;
 
     //~ Instance fields --------------------------------------------------------
 
     protected final String decodeSampleValuesStatementTpl;
-    protected final String exportWaMesswerteStatementTpl;
+    protected final String exportEprtrReleaseStatementTpl;
     protected final String projectionFile;
-    protected final String waSource;
 
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new CsvExportAction object.
      *
-     * @param   waSource  DOCUMENT ME!
-     *
      * @throws  IOException             DOCUMENT ME!
      * @throws  ClassNotFoundException  DOCUMENT ME!
      * @throws  SQLException            DOCUMENT ME!
      */
-    public WaExportAction(final String waSource) throws IOException, ClassNotFoundException, SQLException {
-        super(WaImport.class.getResourceAsStream(waSource + ".properties"));
-        this.waSource = waSource;
+    public EprtrExportAction() throws IOException, ClassNotFoundException, SQLException {
+        super(EprtrImport.class.getResourceAsStream("eprtr.properties"));
+        this.log = Logger.getLogger(EprtrExportAction.class);
+        log.info("new EprtrExportAction created");
 
         this.decodeSampleValuesStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/dataexport/"
-                            + waSource
-                            + "/decode-"
-                            + waSource
-                            + "-messwerte.tpl.sql"),
+                    "/de/cismet/cids/custom/udm2020di/dataexport/eprtr/decode-eprtr-releases.tpl.sql"),
                 "UTF-8");
 
-        this.exportWaMesswerteStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/dataexport/"
-                            + waSource
-                            + "/export-"
-                            + waSource
-                            + "-messwerte.tpl.sql"),
+        this.exportEprtrReleaseStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                    "/de/cismet/cids/custom/udm2020di/dataexport/eprtr/export-eprtr-releases.tpl.sql"),
                 "UTF-8");
 
         this.projectionFile = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/dataexport/MGI_Austria_Lambert.prj"),
+                    "/de/cismet/cids/custom/udm2020di/dataexport/GCS_WGS_1984.prj"),
                 "UTF-8");
     }
 
@@ -114,25 +111,25 @@ public abstract class WaExportAction extends AbstractExportAction {
     /**
      * DOCUMENT ME!
      *
-     * @param   messstellePks  DOCUMENT ME!
-     * @param   parameters     DOCUMENT ME!
+     * @param   installationPks  DOCUMENT ME!
+     * @param   parameters       DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    protected String createExportWaMesswerteStatement(
-            final Collection<String> messstellePks,
+    protected String createExportEprtrReleaseStatement(
+            final Collection<Long> installationPks,
             final Collection<Parameter> parameters) {
         if (log.isDebugEnabled()) {
-            log.debug("creating export statements for " + messstellePks.size() + " Messstellen and "
+            log.debug("creating export statements for " + installationPks.size() + "installatione and "
                         + parameters.size() + parameters);
         }
 
-        final StringBuilder messstelleeBuilder = new StringBuilder();
-        final Iterator<String> messstellePksIterator = messstellePks.iterator();
-        while (messstellePksIterator.hasNext()) {
-            messstelleeBuilder.append('\'').append(messstellePksIterator.next()).append('\'');
-            if (messstellePksIterator.hasNext()) {
-                messstelleeBuilder.append(',');
+        final StringBuilder installationeBuilder = new StringBuilder();
+        final Iterator<Long> installationPksIterator = installationPks.iterator();
+        while (installationPksIterator.hasNext()) {
+            installationeBuilder.append(installationPksIterator.next());
+            if (installationPksIterator.hasNext()) {
+                installationeBuilder.append(',');
             }
         }
 
@@ -146,7 +143,6 @@ public abstract class WaExportAction extends AbstractExportAction {
             String tmpDecodeString = this.decodeSampleValuesStatementTpl.replace(
                     "%PARAMETER_PK%",
                     parameter.getParameterPk());
-            // ORACLE: column name length restriction
             final String parameterName = (parameter.getParameterName().length() > 28)
                 ? parameter.getParameterName().substring(0, 28) : parameter.getParameterName();
             tmpDecodeString = tmpDecodeString.replace("%PARAMETER_NAME%", parameterName);
@@ -161,34 +157,36 @@ public abstract class WaExportAction extends AbstractExportAction {
             }
         }
 
-        String exportWaMesswerteStatement = exportWaMesswerteStatementTpl.replace(
-                "%MESSWERT_DECODE_STATEMENTS%",
+        String exportEprtrReleaseStatement = exportEprtrReleaseStatementTpl.replace(
+                "%RELEASE_DECODE_STATEMENTS%",
                 decodeBuilder);
-        exportWaMesswerteStatement = exportWaMesswerteStatement.replace(
-                "%MESSWERT_PARAMETER_PKS%",
+        exportEprtrReleaseStatement = exportEprtrReleaseStatement.replace(
+                "%RELEASE_PARAMETER_PKS%",
                 parameterBuilder);
-        exportWaMesswerteStatement = exportWaMesswerteStatement.replace("%MESSSTELLE_PKS%", messstelleeBuilder);
+        exportEprtrReleaseStatement = exportEprtrReleaseStatement.replace(
+                "%INSTALLATION_ERAS_IDS%",
+                installationeBuilder);
         if (log.isDebugEnabled()) {
-            log.debug(exportWaMesswerteStatement);
+            log.debug(exportEprtrReleaseStatement);
         }
-        return exportWaMesswerteStatement;
+        return exportEprtrReleaseStatement;
     }
 
     @Override
     public Object execute(final Object body, final ServerActionParameter... params) {
-        Statement exportWaMesswerteStatement = null;
-        ResultSet exportWaMesswerteResult = null;
+        Statement exportEprtrReleaseStatement = null;
+        ResultSet exportEprtrReleaseResult = null;
         try {
             Object result = null;
 
-            Collection<String> messstellePks = null;
+            Collection<Long> installationPks = null;
             Collection<Parameter> parameters = null;
             String exportFormat = PARAM_EXPORTFORMAT_CSV;
             String name = "export";
 
             for (final ServerActionParameter param : params) {
-                if (param.getKey().equalsIgnoreCase(PARAM_MESSSTELLEN)) {
-                    messstellePks = (Collection<String>)param.getValue();
+                if (param.getKey().equalsIgnoreCase(PARAM_INSTALLATIONS)) {
+                    installationPks = (Collection<Long>)param.getValue();
                 } else if (param.getKey().equalsIgnoreCase(PARAM_PARAMETER)) {
                     parameters = (Collection<Parameter>)param.getValue();
                 } else if (param.getKey().equalsIgnoreCase(PARAM_EXPORTFORMAT)) {
@@ -201,46 +199,46 @@ public abstract class WaExportAction extends AbstractExportAction {
                 }
             }
 
-            if ((messstellePks != null) && (parameters != null)) {
-                final String exportWaMesswerte = this.createExportWaMesswerteStatement(messstellePks, parameters);
+            if ((installationPks != null) && (parameters != null)) {
+                final String exportEprtrRelease = this.createExportEprtrReleaseStatement(installationPks, parameters);
 
-                exportWaMesswerteStatement = this.sourceConnection.createStatement();
-                exportWaMesswerteResult = exportWaMesswerteStatement.executeQuery(exportWaMesswerte);
+                exportEprtrReleaseStatement = this.sourceConnection.createStatement();
+                exportEprtrReleaseResult = exportEprtrReleaseStatement.executeQuery(exportEprtrRelease);
 
                 if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_CSV)) {
-                    result = this.createCsv(exportWaMesswerteResult, name, false);
+                    result = this.createCsv(exportEprtrReleaseResult, name, false);
                 } else if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_XLSX)) {
-                    result = this.createXlsx(exportWaMesswerteResult, name);
+                    result = this.createXlsx(exportEprtrReleaseResult, name);
                 } else if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_SHP)) {
-                    result = this.createShapeFile(exportWaMesswerteResult, name);
+                    result = this.createShapeFile(exportEprtrReleaseResult, name);
                 } else {
                     final String message = "unsupported export format '" + exportFormat + "'";
                     log.error(message);
                     throw new Exception(message);
                 }
 
-                exportWaMesswerteStatement.close();
+                exportEprtrReleaseStatement.close();
             } else {
-                log.error("no PARAM_MESSSTELLEN and PARAM_PARAMETER server action parameters provided,"
+                log.error("no PARAM_INSTALLATIONS and PARAM_PARAMETER server action parameters provided,"
                             + "returning null");
             }
 
             return result;
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
-            if (exportWaMesswerteResult != null) {
+            if (exportEprtrReleaseResult != null) {
                 try {
-                    exportWaMesswerteResult.close();
+                    exportEprtrReleaseResult.close();
                 } catch (Exception e) {
-                    log.error("could not close exportWaMesswerteResult", e);
+                    log.error("could not close exportEprtrReleaseResult", e);
                 }
             }
 
-            if (exportWaMesswerteStatement != null) {
+            if (exportEprtrReleaseStatement != null) {
                 try {
-                    exportWaMesswerteStatement.close();
+                    exportEprtrReleaseStatement.close();
                 } catch (Exception e) {
-                    log.error("could not close exportWaMesswerteStatement", e);
+                    log.error("could not close exportEprtrReleaseStatement", e);
                 }
             }
 
@@ -270,7 +268,7 @@ public abstract class WaExportAction extends AbstractExportAction {
         UnknownTypeException,
         Exception {
         final PrecisionModel precisionModel = new PrecisionModel(PrecisionModel.FLOATING);
-        final GeometryFactory geometryFactory = new GeometryFactory(precisionModel, WA_EPSG);
+        final GeometryFactory geometryFactory = new GeometryFactory(precisionModel, EPSG);
         final ResultSetMetaData metaData = resultSet.getMetaData();
 
         final int columnCount = metaData.getColumnCount();
@@ -307,14 +305,13 @@ public abstract class WaExportAction extends AbstractExportAction {
         while (resultSet.next()) {
             rowNum++;
 
-            // final String STANDORT_PK = resultSet.getString("STANDORT_PK");
-            final float RECHTSWERT = resultSet.getFloat("XKOORDINATE");
-            final float HOCHWERT = resultSet.getFloat("YKOORDINATE");
-            final String PROBE_PK = resultSet.getString("PROBE_PK");
+            final float RECHTSWERT = resultSet.getFloat("LONGITUDE"); // Y
+            final float HOCHWERT = resultSet.getFloat("LATITUDE");    // X
+            final String INSTALLATION_ERAS_ID = resultSet.getString("INSTALLATION_ERAS_ID");
 
             int id;
             try {
-                id = Integer.parseInt(PROBE_PK);
+                id = Integer.parseInt(INSTALLATION_ERAS_ID);
             } catch (Exception ex) {
                 id = rowNum;
             }
@@ -357,5 +354,52 @@ public abstract class WaExportAction extends AbstractExportAction {
         output.close();
 
         return result;
+    }
+
+    @Override
+    public String getTaskName() {
+        return TASK_NAME;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  args  DOCUMENT ME!
+     */
+    public static void main(final String[] args) {
+        try {
+            final Collection<Long> installationPks = Arrays.asList(
+                    new Long[] { 4263L, 4287L, 4498L, 4567L, 1183L, 1985L, 2103L, 4077L, 4144L });
+
+            final Collection<Parameter> parameter = Arrays.asList(
+                    new Parameter[] {
+                        new Parameter("tscurwaxyd36cx", "Kohlenmonoxid (CO)"),
+                        new Parameter("vqktwy5mugt4im", "Phenole (als Gesamt-C)"),
+                        new Parameter("2wdixwiua7cjxm", "Stickoxide (NO/NO2)"),
+                        new Parameter("yidbi85iuww432", "Ammoniak (NH3)"),
+                        new Parameter("2ce2z9q9pv5j8w", "Quecksilber (Hg)"),
+                        new Parameter("g6exbw2kyryag8", "Kupfer (Cu)")
+                    });
+
+            final ServerActionParameter[] serverActionParameters = new ServerActionParameter[] {
+                    new ServerActionParameter<Collection<Long>>(PARAM_INSTALLATIONS, installationPks),
+                    new ServerActionParameter<Collection<Parameter>>(PARAM_PARAMETER, parameter),
+                    new ServerActionParameter<String>(PARAM_EXPORTFORMAT, PARAM_EXPORTFORMAT_SHP),
+                    new ServerActionParameter<String>(PARAM_NAME, "eprtr-shp-export")
+                };
+
+            BasicConfigurator.configure();
+            final EprtrExportAction eprtrExportAction = new EprtrExportAction();
+
+            final Object result = eprtrExportAction.execute(null, serverActionParameters);
+            // final Path csvFile = Files.write(Paths.get("eprtr-export.xlsx"), result.toString().getBytes("UTF-8"));
+
+            final Path file = Files.write(Paths.get("eprtr-shp-export.zip"), (byte[])result);
+            System.out.println("Export File written to "
+                        + file.toAbsolutePath().toString());
+        } catch (Throwable ex) {
+            Logger.getLogger(EprtrExportAction.class).fatal(ex.getMessage(), ex);
+            System.exit(1);
+        }
     }
 }

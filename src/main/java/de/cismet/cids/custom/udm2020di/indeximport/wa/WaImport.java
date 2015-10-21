@@ -270,7 +270,7 @@ public class WaImport extends OracleImport {
         }
         int i = 0;
 
-        while (stationsResultSet.next() && (i < 25)) {
+        while (stationsResultSet.next()) {
             try {
                 startTime = System.currentTimeMillis();
                 ++i;

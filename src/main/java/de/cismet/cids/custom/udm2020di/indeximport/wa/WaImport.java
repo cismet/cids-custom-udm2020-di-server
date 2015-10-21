@@ -34,7 +34,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 
 import de.cismet.cids.custom.udm2020di.indeximport.OracleImport;
 import de.cismet.cids.custom.udm2020di.types.AggregationValue;
@@ -55,8 +54,8 @@ public class WaImport extends OracleImport {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    protected static final String WAOW = "waow";
-    protected static final String WAGW = "wagw";
+    public static final String WAOW = "waow";
+    public static final String WAGW = "wagw";
 
     //~ Instance fields --------------------------------------------------------
 
@@ -271,7 +270,7 @@ public class WaImport extends OracleImport {
         }
         int i = 0;
 
-        while (stationsResultSet.next()) {
+        while (stationsResultSet.next() && (i < 25)) {
             try {
                 startTime = System.currentTimeMillis();
                 ++i;
@@ -523,12 +522,15 @@ public class WaImport extends OracleImport {
      *
      * @return  DOCUMENT ME!
      *
-     * @throws  SQLException  DOCUMENT ME!
-     * @throws  IOException   DOCUMENT ME!
+     * @throws  SQLException                DOCUMENT ME!
+     * @throws  IOException                 DOCUMENT ME!
+     * @throws  CloneNotSupportedException  DOCUMENT ME!
      */
     protected Collection<Long> getAndInsertSampleValues(final long waStationId,
             final String stationSrcPk,
-            final Collection<AggregationValue> aggregationValues) throws SQLException, IOException {
+            final Collection<AggregationValue> aggregationValues) throws SQLException,
+        IOException,
+        CloneNotSupportedException {
         final long currentTime = System.currentTimeMillis();
         final Collection<Long> sampeValueIds = new HashSet<Long>();
         int i = 0;
@@ -577,18 +579,33 @@ public class WaImport extends OracleImport {
                 aggregationValue.setPollutantgroupKey(parameterMapping.getPollutantGroupKey());
                 // this.insertSampleValuesStmnt.setString(3, mappedParameters[2]);
 
+                // SAMPLE_DATE
                 final Date sampleDate = sampleValuesResultSet.getDate("SAMPLE_DATE");
                 // this.insertSampleValuesStmnt.setDateAtName("MIN_DATE", sampleDate);
                 aggregationValue.setMinDate(sampleDate);
                 this.insertSampleValuesStmnt.setDateAtName("MAX_DATE", sampleDate);
                 aggregationValue.setMaxDate(sampleDate);
 
-                final float sampleValue = sampleValuesResultSet.getFloat("SAMPLE_VALUE");
+                // SAMPLE_VALUE
+                float sampleValue = sampleValuesResultSet.getFloat("SAMPLE_VALUE");
+                // convert if necessary
+                if ((parameterMapping.getParameterAggregationExpression() != null)
+                            && !parameterMapping.getParameterAggregationExpression().isEmpty()) {
+                    sampleValue = convertAggregationValue(
+                            sampleValue,
+                            parameterMapping.getParameterAggregationExpression());
+//                    if (log.isDebugEnabled()) {
+//                        log.debug("sample value '" + parameterMapping.getDisplayName()
+//                                    + "' converted to " + sampleValue + ' ' + parameterMapping.getUnit());
+//                    }
+                }
+                // ignore min value: samples values in index db not aggregated!
                 // this.insertSampleValuesStmnt.setFloatAtName("MIN_VALUE", sampleValue);
                 aggregationValue.setMinValue(sampleValue);
                 this.insertSampleValuesStmnt.setFloatAtName("MAX_VALUE", sampleValue);
                 aggregationValue.setMaxValue(sampleValue);
 
+                // PROBE_PK
                 aggregationValue.setProbePk(sampleValuesResultSet.getString("PROBE_PK"));
                 if ((parameterMapping.getUnit() != null) && !parameterMapping.getUnit().isEmpty()) {
                     aggregationValue.setUnit(parameterMapping.getUnit());

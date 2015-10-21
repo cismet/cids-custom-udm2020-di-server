@@ -5,7 +5,7 @@
 *              ... and it just works.
 *
 ****************************************************/
-package de.cismet.cids.custom.udm2020di.serveractions.boris;
+package de.cismet.cids.custom.udm2020di.serveractions.wa;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -13,8 +13,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
 
 import org.deegree.datatypes.Types;
 import org.deegree.datatypes.UnknownTypeException;
@@ -26,17 +24,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -44,11 +37,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipOutputStream;
 
-import de.cismet.cids.custom.udm2020di.indeximport.boris.BorisImport;
+import de.cismet.cids.custom.udm2020di.indeximport.wa.WaImport;
 import de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction;
 import de.cismet.cids.custom.udm2020di.types.Parameter;
 
-import de.cismet.cids.server.actions.ServerAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
 
 import de.cismet.cismap.commons.features.DefaultFeatureServiceFeature;
@@ -64,41 +56,52 @@ import de.cismet.cismap.commons.tools.SimpleFeatureCollection;
  * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
-@org.openide.util.lookup.ServiceProvider(service = ServerAction.class)
-public class BorisExportAction extends AbstractExportAction {
+public abstract class WaExportAction extends AbstractExportAction {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    public static final String TASK_NAME = "borisExportAction";
-    public static final String PARAM_STANDORTE = "standorte";
-    public static final int BORIS_EPSG = 31287;
+    public static final String WAOW = WaImport.WAOW;
+    public static final String WAGW = WaImport.WAGW;
+
+    public static final String PARAM_MESSSTELLEN = "messstellen";
+    public static final int WA_EPSG = 31287;
 
     //~ Instance fields --------------------------------------------------------
 
     protected final String decodeSampleValuesStatementTpl;
-    protected final String exportBorisMesswerteStatementTpl;
+    protected final String exportWaMesswerteStatementTpl;
     protected final String projectionFile;
+    protected final String waSource;
 
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new CsvExportAction object.
      *
+     * @param   waSource  DOCUMENT ME!
+     *
      * @throws  IOException             DOCUMENT ME!
      * @throws  ClassNotFoundException  DOCUMENT ME!
      * @throws  SQLException            DOCUMENT ME!
      */
-    public BorisExportAction() throws IOException, ClassNotFoundException, SQLException {
-        super(BorisImport.class.getResourceAsStream("boris.properties"));
-        this.log = Logger.getLogger(BorisExportAction.class);
-        log.info("new BorisExportAction created");
+    public WaExportAction(final String waSource) throws IOException, ClassNotFoundException, SQLException {
+        super(WaImport.class.getResourceAsStream(waSource + ".properties"));
+        this.waSource = waSource;
 
         this.decodeSampleValuesStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/dataexport/boris/decode-boris-messwerte.tpl.sql"),
+                    "/de/cismet/cids/custom/udm2020di/dataexport/"
+                            + waSource
+                            + "/decode-"
+                            + waSource
+                            + "-messwerte.tpl.sql"),
                 "UTF-8");
 
-        this.exportBorisMesswerteStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/dataexport/boris/export-boris-messwerte.tpl.sql"),
+        this.exportWaMesswerteStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                    "/de/cismet/cids/custom/udm2020di/dataexport/"
+                            + waSource
+                            + "/export-"
+                            + waSource
+                            + "-messwerte.tpl.sql"),
                 "UTF-8");
 
         this.projectionFile = IOUtils.toString(this.getClass().getResourceAsStream(
@@ -111,25 +114,25 @@ public class BorisExportAction extends AbstractExportAction {
     /**
      * DOCUMENT ME!
      *
-     * @param   standortPks  DOCUMENT ME!
-     * @param   parameters   DOCUMENT ME!
+     * @param   messstellePks  DOCUMENT ME!
+     * @param   parameters     DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    protected String createExportBorisMesswerteStatement(
-            final Collection<String> standortPks,
+    protected String createExportWaMesswerteStatement(
+            final Collection<String> messstellePks,
             final Collection<Parameter> parameters) {
         if (log.isDebugEnabled()) {
-            log.debug("creating export statements for " + standortPks.size() + "standorte and "
+            log.debug("creating export statements for " + messstellePks.size() + "messstellee and "
                         + parameters.size() + parameters);
         }
 
-        final StringBuilder standorteBuilder = new StringBuilder();
-        final Iterator<String> standortPksIterator = standortPks.iterator();
-        while (standortPksIterator.hasNext()) {
-            standorteBuilder.append('\'').append(standortPksIterator.next()).append('\'');
-            if (standortPksIterator.hasNext()) {
-                standorteBuilder.append(',');
+        final StringBuilder messstelleeBuilder = new StringBuilder();
+        final Iterator<String> messstellePksIterator = messstellePks.iterator();
+        while (messstellePksIterator.hasNext()) {
+            messstelleeBuilder.append('\'').append(messstellePksIterator.next()).append('\'');
+            if (messstellePksIterator.hasNext()) {
+                messstelleeBuilder.append(',');
             }
         }
 
@@ -157,34 +160,34 @@ public class BorisExportAction extends AbstractExportAction {
             }
         }
 
-        String exportBorisMesswerteStatement = exportBorisMesswerteStatementTpl.replace(
+        String exportWaMesswerteStatement = exportWaMesswerteStatementTpl.replace(
                 "%MESSWERT_DECODE_STATEMENTS%",
                 decodeBuilder);
-        exportBorisMesswerteStatement = exportBorisMesswerteStatement.replace(
+        exportWaMesswerteStatement = exportWaMesswerteStatement.replace(
                 "%MESSWERT_PARAMETER_PKS%",
                 parameterBuilder);
-        exportBorisMesswerteStatement = exportBorisMesswerteStatement.replace("%STANDORT_PKS%", standorteBuilder);
+        exportWaMesswerteStatement = exportWaMesswerteStatement.replace("%MESSSTELLE_PKS%", messstelleeBuilder);
         if (log.isDebugEnabled()) {
-            log.debug(exportBorisMesswerteStatement);
+            log.debug(exportWaMesswerteStatement);
         }
-        return exportBorisMesswerteStatement;
+        return exportWaMesswerteStatement;
     }
 
     @Override
     public Object execute(final Object body, final ServerActionParameter... params) {
-        Statement exportBorisMesswerteStatement = null;
-        ResultSet exportBorisMesswerteResult = null;
+        Statement exportWaMesswerteStatement = null;
+        ResultSet exportWaMesswerteResult = null;
         try {
             Object result = null;
 
-            Collection<String> standortPks = null;
+            Collection<String> messstellePks = null;
             Collection<Parameter> parameters = null;
             String exportFormat = PARAM_EXPORTFORMAT_CSV;
             String name = "export";
 
             for (final ServerActionParameter param : params) {
-                if (param.getKey().equalsIgnoreCase(PARAM_STANDORTE)) {
-                    standortPks = (Collection<String>)param.getValue();
+                if (param.getKey().equalsIgnoreCase(PARAM_MESSSTELLEN)) {
+                    messstellePks = (Collection<String>)param.getValue();
                 } else if (param.getKey().equalsIgnoreCase(PARAM_PARAMETER)) {
                     parameters = (Collection<Parameter>)param.getValue();
                 } else if (param.getKey().equalsIgnoreCase(PARAM_EXPORTFORMAT)) {
@@ -197,46 +200,46 @@ public class BorisExportAction extends AbstractExportAction {
                 }
             }
 
-            if ((standortPks != null) && (parameters != null)) {
-                final String exportBorisMesswerte = this.createExportBorisMesswerteStatement(standortPks, parameters);
+            if ((messstellePks != null) && (parameters != null)) {
+                final String exportWaMesswerte = this.createExportWaMesswerteStatement(messstellePks, parameters);
 
-                exportBorisMesswerteStatement = this.sourceConnection.createStatement();
-                exportBorisMesswerteResult = exportBorisMesswerteStatement.executeQuery(exportBorisMesswerte);
+                exportWaMesswerteStatement = this.sourceConnection.createStatement();
+                exportWaMesswerteResult = exportWaMesswerteStatement.executeQuery(exportWaMesswerte);
 
                 if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_CSV)) {
-                    result = this.createCsv(exportBorisMesswerteResult, name, false);
+                    result = this.createCsv(exportWaMesswerteResult, name, false);
                 } else if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_XLSX)) {
-                    result = this.createXlsx(exportBorisMesswerteResult, name);
+                    result = this.createXlsx(exportWaMesswerteResult, name);
                 } else if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_SHP)) {
-                    result = this.createShapeFile(exportBorisMesswerteResult, name);
+                    result = this.createShapeFile(exportWaMesswerteResult, name);
                 } else {
                     final String message = "unsupported export format '" + exportFormat + "'";
                     log.error(message);
                     throw new Exception(message);
                 }
 
-                exportBorisMesswerteStatement.close();
+                exportWaMesswerteStatement.close();
             } else {
-                log.error("no PARAM_STANDORTE and PARAM_PARAMETER server action parameters provided,"
+                log.error("no PARAM_MESSSTELLEN and PARAM_PARAMETER server action parameters provided,"
                             + "returning null");
             }
 
             return result;
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
-            if (exportBorisMesswerteResult != null) {
+            if (exportWaMesswerteResult != null) {
                 try {
-                    exportBorisMesswerteResult.close();
+                    exportWaMesswerteResult.close();
                 } catch (Exception e) {
-                    log.error("could not close exportBorisMesswerteResult", e);
+                    log.error("could not close exportWaMesswerteResult", e);
                 }
             }
 
-            if (exportBorisMesswerteStatement != null) {
+            if (exportWaMesswerteStatement != null) {
                 try {
-                    exportBorisMesswerteStatement.close();
+                    exportWaMesswerteStatement.close();
                 } catch (Exception e) {
-                    log.error("could not close exportBorisMesswerteStatement", e);
+                    log.error("could not close exportWaMesswerteStatement", e);
                 }
             }
 
@@ -266,7 +269,7 @@ public class BorisExportAction extends AbstractExportAction {
         UnknownTypeException,
         Exception {
         final PrecisionModel precisionModel = new PrecisionModel(PrecisionModel.FLOATING);
-        final GeometryFactory geometryFactory = new GeometryFactory(precisionModel, BORIS_EPSG);
+        final GeometryFactory geometryFactory = new GeometryFactory(precisionModel, WA_EPSG);
         final ResultSetMetaData metaData = resultSet.getMetaData();
 
         final int columnCount = metaData.getColumnCount();
@@ -304,8 +307,8 @@ public class BorisExportAction extends AbstractExportAction {
             rowNum++;
 
             // final String STANDORT_PK = resultSet.getString("STANDORT_PK");
-            final float RECHTSWERT = resultSet.getFloat("RECHTSWERT");
-            final float HOCHWERT = resultSet.getFloat("HOCHWERT");
+            final float RECHTSWERT = resultSet.getFloat("XKOORDINATE");
+            final float HOCHWERT = resultSet.getFloat("YKOORDINATE");
             final String PROBE_PK = resultSet.getString("PROBE_PK");
 
             int id;
@@ -353,56 +356,5 @@ public class BorisExportAction extends AbstractExportAction {
         output.close();
 
         return result;
-
-//        final ShapeFileWriter writer = new ShapeFileWriter(shapeFile);
-//        writer.write();
-//        return shapeFile;
-    }
-
-    @Override
-    public String getTaskName() {
-        return TASK_NAME;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  args  DOCUMENT ME!
-     */
-    public static void main(final String[] args) {
-        try {
-            final Collection<String> standortPks = Arrays.asList(
-                    new String[] { "1000066", "1000067", "1000068", "1000069", "1000070", "1000071", "1000072" });
-
-            final Collection<Parameter> parameter = Arrays.asList(
-                    new Parameter[] {
-                        new Parameter("BCU1", "Kü ü ü pfer"),
-                        new Parameter("BZN1", "Zinn"),
-                        new Parameter("BPB1", "Blei"),
-                    });
-
-            final ServerActionParameter[] serverActionParameters = new ServerActionParameter[] {
-                    new ServerActionParameter<Collection<String>>(PARAM_STANDORTE, standortPks),
-                    new ServerActionParameter<Collection<Parameter>>(PARAM_PARAMETER, parameter),
-                    new ServerActionParameter<String>(PARAM_EXPORTFORMAT, PARAM_EXPORTFORMAT_SHP),
-                    new ServerActionParameter<String>(PARAM_NAME, "boris-shapexport")
-                };
-
-            // final ConsoleAppender consoleAppender = new ConsoleAppender();
-            // consoleAppender.setThreshold(Priority.DEBUG);
-            // BasicConfigurator.configure(consoleAppender);
-            BasicConfigurator.configure();
-            final BorisExportAction borisExportAction = new BorisExportAction();
-
-            final Object result = borisExportAction.execute(null, serverActionParameters);
-            // final Path csvFile = Files.write(Paths.get("boris-export.xlsx"), result.toString().getBytes("UTF-8"));
-
-            final Path file = Files.write(Paths.get("boris-export.zip"), (byte[])result);
-            System.out.println("Export File written to "
-                        + file.toAbsolutePath().toString());
-        } catch (Throwable ex) {
-            Logger.getLogger(BorisExportAction.class).fatal(ex.getMessage(), ex);
-            System.exit(1);
-        }
     }
 }

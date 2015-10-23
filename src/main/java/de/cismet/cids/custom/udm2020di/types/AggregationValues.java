@@ -210,4 +210,12 @@ public class AggregationValues extends AbstractCollection<AggregationValue> impl
     public int size() {
         return aggregationValues.size();
     }
+
+    @Override
+    public void clear() {
+        super.clear();
+        this.aggregationValues.clear();
+        this.maxDate = null;
+        this.minDate = null;
+    }
 }

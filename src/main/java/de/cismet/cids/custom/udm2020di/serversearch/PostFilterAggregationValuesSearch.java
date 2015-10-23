@@ -5,14 +5,13 @@
 *              ... and it just works.
 *
 ****************************************************/
-package de.cismet.cids.custom.udm2020di.serversearch.boris;
+package de.cismet.cids.custom.udm2020di.serversearch;
 
 import Sirius.server.middleware.impls.domainserver.DomainServerImpl;
 
 import lombok.Getter;
 import lombok.Setter;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -29,7 +28,6 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import de.cismet.cids.custom.udm2020di.dataexport.OracleExport;
-import de.cismet.cids.custom.udm2020di.serversearch.PostFilterTagsSearch;
 import de.cismet.cids.custom.udm2020di.types.AggregationValue;
 import de.cismet.cids.custom.udm2020di.types.AggregationValues;
 import de.cismet.cids.custom.udm2020di.types.AggregationValuesBean;
@@ -44,13 +42,13 @@ import de.cismet.cids.server.search.SearchException;
  * @version  $Revision$, $Date$
  */
 
-public class PostFilterAggregationValuesSearch extends AbstractCidsServerSearch {
+public abstract class PostFilterAggregationValuesSearch extends AbstractCidsServerSearch {
 
     //~ Static fields/initializers ---------------------------------------------
 
     protected static final String DOMAIN = "UDM2020-DI";
 
-    protected static final Logger LOG = Logger.getLogger(PostFilterTagsSearch.class);
+    protected static final Logger LOGGER = Logger.getLogger(PostFilterAggregationValuesSearch.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -58,19 +56,17 @@ public class PostFilterAggregationValuesSearch extends AbstractCidsServerSearch 
     @Setter
     protected Collection<Integer> objectIds;
 
-    protected String getAggregationValuesTpl;
+    protected final String getAggregationValuesTpl;
 
     //~ Constructors -----------------------------------------------------------
 
     /**
-     * Creates a new AggregationValuesTagSearch object.
+     * Creates a new PostFilterAggregationValuesSearch object.
      *
-     * @throws  IOException  DOCUMENT ME!
+     * @param  getAggregationValuesTpl  DOCUMENT ME!
      */
-    public PostFilterAggregationValuesSearch() throws IOException {
-        this.getAggregationValuesTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/serversearch/boris/get-postfilter-aggregation-values.tpl.sql"),
-                "UTF-8");
+    protected PostFilterAggregationValuesSearch(final String getAggregationValuesTpl) {
+        this.getAggregationValuesTpl = getAggregationValuesTpl;
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -84,8 +80,8 @@ public class PostFilterAggregationValuesSearch extends AbstractCidsServerSearch 
      */
     protected String createAggregationValuesSearchStatement(
             final Collection<Integer> objectIds) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("building sql statement for " + objectIds.size() + "object ids");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("building sql statement for " + objectIds.size() + "object ids");
         }
 
         final StringBuilder objectIdsBuilder = new StringBuilder();
@@ -101,8 +97,8 @@ public class PostFilterAggregationValuesSearch extends AbstractCidsServerSearch 
         final String getAggregationValuesSearchStatement = this.getAggregationValuesTpl.replace(
                 "%OBJECT_IDS%",
                 objectIdsBuilder);
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(getAggregationValuesSearchStatement);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(getAggregationValuesSearchStatement);
         }
 
         return getAggregationValuesSearchStatement;
@@ -114,13 +110,13 @@ public class PostFilterAggregationValuesSearch extends AbstractCidsServerSearch 
         final AggregationValues aggregationValues = new AggregationValues();
 
         if ((this.objectIds != null) && !this.objectIds.isEmpty()) {
-            LOG.info("performing search for aggregation values of "
+            LOGGER.info("performing search for aggregation values of "
                         + this.objectIds.size() + " different objects.");
 
             final String getAggregationValuesSearchStatement = this.createAggregationValuesSearchStatement(
                     this.objectIds);
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(getAggregationValuesSearchStatement);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(getAggregationValuesSearchStatement);
             }
 
             // final MetaService metaService = (MetaService)getActiveLocalServers().get(DOMAIN);
@@ -142,31 +138,40 @@ public class PostFilterAggregationValuesSearch extends AbstractCidsServerSearch 
                 aggregationValuesSearchStmnt.close();
 
                 if (aggregationValues.isEmpty()) {
-                    LOG.warn("no aggregation values tags found!");
+                    LOGGER.warn("no aggregation values tags found!");
                 } else {
-                    LOG.info(aggregationValues.size() + " aggregation values found and processed for "
+                    LOGGER.info(aggregationValues.size() + " aggregation values found and processed for "
                                 + this.objectIds.size() + " objects in "
                                 + (System.currentTimeMillis() - startTime) + "ms");
                 }
             } catch (RemoteException ex) {
-                LOG.error(ex.getMessage(), ex);
+                LOGGER.error(ex.getMessage(), ex);
             } catch (IOException ex) {
-                LOG.error(ex.getMessage(), ex);
+                LOGGER.error(ex.getMessage(), ex);
             } catch (SQLException ex) {
-                LOG.error(ex.getMessage(), ex);
+                LOGGER.error(ex.getMessage(), ex);
                 try {
                     if (aggregationValuesSearchStmnt != null) {
                         aggregationValuesSearchStmnt.close();
                     }
                 } catch (SQLException sx) {
-                    LOG.error(sx.getMessage(), sx);
+                    LOGGER.error(sx.getMessage(), sx);
                 }
             }
+//            } else {
+//                LOGGER.error("active local server " + DOMAIN + " not found"); // NOI18N
+//            }
+//            } else {
+//                LOG.error("active local server " + DOMAIN + " not found"); // NOI18N
+//            }
+//            } else {
+//                logger.error("active local server " + DOMAIN + " not found"); // NOI18N
+//            }
 //            } else {
 //                LOG.error("active local server " + DOMAIN + " not found"); // NOI18N
 //            }
         } else {
-            LOG.warn("missing parameters, returning empty collection");
+            LOGGER.warn("missing parameters, returning empty collection");
         }
 
         return new ArrayList<AggregationValue>(aggregationValues);

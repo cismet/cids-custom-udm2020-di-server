@@ -19,8 +19,11 @@ import java.math.BigDecimal;
 
 import java.rmi.RemoteException;
 
+import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,24 +39,30 @@ import de.cismet.cids.server.search.SearchException;
  * @author   pd
  * @version  $Revision$, $Date$
  */
-public class BorisCustomSearch extends AbstractCidsServerSearch implements CustomMaxValuesSearch {
+public class BorisSiteSearch extends AbstractCidsServerSearch implements CustomMaxValuesSearch {
 
     //~ Static fields/initializers ---------------------------------------------
 
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("YYYYMMDD");
+
     protected static final String DOMAIN = "UDM2020-DI";
 
-    protected static final Logger log = Logger.getLogger(BorisCustomSearch.class);
+    protected static final Logger LOGGER = Logger.getLogger(BorisSiteSearch.class);
 
     //~ Instance fields --------------------------------------------------------
 
     protected Map<String, Float> maxValues;
 
     protected final String maxSampleValueConditionTpl;
-    protected final String borisCustomSearchTpl;
+    protected final String searchTpl;
 
     private Collection<Integer> objectIds;
 
     private int classId = -1;
+
+    private Date minDate;
+
+    private Date maxDate;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -62,17 +71,65 @@ public class BorisCustomSearch extends AbstractCidsServerSearch implements Custo
      *
      * @throws  IOException  DOCUMENT ME!
      */
-    public BorisCustomSearch() throws IOException {
-        this.maxSampleValueConditionTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+    public BorisSiteSearch() throws IOException {
+        this(IOUtils.toString(
+                BorisSiteSearch.class.getResourceAsStream(
+                    "/de/cismet/cids/custom/udm2020di/serversearch/boris/boris-site-search.tpl.sql"),
+                "UTF-8"),
+                IOUtils.toString(
+                BorisSiteSearch.class.getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/serversearch/boris/max-sample-value-condition.tpl.sql"),
-                "UTF-8");
+                "UTF-8"));
+    }
 
-        this.borisCustomSearchTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/serversearch/boris/boris-custom-search.tpl.sql"),
-                "UTF-8");
+    /**
+     * Creates a new BorisSiteSearch object.
+     *
+     * @param  searchTpl                   DOCUMENT ME!
+     * @param  maxSampleValueConditionTpl  DOCUMENT ME!
+     */
+    public BorisSiteSearch(final String searchTpl, final String maxSampleValueConditionTpl) {
+        this.searchTpl = searchTpl;
+        this.maxSampleValueConditionTpl = maxSampleValueConditionTpl;
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * Get the value of minDate.
+     *
+     * @return  the value of minDate
+     */
+    public Date getMinDate() {
+        return minDate;
+    }
+
+    /**
+     * Set the value of minDate.
+     *
+     * @param  minDate  new value of minDate
+     */
+    public void setMinDate(final Date minDate) {
+        this.minDate = minDate;
+    }
+
+    /**
+     * Get the value of maxDate.
+     *
+     * @return  the value of maxDate
+     */
+    public Date getMaxDate() {
+        return maxDate;
+    }
+
+    /**
+     * Set the value of maxDate.
+     *
+     * @param  maxDate  new value of maxDate
+     */
+    public void setMaxDate(final Date maxDate) {
+        this.maxDate = maxDate;
+    }
 
     /**
      * DOCUMENT ME!
@@ -80,14 +137,18 @@ public class BorisCustomSearch extends AbstractCidsServerSearch implements Custo
      * @param   classId    DOCUMENT ME!
      * @param   objectIds  DOCUMENT ME!
      * @param   maxValues  DOCUMENT ME!
+     * @param   minDate    DOCUMENT ME!
+     * @param   maxDate    DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    protected String createBorisCustomSearchStatement(
+    protected String createSearchStatement(
             final int classId,
             final Collection<Integer> objectIds,
-            final Map<String, Float> maxValues) {
-        String borisCustomSearchStatement;
+            final Map<String, Float> maxValues,
+            final Date minDate,
+            final Date maxDate) {
+        String customSearchStatement;
 
         final StringBuilder objectIdsBuilder = new StringBuilder();
         final Iterator<Integer> objectIdsIterator = objectIds.iterator();
@@ -114,20 +175,26 @@ public class BorisCustomSearch extends AbstractCidsServerSearch implements Custo
             }
         }
 
-        borisCustomSearchStatement = this.borisCustomSearchTpl.replace(
+        customSearchStatement = this.searchTpl.replace(
                 "%CLASS_ID%",
                 String.valueOf(classId));
-        borisCustomSearchStatement = borisCustomSearchStatement.replace(
+        customSearchStatement = customSearchStatement.replace(
                 "%BORIS_SITE_IDS%",
                 objectIdsBuilder);
-        borisCustomSearchStatement = borisCustomSearchStatement.replace(
+        customSearchStatement = customSearchStatement.replace(
                 "%MAX_SAMPLE_VALUE_CONDITIONS%",
                 maxValuesBuilder);
-        borisCustomSearchStatement = borisCustomSearchStatement.replace(
+        customSearchStatement = customSearchStatement.replace(
                 "%NUM_MAX_SAMPLE_VALUE_CONDITIONS%",
                 String.valueOf(maxValues.size()));
+        customSearchStatement = customSearchStatement.replace(
+                "%MIN_DATE%",
+                DATE_FORMAT.format(minDate));
+        customSearchStatement = customSearchStatement.replace(
+                "%MAX_DATE%",
+                DATE_FORMAT.format(maxDate));
 
-        return borisCustomSearchStatement;
+        return customSearchStatement;
     }
 
     /**
@@ -193,23 +260,32 @@ public class BorisCustomSearch extends AbstractCidsServerSearch implements Custo
     @Override
     public Collection<MetaObjectNode> performServerSearch() throws SearchException {
         final long startTime = System.currentTimeMillis();
-        log.info("performing search for " + this.objectIds.size() + " objects of class #"
-                    + this.classId + " and " + this.maxValues.size() + " max values");
-
-        if (this.objectIds.isEmpty() || this.maxValues.isEmpty() || (this.classId == -1)) {
-            log.warn("missing parameters, returning empty collection");
+        if ((this.minDate == null) || (this.maxDate == null)
+                    || (this.objectIds == null) || this.objectIds.isEmpty()
+                    || (this.maxValues == null) || this.maxValues.isEmpty()
+                    || (this.classId == -1)) {
+            LOGGER.warn("missing parameters, returning empty collection");
+        } else {
+            LOGGER.info("performing search for " + this.objectIds.size() + " objects of class #"
+                        + this.classId + " and " + this.maxValues.size() + " max values between "
+                        + DATE_FORMAT.format(minDate) + " and " + DATE_FORMAT.format(maxDate));
         }
 
         final Collection<MetaObjectNode> result = new ArrayList<MetaObjectNode>();
-        final String borisCustomSearchStatement = this.createBorisCustomSearchStatement(classId, objectIds, maxValues);
-        if (log.isDebugEnabled()) {
-            log.debug(borisCustomSearchStatement);
+        final String customSearchStatement = this.createSearchStatement(
+                classId,
+                objectIds,
+                maxValues,
+                minDate,
+                maxDate);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(customSearchStatement);
         }
 
         final MetaService metaService = (MetaService)getActiveLocalServers().get(DOMAIN);
         if (metaService != null) {
             try {
-                final ArrayList<ArrayList> resultSet = metaService.performCustomSearch(borisCustomSearchStatement);
+                final ArrayList<ArrayList> resultSet = metaService.performCustomSearch(customSearchStatement);
 
                 for (final ArrayList row : resultSet) {
                     final int classID = ((BigDecimal)row.get(0)).intValue();
@@ -221,13 +297,13 @@ public class BorisCustomSearch extends AbstractCidsServerSearch implements Custo
                     result.add(node);
                 }
             } catch (RemoteException ex) {
-                log.error(ex.getMessage(), ex);
+                LOGGER.error(ex.getMessage(), ex);
             }
         } else {
-            log.error("active local server " + DOMAIN + "not found"); // NOI18N
+            LOGGER.error("active local server " + DOMAIN + "not found"); // NOI18N
         }
 
-        log.info(result.size() + " objects found in "
+        LOGGER.info(result.size() + " objects found in "
                     + (System.currentTimeMillis() - startTime) + "ms");
         return result;
     }

@@ -41,7 +41,7 @@ public class PostFilterTagsSearch extends AbstractCidsServerSearch {
 
     protected static final String DOMAIN = "UDM2020-DI";
 
-    protected static final Logger LOG = Logger.getLogger(PostFilterTagsSearch.class);
+    protected static final Logger LOGGER = Logger.getLogger(PostFilterTagsSearch.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -113,12 +113,12 @@ public class PostFilterTagsSearch extends AbstractCidsServerSearch {
         final long startTime = System.currentTimeMillis();
 
         if ((this.objectIdMap != null) && !this.objectIdMap.isEmpty()) {
-            LOG.info("performing search for object tags of "
+            LOGGER.info("performing search for object tags of "
                         + this.objectIdMap.size() + " different classes.");
 
             final String postfilterTagsSearchStatement = this.createPostfilterTagsSearchStatement(this.objectIdMap);
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(postfilterTagsSearchStatement);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(postfilterTagsSearchStatement);
             }
 
             final MetaService metaService = (MetaService)getActiveLocalServers().get(DOMAIN);
@@ -128,21 +128,21 @@ public class PostFilterTagsSearch extends AbstractCidsServerSearch {
                             postfilterTagsSearchStatement);
 
                     if (resultSet.length == 0) {
-                        LOG.warn("no post filter tags found!");
+                        LOGGER.warn("no post filter tags found!");
                     } else {
-                        LOG.info(resultSet.length + " post filter tags found in "
+                        LOGGER.info(resultSet.length + " post filter tags found in "
                                     + (System.currentTimeMillis() - startTime) + "ms");
 
                         return Arrays.asList(resultSet);
                     }
                 } catch (RemoteException ex) {
-                    LOG.error(ex.getMessage(), ex);
+                    LOGGER.error(ex.getMessage(), ex);
                 }
             } else {
-                LOG.error("active local server " + DOMAIN + " not found"); // NOI18N
+                LOGGER.error("active local server " + DOMAIN + " not found"); // NOI18N
             }
         } else {
-            LOG.warn("missing parameters, returning empty collection");
+            LOGGER.warn("missing parameters, returning empty collection");
         }
 
         return new ArrayList();

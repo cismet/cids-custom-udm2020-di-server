@@ -138,9 +138,9 @@ public class AggregationValues extends AbstractCollection<AggregationValue> impl
                     aggregationValue.getReleaseType(),
                     aggregationValue.getPollutantKey(),
                     aggregationValue.getPollutantgroupKey(),
-                    aggregationValue.getMinDate(),
                     aggregationValue.getMaxDate(),
-                    aggregationValue.getMinValue(),
+                    aggregationValue.getMaxDate(),
+                    aggregationValue.getMaxValue(),
                     aggregationValue.getMaxValue()));
             return true;
         }

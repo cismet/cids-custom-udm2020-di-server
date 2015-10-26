@@ -43,7 +43,7 @@ public class BorisSiteSearch extends AbstractCidsServerSearch implements CustomM
 
     //~ Static fields/initializers ---------------------------------------------
 
-    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("YYYYMMDD");
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("YYYYMMdd");
 
     protected static final String DOMAIN = "UDM2020-DI";
 
@@ -72,14 +72,14 @@ public class BorisSiteSearch extends AbstractCidsServerSearch implements CustomM
      * @throws  IOException  DOCUMENT ME!
      */
     public BorisSiteSearch() throws IOException {
-        this(IOUtils.toString(
+        this.searchTpl = IOUtils.toString(
                 BorisSiteSearch.class.getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/serversearch/boris/boris-site-search.tpl.sql"),
-                "UTF-8"),
-                IOUtils.toString(
+                "UTF-8");
+        this.maxSampleValueConditionTpl = IOUtils.toString(
                 BorisSiteSearch.class.getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/serversearch/boris/max-sample-value-condition.tpl.sql"),
-                "UTF-8"));
+                "UTF-8");
     }
 
     /**
@@ -148,8 +148,7 @@ public class BorisSiteSearch extends AbstractCidsServerSearch implements CustomM
             final Map<String, Float> maxValues,
             final Date minDate,
             final Date maxDate) {
-        String customSearchStatement;
-
+        final StringBuilder customSearchStatementBuilder = new StringBuilder();
         final StringBuilder objectIdsBuilder = new StringBuilder();
         final Iterator<Integer> objectIdsIterator = objectIds.iterator();
         while (objectIdsIterator.hasNext()) {
@@ -159,7 +158,7 @@ public class BorisSiteSearch extends AbstractCidsServerSearch implements CustomM
             }
         }
 
-        final StringBuilder maxValuesBuilder = new StringBuilder();
+        // final StringBuilder maxValuesBuilder = new StringBuilder();
         final Iterator<Entry<String, Float>> maxValuesIterator = maxValues.entrySet().iterator();
         while (maxValuesIterator.hasNext()) {
             final Entry<String, Float> maxValue = maxValuesIterator.next();
@@ -169,32 +168,38 @@ public class BorisSiteSearch extends AbstractCidsServerSearch implements CustomM
             maxSampleValueConditionStatement = maxSampleValueConditionStatement.replace(
                     "%MAX_VALUE%",
                     String.valueOf(maxValue.getValue()));
-            maxValuesBuilder.append(maxSampleValueConditionStatement);
+            // maxValuesBuilder.append(maxSampleValueConditionStatement);
+            // if (maxValuesIterator.hasNext()) {
+            // maxValuesBuilder.append(" \n OR ");
+            // }
+            String customSearchStatement = this.searchTpl.replace(
+                    "%CLASS_ID%",
+                    String.valueOf(classId));
+            customSearchStatement = customSearchStatement.replace(
+                    "%BORIS_SITE_IDS%",
+                    objectIdsBuilder);
+            customSearchStatement = customSearchStatement.replace(
+                    "%MAX_SAMPLE_VALUE_CONDITION%",
+                    maxSampleValueConditionStatement);
+            // customSearchStatement = customSearchStatement.replace(
+            // "%NUM_MAX_SAMPLE_VALUE_CONDITIONS%",
+            // String.valueOf(maxValues.size()));
+            customSearchStatement = customSearchStatement.replace(
+                    "%MIN_DATE%",
+                    DATE_FORMAT.format(minDate));
+            customSearchStatement = customSearchStatement.replace(
+                    "%MAX_DATE%",
+                    DATE_FORMAT.format(maxDate));
+
+            customSearchStatementBuilder.append(customSearchStatement);
             if (maxValuesIterator.hasNext()) {
-                maxValuesBuilder.append(" \n OR ");
+                customSearchStatementBuilder.append(" \nINTERSECT \n");
+            } else {
+                customSearchStatementBuilder.append(" \nORDER BY NAME");
             }
         }
 
-        customSearchStatement = this.searchTpl.replace(
-                "%CLASS_ID%",
-                String.valueOf(classId));
-        customSearchStatement = customSearchStatement.replace(
-                "%BORIS_SITE_IDS%",
-                objectIdsBuilder);
-        customSearchStatement = customSearchStatement.replace(
-                "%MAX_SAMPLE_VALUE_CONDITIONS%",
-                maxValuesBuilder);
-        customSearchStatement = customSearchStatement.replace(
-                "%NUM_MAX_SAMPLE_VALUE_CONDITIONS%",
-                String.valueOf(maxValues.size()));
-        customSearchStatement = customSearchStatement.replace(
-                "%MIN_DATE%",
-                DATE_FORMAT.format(minDate));
-        customSearchStatement = customSearchStatement.replace(
-                "%MAX_DATE%",
-                DATE_FORMAT.format(maxDate));
-
-        return customSearchStatement;
+        return customSearchStatementBuilder.toString();
     }
 
     /**

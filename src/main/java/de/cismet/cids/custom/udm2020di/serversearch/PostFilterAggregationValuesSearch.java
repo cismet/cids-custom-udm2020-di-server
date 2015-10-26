@@ -81,7 +81,7 @@ public abstract class PostFilterAggregationValuesSearch extends AbstractCidsServ
     protected String createAggregationValuesSearchStatement(
             final Collection<Integer> objectIds) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("building sql statement for " + objectIds.size() + "object ids");
+            LOGGER.debug("building sql statement for " + objectIds.size() + " object ids");
         }
 
         final StringBuilder objectIdsBuilder = new StringBuilder();
@@ -131,7 +131,17 @@ public abstract class PostFilterAggregationValuesSearch extends AbstractCidsServ
                     final AggregationValuesBean aggregationValuesBean = OracleExport.JSON_MAPPER.readValue(
                             aggregationValuesSearchResult.getClob(1).getCharacterStream(),
                             AggregationValuesBean.class);
-                    aggregationValues.addAll(aggregationValuesBean.getAggregationValues());
+                    // ignore all aggregation values that do not map to a concrete pollutant
+                    for (final AggregationValue aggregationValue : aggregationValuesBean.getAggregationValues()) {
+                        if (!aggregationValue.getPollutantKey().equalsIgnoreCase("METPlus")
+                                    && !aggregationValue.getPollutantKey().equalsIgnoreCase("KWSplus")
+                                    && !aggregationValue.getPollutantKey().equalsIgnoreCase("PESTplus")
+                                    && !aggregationValue.getPollutantKey().equalsIgnoreCase("THGundLSSplus")
+                                    && !aggregationValue.getPollutantKey().equalsIgnoreCase("DNMplus")
+                                    && !aggregationValue.getPollutantKey().equalsIgnoreCase("SYSSplus")) {
+                            aggregationValues.add(aggregationValue);
+                        }
+                    }
                 }
 
                 aggregationValuesSearchResult.close();
@@ -174,6 +184,6 @@ public abstract class PostFilterAggregationValuesSearch extends AbstractCidsServ
             LOGGER.warn("missing parameters, returning empty collection");
         }
 
-        return new ArrayList<AggregationValue>(aggregationValues);
+        return aggregationValues;
     }
 }

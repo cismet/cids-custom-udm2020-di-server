@@ -138,9 +138,9 @@ public class AggregationValues extends AbstractCollection<AggregationValue> impl
                     aggregationValue.getReleaseType(),
                     aggregationValue.getPollutantKey(),
                     aggregationValue.getPollutantgroupKey(),
-                    aggregationValue.getMinDate(),
                     aggregationValue.getMaxDate(),
-                    aggregationValue.getMinValue(),
+                    aggregationValue.getMaxDate(),
+                    aggregationValue.getMaxValue(),
                     aggregationValue.getMaxValue()));
             return true;
         }
@@ -209,5 +209,13 @@ public class AggregationValues extends AbstractCollection<AggregationValue> impl
     @Override
     public int size() {
         return aggregationValues.size();
+    }
+
+    @Override
+    public void clear() {
+        super.clear();
+        this.aggregationValues.clear();
+        this.maxDate = null;
+        this.minDate = null;
     }
 }

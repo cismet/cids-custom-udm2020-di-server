@@ -5,7 +5,7 @@
 *              ... and it just works.
 *
 ****************************************************/
-package de.cismet.cids.custom.udm2020di.serversearch.boris;
+package de.cismet.cids.custom.udm2020di.serversearch.wa;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -20,11 +20,11 @@ import de.cismet.cids.custom.udm2020di.serversearch.AbstractMaxValuesSearch;
  * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
-public class BorisSiteSearch extends AbstractMaxValuesSearch {
+public class WagwStationSearch extends AbstractMaxValuesSearch {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    protected static final Logger LOGGER = Logger.getLogger(BorisSiteSearch.class);
+    protected static final Logger LOGGER = Logger.getLogger(WagwStationSearch.class);
 
     //~ Constructors -----------------------------------------------------------
 
@@ -33,14 +33,12 @@ public class BorisSiteSearch extends AbstractMaxValuesSearch {
      *
      * @throws  IOException  DOCUMENT ME!
      */
-    public BorisSiteSearch() throws IOException {
-        this.searchTpl = IOUtils.toString(
-                BorisSiteSearch.class.getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/serversearch/boris/boris-site-search.tpl.sql"),
+    public WagwStationSearch() throws IOException {
+        this.searchTpl = IOUtils.toString(WagwStationSearch.class.getResourceAsStream(
+                    "/de/cismet/cids/custom/udm2020di/serversearch/wagw/wagw-station-search.tpl.sql"),
                 "UTF-8");
-        this.maxSampleValueConditionTpl = IOUtils.toString(
-                BorisSiteSearch.class.getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/serversearch/boris/max-sample-value-condition.tpl.sql"),
+        this.maxSampleValueConditionTpl = IOUtils.toString(WagwStationSearch.class.getResourceAsStream(
+                    "/de/cismet/cids/custom/udm2020di/serversearch/wagw/max-sample-value-condition.tpl.sql"),
                 "UTF-8");
     }
 }

@@ -8,7 +8,6 @@
 package de.cismet.cids.custom.udm2020di.serversearch.wa;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
 
 import java.io.IOException;
 

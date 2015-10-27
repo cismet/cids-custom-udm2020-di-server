@@ -8,10 +8,11 @@
 package de.cismet.cids.custom.udm2020di.serversearch.boris;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
-import de.cismet.cids.custom.udm2020di.serversearch.PostFilterAggregationValuesSearch;
+import de.cismet.cids.custom.udm2020di.serversearch.AbstractAggregationValuesSearch;
 
 /**
  * DOCUMENT ME!
@@ -20,7 +21,11 @@ import de.cismet.cids.custom.udm2020di.serversearch.PostFilterAggregationValuesS
  * @version  $Revision$, $Date$
  */
 
-public class BorisAggregationValuesSearch extends PostFilterAggregationValuesSearch {
+public class BorisAggregationValuesSearch extends AbstractAggregationValuesSearch {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    protected static final Logger LOGGER = Logger.getLogger(BorisAggregationValuesSearch.class);
 
     //~ Constructors -----------------------------------------------------------
 

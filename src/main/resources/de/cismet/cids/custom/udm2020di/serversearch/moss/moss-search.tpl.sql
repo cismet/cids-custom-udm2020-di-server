@@ -1,0 +1,8 @@
+SELECT DISTINCT %CLASS_ID% AS class_id,
+                         MOSS.ID AS id,
+                         MOSS.SAMPLE_ID AS name
+FROM MOSS
+WHERE MOSS.ID IN (%OBJECT_IDS%)
+  AND %MAX_SAMPLE_VALUE_CONDITIONS%
+GROUP BY MOSS.ID,
+         MOSS.SAMPLE_ID

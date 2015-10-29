@@ -122,7 +122,7 @@ public abstract class AbstractMaxValuesSearch extends AbstractCidsServerSearch i
         final StringBuilder objectIdsBuilder = new StringBuilder();
         final Iterator<Integer> objectIdsIterator = objectIds.iterator();
         while (objectIdsIterator.hasNext()) {
-            objectIdsBuilder.append('\'').append(objectIdsIterator.next()).append('\'');
+            objectIdsBuilder.append(objectIdsIterator.next());
             if (objectIdsIterator.hasNext()) {
                 objectIdsBuilder.append(',');
             }

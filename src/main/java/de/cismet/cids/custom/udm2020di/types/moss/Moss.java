@@ -46,8 +46,8 @@ public class Moss {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    protected static final Date MIN_DATE = new GregorianCalendar(2010, 01, 01).getTime();
-    protected static final Date MAX_DATE = new GregorianCalendar(2010, 12, 31).getTime();
+    public static final Date MIN_DATE = new GregorianCalendar(2010, 0, 01).getTime();
+    public static final Date MAX_DATE = new GregorianCalendar(2010, 11, 31).getTime();
 
     //~ Instance fields --------------------------------------------------------
 
@@ -226,17 +226,6 @@ public class Moss {
                 ((BigDecimal)cidsBean.getProperty("as_conv")).floatValue(),
                 ((BigDecimal)cidsBean.getProperty("as_conv")).floatValue()));
         this.aggregationValues.add(new AggregationValue(
-                "As",
-                "mg/kg",
-                this.sampleId,
-                null,
-                "As",
-                "MET",
-                MIN_DATE,
-                MAX_DATE,
-                ((BigDecimal)cidsBean.getProperty("as_conv")).floatValue(),
-                ((BigDecimal)cidsBean.getProperty("as_conv")).floatValue()));
-        this.aggregationValues.add(new AggregationValue(
                 "Cd",
                 "mg/kg",
                 this.sampleId,
@@ -313,17 +302,6 @@ public class Moss {
                 MAX_DATE,
                 ((BigDecimal)cidsBean.getProperty("ni_conv")).floatValue(),
                 ((BigDecimal)cidsBean.getProperty("ni_conv")).floatValue()));
-        this.aggregationValues.add(new AggregationValue(
-                "Pb",
-                "mg/kg",
-                this.sampleId,
-                null,
-                "Pb",
-                "MET",
-                MIN_DATE,
-                MAX_DATE,
-                ((BigDecimal)cidsBean.getProperty("pb_conv")).floatValue(),
-                ((BigDecimal)cidsBean.getProperty("pb_conv")).floatValue()));
         this.aggregationValues.add(new AggregationValue(
                 "Pb",
                 "mg/kg",

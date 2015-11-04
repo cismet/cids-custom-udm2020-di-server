@@ -284,6 +284,7 @@ public class WaImport extends OracleImport {
                 // key
                 final String stationKey = this.waSource.toUpperCase() + '.' + tmpStr;
 
+                // name
                 tmpStr = stationsResultSet.getNString("MESSSTELLE_NAME");
                 final String stationName = ((tmpStr != null) && !tmpStr.isEmpty()) ? tmpStr : stationSrcPk;
 
@@ -700,6 +701,7 @@ public class WaImport extends OracleImport {
 
         if ((null != generatedStationKeysRs) && generatedStationKeysRs.next()) {
             generatedKey = generatedStationKeysRs.getLong(1);
+            generatedStationKeysRs.close();
         } else {
             log.error("could not fetch generated key for inserted " + this.waSource.toUpperCase() + " Station!");
         }

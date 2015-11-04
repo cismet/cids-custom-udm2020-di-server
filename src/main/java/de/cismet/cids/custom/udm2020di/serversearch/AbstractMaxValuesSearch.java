@@ -38,7 +38,7 @@ public abstract class AbstractMaxValuesSearch extends AbstractCidsServerSearch i
 
     //~ Static fields/initializers ---------------------------------------------
 
-    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("YYYYMMdd");
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
 
     protected static final String DOMAIN = "UDM2020-DI";
 

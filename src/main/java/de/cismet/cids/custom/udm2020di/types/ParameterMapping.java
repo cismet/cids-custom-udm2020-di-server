@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * DOCUMENT ME!
  *
- * @author   pd
+ * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
 @XmlRootElement

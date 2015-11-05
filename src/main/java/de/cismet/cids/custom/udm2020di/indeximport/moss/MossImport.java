@@ -42,6 +42,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
+import de.cismet.cids.custom.udm2020di.dataexport.XlsHelper;
 import de.cismet.cids.custom.udm2020di.indeximport.OracleImport;
 import de.cismet.cids.custom.udm2020di.types.AggregationValue;
 import de.cismet.cids.custom.udm2020di.types.AggregationValues;
@@ -67,12 +68,14 @@ public class MossImport extends OracleImport {
     protected final OraclePreparedStatement getTagsStmnt;
     protected final ParameterMappings parameterMappings = new ParameterMappings();
     protected final Map<String, Moss> mossStations = new HashMap<String, Moss>();
-    protected final Map<String, Short> columnMap = new HashMap<String, Short>();
+
     protected final Map<String, Long> mossIdMap = new HashMap<String, Long>();
     protected final Map<String, AggregationValues> aggregationValuesMap = new HashMap<String, AggregationValues>();
-    protected String[] columnNames = null;
+
     protected final Sheet mossSheet;
     protected final Map<String, java.util.Date> dateMap = new HashMap<String, java.util.Date>();
+
+    protected final XlsHelper xlsHelper = new XlsHelper();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -184,88 +187,6 @@ public class MossImport extends OracleImport {
     /**
      * DOCUMENT ME!
      *
-     * @param  headerRow  DOCUMENT ME!
-     */
-    protected void initColumnMap(final Row headerRow) {
-        if (!this.columnMap.isEmpty()) {
-            log.warn("suspicious call to initColumnMap: columns aready processed!");
-            this.columnMap.clear();
-        }
-
-        final short minColIx = headerRow.getFirstCellNum();
-        final short maxColIx = headerRow.getLastCellNum();
-        this.columnNames = new String[maxColIx + 1];
-        for (short i = minColIx; i < maxColIx; i++) {
-            final Cell cell = headerRow.getCell(i);
-            if (cell == null) {
-                log.warn("header cell #" + i + " is empty!");
-            } else if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
-                final String columnName = cell.getStringCellValue();
-                columnNames[i] = columnName;
-                if (this.columnMap.containsKey(columnName)) {
-                    log.warn("duplicate column name '" + columnName + "' for cells "
-                                + this.columnMap.get(columnName) + " and " + i + '!');
-                } else {
-                    this.columnMap.put(columnName, i);
-                }
-            } else {
-                log.warn("header cell #" + i + " is not of type STRING!");
-            }
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   columnName  DOCUMENT ME!
-     * @param   row         DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    protected Object getCellValue(final String columnName, final Row row) {
-        if (this.columnMap.containsKey(columnName)) {
-            final Cell cell = row.getCell(this.columnMap.get(columnName),
-                    Row.RETURN_BLANK_AS_NULL);
-            return this.getCellValue(cell);
-        } else {
-            log.warn("column '" + columnName + "' not found in sheet '"
-                        + this.mossSheet.getSheetName() + "'");
-        }
-
-        return null;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   cell  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    protected Object getCellValue(final Cell cell) {
-        if (cell != null) {
-            switch (cell.getCellType()) {
-                case Cell.CELL_TYPE_BOOLEAN: {
-                    return cell.getBooleanCellValue();
-                }
-                case Cell.CELL_TYPE_STRING: {
-                    return cell.getStringCellValue();
-                }
-                case Cell.CELL_TYPE_NUMERIC: {
-                    return cell.getNumericCellValue();
-                }
-                default: {
-                    return null;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
      * @param   stationSrcPk  DOCUMENT ME!
      * @param   stationRow    DOCUMENT ME!
      *
@@ -291,7 +212,7 @@ public class MossImport extends OracleImport {
         stationKey = "MOSS." + stationSrcPk;
 
         // name
-        tmpStr = this.getCellValue("Moos_Text", stationRow).toString();
+        tmpStr = xlsHelper.getCellValue("Moos_Text", stationRow).toString();
         stationName = stationSrcPk + " (" + tmpStr + ")";
         mossStation.setType(tmpStr);
 
@@ -305,7 +226,7 @@ public class MossImport extends OracleImport {
             "MOSS.MOSS_TYPE");
 
         // lab_no
-        tmpStr = this.getCellValue("Labornr", stationRow).toString();
+        tmpStr = xlsHelper.getCellValue("Labornr", stationRow).toString();
         mossStation.setLabNo(tmpStr);
 
         // description
@@ -318,8 +239,8 @@ public class MossImport extends OracleImport {
                     .toString();
 
         // GEOM
-        final float xCoordinate = ((Double)this.getCellValue("geogrLaeng", stationRow)).floatValue(); // X
-        final float yCoordinate = ((Double)this.getCellValue("geogrBreit", stationRow)).floatValue(); // Y
+        final float xCoordinate = ((Double)xlsHelper.getCellValue("geogrLaeng", stationRow)).floatValue(); // X
+        final float yCoordinate = ((Double)xlsHelper.getCellValue("geogrBreit", stationRow)).floatValue(); // Y
         // -> INSERT GEOM and GET ID!
         stationGeomId = this.insertGeomPoint(xCoordinate, yCoordinate, 4326, 4326);
         if (log.isDebugEnabled()) {
@@ -378,17 +299,17 @@ public class MossImport extends OracleImport {
                 final long startTime = System.currentTimeMillis();
                 final Row row = rowIterator.next();
 
-                if (this.columnMap.isEmpty()) {
+                if (xlsHelper.getColumnMap().isEmpty()) {
                     if (log.isDebugEnabled()) {
                         log.debug("reading sheet header information");
                     }
-                    this.initColumnMap(row);
-                    log.info("sheet header information processed, " + this.columnMap.size()
+                    xlsHelper.initColumnMap(row);
+                    log.info("sheet header information processed, " + xlsHelper.getColumnMap().size()
                                 + " columns identified");
                     continue;
                 }
 
-                final String stationSrcPk = this.getCellValue("Proben_ID", row).toString();
+                final String stationSrcPk = xlsHelper.getCellValue("Proben_ID", row).toString();
                 long mossStationId = -1;
                 if (!this.mossIdMap.containsKey(stationSrcPk)) {
                     if (log.isDebugEnabled()) {
@@ -555,7 +476,7 @@ public class MossImport extends OracleImport {
      * @return  DOCUMENT ME!
      */
     protected ParameterMapping getParameterMapping(final short columnIndex, final Cell cell) {
-        final String columnName = columnNames[columnIndex];
+        final String columnName = xlsHelper.getColumnNames()[columnIndex];
         if ((columnName != null) && (columnName.indexOf('_') > 0)) {
             final String potentialPollutantKey = columnName.substring(0, columnName.indexOf('_'));
             if (this.parameterMappings.containsKey(potentialPollutantKey)) {
@@ -575,7 +496,7 @@ public class MossImport extends OracleImport {
      * @return  DOCUMENT ME!
      */
     protected java.util.Date getSampleDate(final short columnIndex, final Cell cell) {
-        final String columnName = columnNames[columnIndex];
+        final String columnName = xlsHelper.getColumnNames()[columnIndex];
         if ((columnName != null) && (columnName.indexOf('_') > 0)) {
             final String potentialDateKey = columnName.substring(columnName.indexOf('_') + 1);
             if (this.dateMap.containsKey(potentialDateKey)) {
@@ -616,7 +537,7 @@ public class MossImport extends OracleImport {
             if (cell == null) {
                 if (log.isDebugEnabled()) {
                     log.warn("empty cell #" + i + " '"
-                                + this.columnNames[i] + "' of row #" + row.getRowNum());
+                                + this.xlsHelper.getColumnNames()[i] + "' of row #" + row.getRowNum());
                 }
                 continue;
             }
@@ -625,7 +546,7 @@ public class MossImport extends OracleImport {
             if (parameterMapping == null) {
                 if (log.isDebugEnabled()) {
                     log.warn("unsupported value cell #" + i + " '"
-                                + this.columnNames[i] + "' of row #" + row.getRowNum());
+                                + this.xlsHelper.getColumnNames()[i] + "' of row #" + row.getRowNum());
                 }
                 continue;
             }
@@ -634,16 +555,16 @@ public class MossImport extends OracleImport {
             if (sampleDate == null) {
                 if (log.isDebugEnabled()) {
                     log.warn("unsupported date for cell #" + i + " '"
-                                + this.columnNames[i] + "' of row #" + row.getRowNum());
+                                + this.xlsHelper.getColumnNames()[i] + "' of row #" + row.getRowNum());
                 }
                 continue;
             }
 
-            final Object sampleValueObject = this.getCellValue(cell);
+            final Object sampleValueObject = xlsHelper.getCellValue(cell);
             if ((sampleValueObject == null) || !Double.class.isAssignableFrom(sampleValueObject.getClass())) {
                 if (log.isDebugEnabled()) {
                     log.warn("empty sample value for cell #" + i + " '"
-                                + this.columnNames[i] + "' of row #" + row.getRowNum());
+                                + this.xlsHelper.getColumnNames()[i] + "' of row #" + row.getRowNum());
                 }
                 continue;
             }

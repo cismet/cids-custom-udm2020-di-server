@@ -13,8 +13,16 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import org.deegree.datatypes.Types;
 import org.deegree.datatypes.UnknownTypeException;
@@ -25,6 +33,7 @@ import org.deegree.model.spatialschema.GeometryException;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,12 +47,16 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
+import de.cismet.cids.custom.udm2020di.dataexport.XlsHelper;
+import de.cismet.cids.custom.udm2020di.indeximport.moss.MossImport;
 import de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction;
 import de.cismet.cids.custom.udm2020di.types.Parameter;
 
@@ -57,6 +70,8 @@ import de.cismet.cismap.commons.featureservice.FeatureServiceAttribute;
 import de.cismet.cismap.commons.gui.shapeexport.ShapeExportHelper;
 import de.cismet.cismap.commons.tools.SimpleFeatureCollection;
 
+import org.apache.log4j.BasicConfigurator;
+
 /**
  * DOCUMENT ME!
  *
@@ -69,7 +84,8 @@ public class MossExportAction extends AbstractExportAction {
     //~ Static fields/initializers ---------------------------------------------
 
     public static final String TASK_NAME = "mossExportAction";
-    public static final String PARAM_SAMPLES = "sites";
+    public static final String PARAM_OBJECT_IDS = "objectIds";
+    public static final String PARAM_SAMPLE_IDS = "sampleIds";
     public static final int EPSG = 4326;
 
     //~ Instance fields --------------------------------------------------------
@@ -177,14 +193,17 @@ public class MossExportAction extends AbstractExportAction {
         try {
             Object result = null;
 
-            Collection<Long> sitePks = null;
+            Collection<Long> objectIds = null;
+            Collection<String> sampleIds = null;
             Collection<Parameter> parameters = null;
             String exportFormat = PARAM_EXPORTFORMAT_CSV;
             String name = "export";
 
             for (final ServerActionParameter param : params) {
-                if (param.getKey().equalsIgnoreCase(PARAM_SAMPLES)) {
-                    sitePks = (Collection<Long>)param.getValue();
+                if (param.getKey().equalsIgnoreCase(PARAM_OBJECT_IDS)) {
+                    objectIds = (Collection<Long>)param.getValue();
+                } else if (param.getKey().equalsIgnoreCase(PARAM_SAMPLE_IDS)) {
+                    sampleIds = (Collection<String>)param.getValue();
                 } else if (param.getKey().equalsIgnoreCase(PARAM_PARAMETER)) {
                     parameters = (Collection<Parameter>)param.getValue();
                 } else if (param.getKey().equalsIgnoreCase(PARAM_EXPORTFORMAT)) {
@@ -197,27 +216,43 @@ public class MossExportAction extends AbstractExportAction {
                 }
             }
 
-            if ((sitePks != null) && (parameters != null)) {
-                final String exportMoss = this.createExportMossStatement(sitePks, parameters);
+            if ((parameters != null)) {
+                if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_XLS)) {
+                    if ((sampleIds != null) && !sampleIds.isEmpty()) {
+                        final Collection<String> parameterPks = new HashSet();
+                        for (final Parameter parameter : parameters) {
+                            parameterPks.add(parameter.getParameterPk());
+                        }
 
-                exportMossStatement = this.sourceConnection.createStatement();
-                exportMossResult = exportMossStatement.executeQuery(exportMoss);
+                        result = this.createXlsFile(sampleIds, parameterPks);
+                    } else {
+                        log.error("no PARAM_SAMPLE_IDS server action parameters provided,"
+                                    + "returning null");
+                    }
+                } else if ((objectIds != null)) {
+                    final String exportMoss = this.createExportMossStatement(objectIds, parameters);
+                    exportMossStatement = this.sourceConnection.createStatement();
+                    exportMossResult = exportMossStatement.executeQuery(exportMoss);
 
-                if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_CSV)) {
-                    result = this.createCsv(exportMossResult, name, false);
-                } else if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_XLSX)) {
-                    result = this.createXlsx(exportMossResult, name);
-                } else if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_SHP)) {
-                    result = this.createShapeFile(exportMossResult, name);
+                    if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_CSV)) {
+                        result = this.createCsv(exportMossResult, name, false);
+                    } else if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_XLSX)) {
+                        result = this.createXlsx(exportMossResult, name);
+                    } else if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_SHP)) {
+                        result = this.createShapeFile(exportMossResult, name);
+                    } else {
+                        final String message = "unsupported export format '" + exportFormat + "'";
+                        log.error(message);
+                        throw new Exception(message);
+                    }
+
+                    exportMossStatement.close();
                 } else {
-                    final String message = "unsupported export format '" + exportFormat + "'";
-                    log.error(message);
-                    throw new Exception(message);
+                    log.error("no PARAM_OBJECT_IDS server action parameters provided,"
+                                + "returning null");
                 }
-
-                exportMossStatement.close();
             } else {
-                log.error("no PARAM_SAMPLES and PARAM_PARAMETER server action parameters provided,"
+                log.error("no PARAM_PARAMETERS server action parameters provided,"
                             + "returning null");
             }
 
@@ -347,6 +382,121 @@ public class MossExportAction extends AbstractExportAction {
         return result;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   sampleIds     DOCUMENT ME!
+     * @param   parameterPks  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  IOException             DOCUMENT ME!
+     * @throws  InvalidFormatException  DOCUMENT ME!
+     */
+    protected byte[] createXlsFile(
+            final Collection<String> sampleIds,
+            final Collection<String> parameterPks) throws IOException, InvalidFormatException {
+        final XlsHelper xlsHelper = new XlsHelper();
+        final InputStream inputStream = MossImport.class.getResourceAsStream("konvert_join_95_10_final.xls");
+        final Workbook workbook = WorkbookFactory.create(inputStream);
+        final CellStyle highlightStyle = workbook.createCellStyle();
+        // highlightStyle.setFillBackgroundColor(HSSFColor.LIGHT_YELLOW.index);
+        highlightStyle.setFillForegroundColor(HSSFColor.LIGHT_YELLOW.index);
+        highlightStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+
+        final Set<Short> highlightedColumns = new HashSet<Short>();
+        final Set<Short> skippedColumns = new HashSet<Short>();
+
+        if (log.isDebugEnabled()) {
+            log.debug("reading XLS sheet '" + workbook.getSheetName(0)
+                        + "' from workbook with " + workbook.getNumberOfSheets() + " sheets");
+        }
+        final Sheet mossSheet = workbook.getSheetAt(0);
+
+        final int rows = mossSheet.getLastRowNum() + 1;
+        log.info("processing Moss stations from XLS Sheet " + mossSheet.getSheetName()
+                    + " with " + rows + " rows.");
+
+        short rowIdx = 0;
+        final Iterator<Row> rowIterator = mossSheet.rowIterator();
+        while (rowIterator.hasNext()) {
+            try {
+                final Row row = rowIterator.next();
+                ++rowIdx;
+                // process first row and parse header information
+                if (xlsHelper.getColumnMap().isEmpty()) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("reading sheet header information");
+                    }
+                    xlsHelper.initColumnMap(row);
+                    log.info("sheet header information processed, " + xlsHelper.getColumnMap().size()
+                                + " columns identified");
+                    continue;
+                }
+
+                // process cells of rows
+                final short minColIx = row.getFirstCellNum();
+                final short maxColIx = row.getLastCellNum();
+                short columnIndex;
+                boolean highlightFullRow = false;
+                for (columnIndex = minColIx; columnIndex < maxColIx; columnIndex++) {
+                    final Cell cell = row.getCell(columnIndex);
+
+                    if (cell == null) {
+                        if (log.isDebugEnabled()) {
+                            log.warn("empty cell #" + columnIndex + " '"
+                                        + xlsHelper.getColumnNames()[columnIndex] + "' of row #" + row.getRowNum());
+                        }
+                        continue;
+                    }
+
+                    if (highlightFullRow) {
+                        cell.setCellStyle(highlightStyle);
+                    } else if (highlightedColumns.contains(columnIndex)) {
+                        cell.setCellStyle(highlightStyle);
+                    } else if (columnIndex == minColIx) {
+                        final Object probenId = xlsHelper.getCellValue(cell);
+                        if (sampleIds.contains(probenId)) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("highlighting row " + rowIdx + " with sample value id " + probenId);
+                            }
+                            highlightFullRow = true;
+                            cell.setCellStyle(highlightStyle);
+                        }
+                    } else if (skippedColumns.contains(columnIndex)) {
+                        continue;
+                    } else {
+                        final String columnName = xlsHelper.getColumnNames()[columnIndex];
+                        if ((columnName != null) && (columnName.indexOf('_') > 0)) {
+                            final String potentialPollutantKey = columnName.substring(0, columnName.indexOf('_'));
+                            if (parameterPks.contains(potentialPollutantKey)) {
+                                if (log.isDebugEnabled()) {
+                                    log.debug("highlighting column #" + columnIndex + " '" + columnName
+                                                + "' with pollutant key " + potentialPollutantKey);
+                                }
+                                highlightedColumns.add(columnIndex);
+                                cell.setCellStyle(highlightStyle);
+                            } else {
+                                skippedColumns.add(columnIndex);
+                            }
+                        } else {
+                            skippedColumns.add(columnIndex);
+                        }
+                    }
+                }
+            } catch (Throwable t) {
+                log.error("could not process row " + rowIdx
+                            + " due to error: " + t.getMessage(), t);
+            }
+        }
+
+        inputStream.close();
+        final ByteArrayOutputStream output = new ByteArrayOutputStream();
+        workbook.write(output);
+        output.close();
+        return output.toByteArray();
+    }
+
     @Override
     public String getTaskName() {
         return TASK_NAME;
@@ -359,8 +509,23 @@ public class MossExportAction extends AbstractExportAction {
      */
     public static void main(final String[] args) {
         try {
-            final Collection<Long> sitePks = Arrays.asList(
-                    new Long[] { 51L, 52L, 53L, 54L, 55L });
+            final Collection<Long> objectIds = Arrays.asList(
+                    new Long[] {
+                        1063L,
+                        1075L,
+                        1094L,
+                        1105L,
+                        1106L
+                    });
+
+            final Collection<String> sampleIds = Arrays.asList(
+                    new String[] {
+                        "213-1",
+                        "33-1",
+                        "50-1",
+                        "60-1",
+                        "60-2",
+                    });
 
             final Collection<Parameter> parameter = Arrays.asList(
                     new Parameter[] {
@@ -370,17 +535,19 @@ public class MossExportAction extends AbstractExportAction {
                     });
 
             final ServerActionParameter[] serverActionParameters = new ServerActionParameter[] {
-                    new ServerActionParameter<Collection<Long>>(PARAM_SAMPLES, sitePks),
+                    new ServerActionParameter<Collection<Long>>(PARAM_OBJECT_IDS, objectIds),
+                    new ServerActionParameter<Collection<String>>(PARAM_SAMPLE_IDS, sampleIds),
                     new ServerActionParameter<Collection<Parameter>>(PARAM_PARAMETER, parameter),
-                    new ServerActionParameter<String>(PARAM_EXPORTFORMAT, PARAM_EXPORTFORMAT_XLSX),
-                    new ServerActionParameter<String>(PARAM_NAME, "moss-xlsx-export")
+                    new ServerActionParameter<String>(PARAM_EXPORTFORMAT, PARAM_EXPORTFORMAT_XLS),
+                    new ServerActionParameter<String>(PARAM_NAME, "moss-xls-export")
                 };
 
             BasicConfigurator.configure();
+
             final MossExportAction mossExportAction = new MossExportAction();
 
             final Object result = mossExportAction.execute(null, serverActionParameters);
-            final Path file = Files.write(Paths.get("moss-export.xlsx"), (byte[])result);
+            final Path file = Files.write(Paths.get("moss-export.xls"), (byte[])result);
 
             // final Path file = Files.write(Paths.get("moss-shp-export.zip"), (byte[])result);
             System.out.println("Export File written to "

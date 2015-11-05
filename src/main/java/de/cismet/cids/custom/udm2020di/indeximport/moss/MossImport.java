@@ -446,7 +446,7 @@ public class MossImport extends OracleImport {
             }
 
             // test mode:
-            break;
+            // break;
         }
 
         i = 0;

@@ -124,16 +124,17 @@ public class MossExportAction extends AbstractExportAction {
                         + parameters.size() + parameters);
         }
 
-        final StringBuilder siteBuilder = new StringBuilder();
-        final Iterator<Long> sitePksIterator = sitePks.iterator();
-        while (sitePksIterator.hasNext()) {
-            siteBuilder.append(sitePksIterator.next());
-            if (sitePksIterator.hasNext()) {
-                siteBuilder.append(',');
+        final StringBuilder mosseBuilder = new StringBuilder();
+        final Iterator<Long> mossPksIterator = sitePks.iterator();
+        while (mossPksIterator.hasNext()) {
+            mosseBuilder.append(mossPksIterator.next());
+            if (mossPksIterator.hasNext()) {
+                mosseBuilder.append(',');
             }
         }
 
         final StringBuilder decodeBuilder = new StringBuilder();
+        final StringBuilder parameterBuilder = new StringBuilder();
         final Iterator<Parameter> parametersIterator = parameters.iterator();
         while (parametersIterator.hasNext()) {
             final Parameter parameter = parametersIterator.next();
@@ -149,18 +150,24 @@ public class MossExportAction extends AbstractExportAction {
             if (parametersIterator.hasNext()) {
                 decodeBuilder.append(", \n");
             }
+
+            parameterBuilder.append('\'').append(parameter.getParameterPk()).append('\'');
+            if (parametersIterator.hasNext()) {
+                parameterBuilder.append(',');
+            }
         }
 
-        String exportMossStatement = exportMossStatementTpl.replace(
+        String exportMossMesswerteStatement = exportMossStatementTpl.replace(
                 "%MOSS_DECODE_STATEMENTS%",
                 decodeBuilder);
-        exportMossStatement = exportMossStatement.replace(
-                "%MOSS_IDS%",
-                siteBuilder);
+        exportMossMesswerteStatement = exportMossMesswerteStatement.replace(
+                "%PARAMETER_PKS%",
+                parameterBuilder);
+        exportMossMesswerteStatement = exportMossMesswerteStatement.replace("%MOSS_IDS%", mosseBuilder);
         if (log.isDebugEnabled()) {
-            log.debug(exportMossStatement);
+            log.debug(exportMossMesswerteStatement);
         }
-        return exportMossStatement;
+        return exportMossMesswerteStatement;
     }
 
     @Override
@@ -357,9 +364,9 @@ public class MossExportAction extends AbstractExportAction {
 
             final Collection<Parameter> parameter = Arrays.asList(
                     new Parameter[] {
-                        new Parameter("AL_CONV", "Al [mg/kg]"),
-                        new Parameter("AS_CONV", "AS [mg/kg]"),
-                        new Parameter("CD_CONV", "Cd [mg/kg]")
+                        new Parameter("Al", "Al [mg/kg]"),
+                        new Parameter("As", "AS [mg/kg]"),
+                        new Parameter("Zn", "Cd [mg/kg]")
                     });
 
             final ServerActionParameter[] serverActionParameters = new ServerActionParameter[] {

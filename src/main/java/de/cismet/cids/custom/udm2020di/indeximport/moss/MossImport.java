@@ -292,7 +292,7 @@ public class MossImport extends OracleImport {
 
         // name
         tmpStr = this.getCellValue("Moos_Text", stationRow).toString();
-        stationName = tmpStr + " (" + stationKey + ")";
+        stationName = stationSrcPk + " (" + tmpStr + ")";
         mossStation.setType(tmpStr);
 
         // type

@@ -18,6 +18,7 @@ import java.beans.PropertyChangeSupport;
 
 import java.io.Serializable;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -92,6 +93,15 @@ public class Parameter implements Serializable, Comparable<Parameter> {
      * Creates a new Parameter object.
      */
     public Parameter() {
+    }
+
+    /**
+     * Creates a new Parameter object.
+     *
+     * @param  parameterMapping  DOCUMENT ME!
+     */
+    public Parameter(final ParameterMapping parameterMapping) {
+        this(parameterMapping.getParameterPk(), parameterMapping.getDisplayName());
     }
 
     /**
@@ -295,5 +305,30 @@ public class Parameter implements Serializable, Comparable<Parameter> {
         }
 
         return this.getParameterName();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Parameter other = (Parameter)obj;
+        if (!Objects.equals(this.parameterPk, other.parameterPk)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = (29 * hash) + Objects.hashCode(this.parameterPk);
+        return hash;
     }
 }

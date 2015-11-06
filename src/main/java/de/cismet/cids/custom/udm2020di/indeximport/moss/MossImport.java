@@ -59,6 +59,10 @@ import de.cismet.cids.custom.udm2020di.types.moss.Moss;
  */
 public class MossImport extends OracleImport {
 
+    //~ Static fields/initializers ---------------------------------------------
+
+    public static final String DEFAULT_IMPORTFILE = "konvert_join_95_10_final.xls";
+
     //~ Instance fields --------------------------------------------------------
 
     protected final OraclePreparedStatement insertStationStmnt;
@@ -86,7 +90,7 @@ public class MossImport extends OracleImport {
      */
     public MossImport() throws Exception {
         this(MossImport.class.getResourceAsStream("moss.properties"),
-            MossImport.class.getResourceAsStream("konvert_join_95_10_final.xls"));
+            MossImport.class.getResourceAsStream(DEFAULT_IMPORTFILE));
     }
 
     /**

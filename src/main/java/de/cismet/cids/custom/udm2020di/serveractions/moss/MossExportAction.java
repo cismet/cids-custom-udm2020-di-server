@@ -13,6 +13,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.util.HSSFColor;
@@ -70,7 +71,7 @@ import de.cismet.cismap.commons.featureservice.FeatureServiceAttribute;
 import de.cismet.cismap.commons.gui.shapeexport.ShapeExportHelper;
 import de.cismet.cismap.commons.tools.SimpleFeatureCollection;
 
-import org.apache.log4j.BasicConfigurator;
+import static de.cismet.cids.custom.udm2020di.indeximport.moss.MossImport.DEFAULT_IMPORTFILE;
 
 /**
  * DOCUMENT ME!
@@ -397,15 +398,22 @@ public class MossExportAction extends AbstractExportAction {
             final Collection<String> sampleIds,
             final Collection<String> parameterPks) throws IOException, InvalidFormatException {
         final XlsHelper xlsHelper = new XlsHelper();
-        final InputStream inputStream = MossImport.class.getResourceAsStream("konvert_join_95_10_final.xls");
+        final InputStream inputStream = MossImport.class.getResourceAsStream(DEFAULT_IMPORTFILE);
         final Workbook workbook = WorkbookFactory.create(inputStream);
-        final CellStyle highlightStyle = workbook.createCellStyle();
-        // highlightStyle.setFillBackgroundColor(HSSFColor.LIGHT_YELLOW.index);
-        highlightStyle.setFillForegroundColor(HSSFColor.LIGHT_YELLOW.index);
-        highlightStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+
+        final CellStyle highlightColumnStyle = workbook.createCellStyle();
+        highlightColumnStyle.setFillForegroundColor(HSSFColor.LIGHT_GREEN.index);
+        highlightColumnStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+
+        final CellStyle highlightRowStyle = workbook.createCellStyle();
+        highlightRowStyle.setFillForegroundColor(HSSFColor.RED.index);
+        highlightRowStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+
+        final CellStyle highlightCellStyle = workbook.createCellStyle();
+        highlightCellStyle.setFillForegroundColor(HSSFColor.YELLOW.index);
+        highlightCellStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
 
         final Set<Short> highlightedColumns = new HashSet<Short>();
-        final Set<Short> skippedColumns = new HashSet<Short>();
 
         if (log.isDebugEnabled()) {
             log.debug("reading XLS sheet '" + workbook.getSheetName(0)
@@ -423,6 +431,12 @@ public class MossExportAction extends AbstractExportAction {
             try {
                 final Row row = rowIterator.next();
                 ++rowIdx;
+
+                // process cells of rows
+                final short minColIx = row.getFirstCellNum();
+                final short maxColIx = row.getLastCellNum();
+                short columnIndex;
+
                 // process first row and parse header information
                 if (xlsHelper.getColumnMap().isEmpty()) {
                     if (log.isDebugEnabled()) {
@@ -431,41 +445,9 @@ public class MossExportAction extends AbstractExportAction {
                     xlsHelper.initColumnMap(row);
                     log.info("sheet header information processed, " + xlsHelper.getColumnMap().size()
                                 + " columns identified");
-                    continue;
-                }
 
-                // process cells of rows
-                final short minColIx = row.getFirstCellNum();
-                final short maxColIx = row.getLastCellNum();
-                short columnIndex;
-                boolean highlightFullRow = false;
-                for (columnIndex = minColIx; columnIndex < maxColIx; columnIndex++) {
-                    final Cell cell = row.getCell(columnIndex);
-
-                    if (cell == null) {
-                        if (log.isDebugEnabled()) {
-                            log.warn("empty cell #" + columnIndex + " '"
-                                        + xlsHelper.getColumnNames()[columnIndex] + "' of row #" + row.getRowNum());
-                        }
-                        continue;
-                    }
-
-                    if (highlightFullRow) {
-                        cell.setCellStyle(highlightStyle);
-                    } else if (highlightedColumns.contains(columnIndex)) {
-                        cell.setCellStyle(highlightStyle);
-                    } else if (columnIndex == minColIx) {
-                        final Object probenId = xlsHelper.getCellValue(cell);
-                        if (sampleIds.contains(probenId)) {
-                            if (log.isDebugEnabled()) {
-                                log.debug("highlighting row " + rowIdx + " with sample value id " + probenId);
-                            }
-                            highlightFullRow = true;
-                            cell.setCellStyle(highlightStyle);
-                        }
-                    } else if (skippedColumns.contains(columnIndex)) {
-                        continue;
-                    } else {
+                    // process heder and identify columsn for highlighting
+                    for (columnIndex = minColIx; columnIndex < maxColIx; columnIndex++) {
                         final String columnName = xlsHelper.getColumnNames()[columnIndex];
                         if ((columnName != null) && (columnName.indexOf('_') > 0)) {
                             final String potentialPollutantKey = columnName.substring(0, columnName.indexOf('_'));
@@ -475,14 +457,44 @@ public class MossExportAction extends AbstractExportAction {
                                                 + "' with pollutant key " + potentialPollutantKey);
                                 }
                                 highlightedColumns.add(columnIndex);
-                                cell.setCellStyle(highlightStyle);
-                            } else {
-                                skippedColumns.add(columnIndex);
                             }
-                        } else {
-                            skippedColumns.add(columnIndex);
                         }
                     }
+                    continue;
+                }
+
+                boolean highlightFullRow = false;
+                for (columnIndex = minColIx; columnIndex < maxColIx; columnIndex++) {
+                    final Cell cell = row.getCell(columnIndex);
+                    final boolean highlightFullColumn = highlightedColumns.contains(columnIndex);
+                    // empty cell -> ignore
+                    if (cell == null) {
+                        if (log.isDebugEnabled()) {
+                            log.warn("empty cell #" + columnIndex + " '"
+                                        + xlsHelper.getColumnNames()[columnIndex] + "' of row #" + row.getRowNum());
+                        }
+                        continue;
+                    }
+
+                    // check first column and conditionally highlight sample row
+                    if (columnIndex == minColIx) {
+                        final Object sampleId = xlsHelper.getCellValue(cell);
+                        if (sampleIds.contains(sampleId)) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("highlighting row " + rowIdx + " with sample value id " + sampleId);
+                            }
+                            highlightFullRow = true;
+                            cell.setCellStyle(highlightRowStyle);
+                        }
+                    } else if (highlightFullRow && highlightFullColumn) {
+                        // cell and row ->  highlight value
+                        cell.setCellStyle(highlightCellStyle);
+                    } else if (highlightFullRow) {
+                        cell.setCellStyle(highlightRowStyle);
+                    } else if (highlightFullColumn) {
+                        cell.setCellStyle(highlightColumnStyle);
+                    }
+                    // else: ignore
                 }
             } catch (Throwable t) {
                 log.error("could not process row " + rowIdx

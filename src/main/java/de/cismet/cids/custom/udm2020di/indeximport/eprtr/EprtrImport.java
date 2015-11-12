@@ -290,7 +290,7 @@ public class EprtrImport extends OracleImport {
         }
         int i = 0;
 
-        while (installationsResultSet.next() && (i < 25)) {
+        while (installationsResultSet.next()) {
             try {
                 startTime = System.currentTimeMillis();
                 ++i;

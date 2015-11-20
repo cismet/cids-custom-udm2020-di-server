@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlTransient;
  */
 @JacksonXmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Parameter implements Serializable, Comparable<Parameter> {
+public class Parameter implements Serializable, Comparable<Parameter>, Cloneable {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -93,6 +93,20 @@ public class Parameter implements Serializable, Comparable<Parameter> {
      * Creates a new Parameter object.
      */
     public Parameter() {
+    }
+
+    /**
+     * Creates a new Parameter object.
+     *
+     * @param  parameter  DOCUMENT ME!
+     */
+    public Parameter(final Parameter parameter) {
+        this(
+            parameter.parameterPk,
+            parameter.parametergruppePk,
+            parameter.parameterName,
+            parameter.parametergruppeName,
+            parameter.selected);
     }
 
     /**
@@ -330,5 +344,10 @@ public class Parameter implements Serializable, Comparable<Parameter> {
         int hash = 5;
         hash = (29 * hash) + Objects.hashCode(this.parameterPk);
         return hash;
+    }
+
+    @Override
+    public Parameter clone() throws CloneNotSupportedException {
+        return new Parameter(this);
     }
 }

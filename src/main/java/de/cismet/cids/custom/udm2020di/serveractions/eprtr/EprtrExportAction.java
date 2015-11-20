@@ -120,7 +120,7 @@ public class EprtrExportAction extends AbstractExportAction {
             final Collection<Long> installationPks,
             final Collection<Parameter> parameters) {
         if (log.isDebugEnabled()) {
-            log.debug("creating export statements for " + installationPks.size() + "installatione and "
+            log.debug("creating export statements for " + installationPks.size() + " installatione and "
                         + parameters.size() + parameters);
         }
 

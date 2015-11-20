@@ -43,10 +43,10 @@ public abstract class AbstractExportAction extends OracleExport implements Serve
     //~ Static fields/initializers ---------------------------------------------
 
     public static final String PARAM_EXPORTFORMAT = "exportFormat";
-    public static final String PARAM_EXPORTFORMAT_CSV = "exportFormatCsv";
-    public static final String PARAM_EXPORTFORMAT_XLSX = "exportFormatXlsx";
-    public static final String PARAM_EXPORTFORMAT_XLS = "exportFormatXls";
-    public static final String PARAM_EXPORTFORMAT_SHP = "exportFormatShp";
+    public static final String PARAM_EXPORTFORMAT_CSV = "CSV Datei";
+    public static final String PARAM_EXPORTFORMAT_XLSX = "Excel Datei (XLSX)";
+    public static final String PARAM_EXPORTFORMAT_XLS = "Excel Datei (XLS)";
+    public static final String PARAM_EXPORTFORMAT_SHP = "ESRI Shape Datei";
     public static final String PARAM_NAME = "name";
     public static final String PARAM_PARAMETER = "parameter";
 

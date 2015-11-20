@@ -212,7 +212,13 @@ public abstract class WaExportAction extends AbstractExportAction {
                 } else if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_XLSX)) {
                     result = this.createXlsx(exportWaMesswerteResult, name);
                 } else if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_SHP)) {
-                    result = this.createShapeFile(exportWaMesswerteResult, name);
+                    if (waSource.equalsIgnoreCase(WAOW)) {
+                        result = this.createShapeFile(exportWaMesswerteResult, name);
+                    } else {
+                        final String message = "SHP Export of WAGW Stations not permitted!";
+                        log.error(message);
+                        throw new Exception(message);
+                    }
                 } else {
                     final String message = "unsupported export format '" + exportFormat + "'";
                     log.error(message);

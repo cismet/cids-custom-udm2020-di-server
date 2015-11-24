@@ -322,6 +322,9 @@ public class Parameter implements Serializable, Comparable<Parameter>, Cloneable
     }
 
     @Override
+    /**
+     * Checks for equality of Parameter PK only.
+     */
     public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
@@ -329,7 +332,7 @@ public class Parameter implements Serializable, Comparable<Parameter>, Cloneable
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!this.getClass().isAssignableFrom(obj.getClass())) {
             return false;
         }
         final Parameter other = (Parameter)obj;

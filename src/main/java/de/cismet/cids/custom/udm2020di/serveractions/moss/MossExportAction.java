@@ -138,7 +138,7 @@ public class MossExportAction extends AbstractExportAction {
             final Collection<Parameter> parameters) {
         if (log.isDebugEnabled()) {
             log.debug("creating export statements for " + sitePks.size() + "site and "
-                        + parameters.size() + parameters);
+                        + parameters.size() + " parameters");
         }
 
         final StringBuilder mosseBuilder = new StringBuilder();

@@ -11,14 +11,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.Objects;
+
+import de.cismet.cids.dynamics.CidsBean;
+
 /**
  * DOCUMENT ME!
  *
  * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @JacksonXmlRootElement
-public class Tag implements Comparable<Tag> {
+public class Tag implements Cloneable, Comparable<Tag> {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -42,115 +55,50 @@ public class Tag implements Comparable<Tag> {
     @JacksonXmlProperty
     private String name;
 
+    @JacksonXmlProperty
+    private boolean selected = false;
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Copy-Constructor.
+     *
+     * @param  tag  DOCUMENT ME!
+     */
+    public Tag(final Tag tag) {
+        this();
+        this.id = tag.id;
+        this.key = tag.key;
+        this.name = tag.name;
+        this.description = tag.description;
+        this.selected = tag.selected;
+        this.taggroupId = tag.taggroupId;
+        this.taggroupKey = tag.taggroupKey;
+    }
+
+    /**
+     * Creates a new Tag object.
+     *
+     * @param  cidsBean  DOCUMENT ME!
+     */
+    public Tag(final CidsBean cidsBean) {
+        this.id = (cidsBean.getProperty("id") != null) ? (int)cidsBean.getProperty("id") : -1;
+
+        this.key = (cidsBean.getProperty("key") != null) ? cidsBean.getProperty("key").toString() : null;
+
+        this.name = (cidsBean.getProperty("name") != null) ? cidsBean.getProperty("name").toString() : null;
+
+        this.description = (cidsBean.getProperty("description") != null)
+            ? cidsBean.getProperty("description").toString() : null;
+
+        this.taggroupId = (cidsBean.getProperty("taggroup.id") != null) ? (int)cidsBean.getProperty("taggroup.id")
+                                                                        : -1L;
+
+        this.taggroupKey = (cidsBean.getProperty("taggroup_key") != null)
+            ? cidsBean.getProperty("taggroup_key").toString() : null;
+    }
+
     //~ Methods ----------------------------------------------------------------
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public long getId() {
-        return id;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  id  DOCUMENT ME!
-     */
-    public void setId(final long id) {
-        this.id = id;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getKey() {
-        return key;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  key  DOCUMENT ME!
-     */
-    public void setKey(final String key) {
-        this.key = key;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  description  DOCUMENT ME!
-     */
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public long getTaggroupId() {
-        return taggroupId;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  taggroupId  DOCUMENT ME!
-     */
-    public void setTaggroup(final long taggroupId) {
-        this.taggroupId = taggroupId;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getTaggroupKey() {
-        return taggroupKey;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  taggroupKey  DOCUMENT ME!
-     */
-    public void setTaggroupKey(final String taggroupKey) {
-        this.taggroupKey = taggroupKey;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  name  DOCUMENT ME!
-     */
-    public void setName(final String name) {
-        this.name = name;
-    }
 
     @Override
     public int compareTo(final Tag tag) {
@@ -160,5 +108,47 @@ public class Tag implements Comparable<Tag> {
     @Override
     public String toString() {
         return this.getName();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!this.getClass().isAssignableFrom(obj.getClass())) {
+            return false;
+        }
+        final Tag other = (Tag)obj;
+
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+
+        if (!Objects.equals(this.key, other.key)) {
+            return false;
+        }
+
+        if (!Objects.equals(this.taggroupKey, other.taggroupKey)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = (29 * hash) + Objects.hashCode(this.id);
+        hash = (29 * hash) + Objects.hashCode(this.key);
+        hash = (29 * hash) + Objects.hashCode(this.taggroupKey);
+        return hash;
+    }
+
+    @Override
+    public Tag clone() throws CloneNotSupportedException {
+        return new Tag(this);
     }
 }

@@ -321,10 +321,14 @@ public class Parameter implements Serializable, Comparable<Parameter>, Cloneable
         return this.getParameterName();
     }
 
-    @Override
     /**
      * Checks for equality of Parameter PK only.
+     *
+     * @param   obj  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
+    @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
             return true;

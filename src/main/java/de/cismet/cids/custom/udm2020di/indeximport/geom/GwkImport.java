@@ -7,22 +7,32 @@
 ****************************************************/
 package de.cismet.cids.custom.udm2020di.indeximport.geom;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
  * DOCUMENT ME!
  *
- * @author   martin.scholl@cismet.de
+ * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
-public class BundeslaenderImport extends GeomImport {
+public class GwkImport extends GeomImport {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    protected static final Logger LOGGER = Logger.getLogger(GwkImport.class);
+
+    //~ Instance fields --------------------------------------------------------
+
+    protected final PreparedStatement insertGwk;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -31,8 +41,14 @@ public class BundeslaenderImport extends GeomImport {
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public BundeslaenderImport() throws Exception {
-        super(BundeslaenderImport.class.getResourceAsStream("bundeslaender.properties"));
+    public GwkImport() throws Exception {
+        super(GwkImport.class.getResourceAsStream("gwk.properties"));
+
+        final String insertGwkTlp = IOUtils.toString(this.getClass().getResourceAsStream(
+                    "/de/cismet/cids/custom/udm2020di/indeximport/geom/insert-gwk.prs.sql"),
+                "UTF-8");
+
+        insertGwk = this.targetConnection.prepareStatement(insertGwkTlp);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -50,7 +66,7 @@ public class BundeslaenderImport extends GeomImport {
 
         try {
             final BufferedReader br = new BufferedReader(
-                    new InputStreamReader(this.getClass().getResourceAsStream("bundeslaender.wkt"), "UTF8"));
+                    new InputStreamReader(this.getClass().getResourceAsStream("gwk_at.wkt"), "UTF8"));
 
             String line;
             while ((line = br.readLine()) != null) {
@@ -60,24 +76,31 @@ public class BundeslaenderImport extends GeomImport {
 
                 // insert geom
                 final String[] split = line.split(";");
+                final String name = split[1];
+
                 psg.setInt(1, id);
-                psg.setClob(2, new StringReader(split[2]));
+                psg.setClob(2, new StringReader(split[0]));
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("inserting new GKW geometry");
+                }
                 psg.executeUpdate();
 
                 // insert named area
-                insertNamedArea.setString(1, split[0]);
-                insertNamedArea.setString(2, split[1]);
-                insertNamedArea.setInt(3, id);
-                insertNamedArea.executeUpdate();
+                insertGwk.setString(1, name);
+                insertGwk.setInt(2, id);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("inserting new GWK NAMED_AREA '" + name + "' with GEOM.id " + id);
+                }
+                insertGwk.executeUpdate();
+
                 i++;
                 if (log.isDebugEnabled()) {
-                    log.debug("inserted Bundesland '" + split[0] + "' of type '"
-                                + split[1] + "'");
+                    log.info("inserted GWK '" + name + "'");
                 }
             }
             this.targetConnection.commit();
         } catch (Exception ex) {
-            log.error("rolling back Bundesländer-Import due to exception: " + ex.getMessage(), ex);
+            log.error("rolling back GWK-Import due to exception: " + ex.getMessage(), ex);
 
             try {
                 this.targetConnection.rollback();
@@ -95,7 +118,7 @@ public class BundeslaenderImport extends GeomImport {
         }
 
         this.psg.close();
-        this.insertNamedArea.close();
+        this.insertGwk.close();
         this.psv.close();
 
         return i;
@@ -107,19 +130,17 @@ public class BundeslaenderImport extends GeomImport {
      * @param  args  the command line arguments
      */
     public static void main(final String[] args) {
-        final Logger logger = Logger.getLogger(BundeslaenderImport.class);
-
         try {
-            logger.info("Starting Bundesländer  Import");
+            GwkImport.LOGGER.info("Starting GWK Import");
 
             final long startTime = System.currentTimeMillis();
-            final BundeslaenderImport bundeslaenderImport = new BundeslaenderImport();
+            final GwkImport bundeslaenderImport = new GwkImport();
             final int i = bundeslaenderImport.doImport();
 
-            logger.info(i + " Bundesländer successfully imported in "
+            GwkImport.LOGGER.info(i + " GWK successfully imported in "
                         + ((System.currentTimeMillis() - startTime) / 1000 / 60) + "m");
         } catch (Exception ex) {
-            logger.error("could not perform Bundeslaender Import: "
+            GwkImport.LOGGER.error("could not perform GWK Import: "
                         + ex.getMessage(), ex);
         }
     }

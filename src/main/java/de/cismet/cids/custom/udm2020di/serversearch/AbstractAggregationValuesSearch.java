@@ -48,7 +48,7 @@ public abstract class AbstractAggregationValuesSearch extends AbstractCidsServer
 
     protected static final String DOMAIN = "UDM2020-DI";
 
-    protected Logger LOGGER = Logger.getLogger(AbstractAggregationValuesSearch.class);
+    protected static Logger LOGGER = Logger.getLogger(AbstractAggregationValuesSearch.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -153,7 +153,7 @@ public abstract class AbstractAggregationValuesSearch extends AbstractCidsServer
                     LOGGER.warn("no aggregation values tags found! (" + i + ") aggregation values filtered");
                 } else {
                     LOGGER.info(aggregationValues.size() + " supported aggregation values processed of "
-                            +i+" available aggregation values for "
+                                + i + " available aggregation values for "
                                 + this.objectIds.size() + " objects in "
                                 + (System.currentTimeMillis() - startTime) + "ms");
                 }

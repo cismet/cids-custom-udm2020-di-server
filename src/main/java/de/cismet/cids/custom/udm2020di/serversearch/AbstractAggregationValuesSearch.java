@@ -23,7 +23,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -49,7 +48,7 @@ public abstract class AbstractAggregationValuesSearch extends AbstractCidsServer
 
     protected static final String DOMAIN = "UDM2020-DI";
 
-    protected static Logger LOGGER = Logger.getLogger(AbstractAggregationValuesSearch.class);
+    protected Logger LOGGER = Logger.getLogger(AbstractAggregationValuesSearch.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -116,9 +115,9 @@ public abstract class AbstractAggregationValuesSearch extends AbstractCidsServer
 
             final String getAggregationValuesSearchStatement = this.createAggregationValuesSearchStatement(
                     this.objectIds);
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(getAggregationValuesSearchStatement);
-            }
+//            if (LOGGER.isDebugEnabled()) {
+//                LOGGER.debug(getAggregationValuesSearchStatement);
+//            }
 
             // final MetaService metaService = (MetaService)getActiveLocalServers().get(DOMAIN);
             // if (metaService != null) {
@@ -128,6 +127,7 @@ public abstract class AbstractAggregationValuesSearch extends AbstractCidsServer
                 aggregationValuesSearchStmnt = connection.createStatement();
                 final ResultSet aggregationValuesSearchResult = aggregationValuesSearchStmnt.executeQuery(
                         getAggregationValuesSearchStatement);
+                int i = 0;
                 while (aggregationValuesSearchResult.next()) {
                     final AggregationValuesBean aggregationValuesBean = OracleExport.JSON_MAPPER.readValue(
                             aggregationValuesSearchResult.getClob(1).getCharacterStream(),
@@ -142,6 +142,7 @@ public abstract class AbstractAggregationValuesSearch extends AbstractCidsServer
                                     && !aggregationValue.getPollutantKey().equalsIgnoreCase("SYSSplus")) {
                             aggregationValues.add(aggregationValue);
                         }
+                        i++;
                     }
                 }
 
@@ -149,9 +150,10 @@ public abstract class AbstractAggregationValuesSearch extends AbstractCidsServer
                 aggregationValuesSearchStmnt.close();
 
                 if (aggregationValues.isEmpty()) {
-                    LOGGER.warn("no aggregation values tags found!");
+                    LOGGER.warn("no aggregation values tags found! (" + i + ") aggregation values filtered");
                 } else {
-                    LOGGER.info(aggregationValues.size() + " aggregation values found and processed for "
+                    LOGGER.info(aggregationValues.size() + " supported aggregation values processed of "
+                            +i+" available aggregation values for "
                                 + this.objectIds.size() + " objects in "
                                 + (System.currentTimeMillis() - startTime) + "ms");
                 }

@@ -7,6 +7,12 @@
 ****************************************************/
 package de.cismet.cids.custom.udm2020di.types;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 
 import java.util.AbstractCollection;
@@ -22,13 +28,23 @@ import java.util.TreeMap;
  * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
-public class AggregationValues extends AbstractCollection<AggregationValue> implements Serializable {
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(
+    fieldVisibility = JsonAutoDetect.Visibility.NONE,
+    isGetterVisibility = JsonAutoDetect.Visibility.NONE,
+    getterVisibility = JsonAutoDetect.Visibility.NONE,
+    setterVisibility = JsonAutoDetect.Visibility.NONE
+)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class AggregationValues extends AbstractCollection<AggregationValue> implements Serializable, Cloneable {
 
     //~ Instance fields --------------------------------------------------------
 
     private final Map<String, AggregationValue> aggregationValues = new TreeMap<String, AggregationValue>();
 
+    @JsonProperty
     private Date maxDate = null;
+    @JsonProperty
     private Date minDate = null;
 
     //~ Constructors -----------------------------------------------------------
@@ -46,6 +62,33 @@ public class AggregationValues extends AbstractCollection<AggregationValue> impl
      */
     public AggregationValues(final Collection<AggregationValue> aggregationValueCollection) {
         this.addAll(aggregationValueCollection);
+    }
+
+    /**
+     * Creates a new AggregationValues object.
+     *
+     * @param  aggregationValues  DOCUMENT ME!
+     * @param  minDate            DOCUMENT ME!
+     * @param  maxDate            DOCUMENT ME!
+     */
+    @JsonCreator
+    public AggregationValues(@JsonProperty("aggregationValues") final Collection<AggregationValue> aggregationValues,
+            @JsonProperty("minDate") final Date minDate,
+            @JsonProperty("maxDate") final Date maxDate) {
+        this.addAll(aggregationValues);
+        this.minDate = minDate;
+        this.maxDate = maxDate;
+    }
+
+    /**
+     * Creates a new AggregationValues object.
+     *
+     * @param  aggregationValues  DOCUMENT ME!
+     */
+    protected AggregationValues(final AggregationValues aggregationValues) {
+        this.aggregationValues.putAll(aggregationValues.aggregationValues);
+        this.minDate = aggregationValues.minDate;
+        this.maxDate = aggregationValues.maxDate;
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -217,5 +260,16 @@ public class AggregationValues extends AbstractCollection<AggregationValue> impl
         this.aggregationValues.clear();
         this.maxDate = null;
         this.minDate = null;
+    }
+
+    @JsonProperty(value = "aggregationValues")
+    @Override
+    public AggregationValue[] toArray() {
+        return super.toArray(new AggregationValue[this.size()]);
+    }
+
+    @Override
+    public AggregationValues clone() throws CloneNotSupportedException {
+        return new AggregationValues(this);
     }
 }

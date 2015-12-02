@@ -13,3 +13,4 @@ bundeslaender.properties
 gwk.properties
 /src/main/resources/de/cismet/cids/custom/udm2020di/indeximport/wa/
 /src/main/resources/de/cismet/cids/custom/udm2020di/indeximport/moss/konvert_join_95_10_final.xls
+/src/main/resources/de/cismet/cids/custom/udm2020di/indeximport/geom/gwk.properties

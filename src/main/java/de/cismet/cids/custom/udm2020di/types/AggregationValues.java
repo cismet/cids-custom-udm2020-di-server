@@ -13,6 +13,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 
 import java.util.AbstractCollection;
@@ -43,9 +45,12 @@ public class AggregationValues extends AbstractCollection<AggregationValue> impl
     private final Map<String, AggregationValue> aggregationValues = new TreeMap<String, AggregationValue>();
 
     @JsonProperty
-    private Date maxDate = null;
-    @JsonProperty
+    @Getter
     private Date minDate = null;
+
+    @JsonProperty
+    @Getter
+    private Date maxDate = null;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -92,24 +97,6 @@ public class AggregationValues extends AbstractCollection<AggregationValue> impl
     }
 
     //~ Methods ----------------------------------------------------------------
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public Date getMaxDate() {
-        return maxDate;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public Date getMinDate() {
-        return minDate;
-    }
 
     /**
      * DOCUMENT ME!

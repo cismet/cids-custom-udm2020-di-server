@@ -42,7 +42,7 @@ public class AggregationValues extends AbstractCollection<AggregationValue> impl
 
     //~ Instance fields --------------------------------------------------------
 
-    private final Map<String, AggregationValue> aggregationValues = new TreeMap<String, AggregationValue>();
+    private final TreeMap<String, AggregationValue> aggregationValues = new TreeMap<String, AggregationValue>();
 
     @JsonProperty
     @Getter

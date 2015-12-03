@@ -54,7 +54,7 @@
             <exec.executable>${profiler.java}</exec.executable>
         </properties>
     </action>
-        <action>
+    <action>
         <actionName>debug.single.main</actionName>
         <activatedProfiles>
             <activatedProfile>cismet-dev-exec</activatedProfile>
@@ -73,7 +73,15 @@
             <exec.executable>java</exec.executable>
         </properties>
     </action>
-        <action>
+    <action>
+        <actionName>CUSTOM-fresh build</actionName>
+        <displayName>fresh build</displayName>
+        <goals>
+            <goal>clean</goal>
+            <goal>install</goal>
+        </goals>
+    </action>
+    <action>
         <actionName>run.single.main</actionName>
         <activatedProfiles>
             <activatedProfile>cismet-dev-exec</activatedProfile>

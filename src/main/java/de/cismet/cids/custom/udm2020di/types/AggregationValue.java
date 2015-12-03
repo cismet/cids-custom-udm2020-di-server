@@ -5,11 +5,6 @@
 *              ... and it just works.
 *
 ****************************************************/
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cismet.cids.custom.udm2020di.types;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -341,7 +336,7 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
 
     @Override
     public int compareTo(final AggregationValue aggregationValue) {
-        return this.getName().compareTo(aggregationValue.getName());
+        return this.getPlainName().compareTo(aggregationValue.getPlainName());
     }
 
     @Override

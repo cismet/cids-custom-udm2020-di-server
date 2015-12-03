@@ -103,6 +103,9 @@ public class Messstelle {
      */
     public void setProbenparameter(final List<Probenparameter> probenparameter) {
         this.probenparameter = probenparameter;
+        if ((this.probenparameter != null) && !this.probenparameter.isEmpty()) {
+            Collections.sort(this.probenparameter);
+        }
     }
 
     /**

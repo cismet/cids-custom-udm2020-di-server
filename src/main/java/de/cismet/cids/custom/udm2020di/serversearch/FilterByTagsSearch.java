@@ -193,7 +193,7 @@ public class FilterByTagsSearch extends AbstractCidsServerSearch {
                         LOGGER.info(resultSet.size() + " nodes of "
                                     + nodes.size() + " nodes remaining after applying "
                                     + filterTagIds.size() + " filter tags in "
-                                    + (System.currentTimeMillis() + startTime) + "ms");
+                                    + (System.currentTimeMillis() - startTime) + "ms");
 
                         final Map<Integer, Collection<Integer>> objectIdMap =
                             new HashMap<Integer, Collection<Integer>>();

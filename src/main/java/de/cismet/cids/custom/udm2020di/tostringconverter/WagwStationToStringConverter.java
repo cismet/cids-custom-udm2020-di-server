@@ -15,7 +15,7 @@ import de.cismet.cids.tools.CustomToStringConverter;
  * @author   Pascal Dihé <pascal.dihe@cismet.de>
  * @version  $Revision$, $Date$
  */
-public class WagwToStringConverter extends CustomToStringConverter {
+public class WagwStationToStringConverter extends CustomToStringConverter {
 
     //~ Methods ----------------------------------------------------------------
 

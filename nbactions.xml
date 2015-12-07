@@ -80,6 +80,10 @@
             <goal>clean</goal>
             <goal>install</goal>
         </goals>
+        <activatedProfiles>
+            <activatedProfile>udm2020-di</activatedProfile>
+            <activatedProfile>cismet-dev</activatedProfile>
+        </activatedProfiles>
     </action>
     <action>
         <actionName>run.single.main</actionName>

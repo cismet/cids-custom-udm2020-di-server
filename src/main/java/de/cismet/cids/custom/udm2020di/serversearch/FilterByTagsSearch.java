@@ -190,11 +190,7 @@ public class FilterByTagsSearch extends AbstractCidsServerSearch {
                         LOGGER.warn("no nodes filtered by " + filterTagIds.size() + " tags in "
                                     + (System.currentTimeMillis() - startTime) + "ms");
                     } else {
-                        LOGGER.info(resultSet.size() + " nodes of "
-                                    + nodes.size() + " nodes remaining after applying "
-                                    + filterTagIds.size() + " filter tags in "
-                                    + (System.currentTimeMillis() + startTime) + "ms");
-
+                        final int nodesSize = nodes.size();
                         final Map<Integer, Collection<Integer>> objectIdMap =
                             new HashMap<Integer, Collection<Integer>>();
 
@@ -224,6 +220,11 @@ public class FilterByTagsSearch extends AbstractCidsServerSearch {
                                 }
                             }
                         }
+
+                        LOGGER.info(nodes.size() + " nodes of "
+                                    + nodesSize + " original nodes remaining after applying "
+                                    + filterTagIds.size() + " filter tags in "
+                                    + (System.currentTimeMillis() - startTime) + "ms");
                     }
                 } catch (RemoteException ex) {
                     LOGGER.error(ex.getMessage(), ex);
@@ -232,7 +233,7 @@ public class FilterByTagsSearch extends AbstractCidsServerSearch {
                 LOGGER.error("active local server " + DOMAIN + "not found"); // NOI18N
             }
         } else {
-            LOGGER.warn("missing parameters, returning returning unmodified node collection of size "
+            LOGGER.warn("missing parameters, returning unmodified node collection of size "
                         + this.nodes.size());
         }
 

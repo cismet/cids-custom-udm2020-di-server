@@ -52,9 +52,7 @@ public abstract class AbstractAggregationValuesSearch extends AbstractCidsServer
 
     //~ Instance fields --------------------------------------------------------
 
-    @Getter
-    @Setter
-    protected Collection<Integer> objectIds;
+    @Getter @Setter protected Collection<Integer> objectIds;
 
     protected final String getAggregationValuesTpl;
 
@@ -159,8 +157,9 @@ public abstract class AbstractAggregationValuesSearch extends AbstractCidsServer
                 }
             } catch (RemoteException ex) {
                 LOGGER.error(ex.getMessage(), ex);
+                throw new SearchException(ex.getMessage(), ex);
             } catch (IOException ex) {
-                LOGGER.error(ex.getMessage(), ex);
+                throw new SearchException(ex.getMessage(), ex);
             } catch (SQLException ex) {
                 LOGGER.error(ex.getMessage(), ex);
                 try {
@@ -170,6 +169,7 @@ public abstract class AbstractAggregationValuesSearch extends AbstractCidsServer
                 } catch (SQLException sx) {
                     LOGGER.error(sx.getMessage(), sx);
                 }
+                throw new SearchException(ex.getMessage(), ex);
             }
 //            } else {
 //                LOGGER.error("active local server " + DOMAIN + " not found"); // NOI18N

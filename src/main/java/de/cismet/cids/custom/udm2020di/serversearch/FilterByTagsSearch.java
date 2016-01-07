@@ -53,13 +53,9 @@ public class FilterByTagsSearch extends AbstractCidsServerSearch {
     protected final String filterByTagsTpl;
     protected final String selectObjectIdConstantsTpl;
 
-    @Getter
-    @Setter
-    protected List<Node> nodes;
+    @Getter @Setter protected List<Node> nodes;
 
-    @Getter
-    @Setter
-    protected Collection<Integer> filterTagIds;
+    @Getter @Setter protected Collection<Integer> filterTagIds;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -228,9 +224,12 @@ public class FilterByTagsSearch extends AbstractCidsServerSearch {
                     }
                 } catch (RemoteException ex) {
                     LOGGER.error(ex.getMessage(), ex);
+                    throw new SearchException(ex.getMessage(), ex);
                 }
             } else {
-                LOGGER.error("active local server " + DOMAIN + "not found"); // NOI18N
+                final String message = "active local server " + DOMAIN + "not found";
+                LOGGER.error(message); // NOI18N
+                throw new SearchException(message);
             }
         } else {
             LOGGER.warn("missing parameters, returning unmodified node collection of size "

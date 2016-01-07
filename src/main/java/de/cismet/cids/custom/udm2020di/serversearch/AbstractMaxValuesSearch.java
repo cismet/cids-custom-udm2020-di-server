@@ -273,9 +273,12 @@ public abstract class AbstractMaxValuesSearch extends AbstractCidsServerSearch i
                 }
             } catch (RemoteException ex) {
                 LOGGER.error(ex.getMessage(), ex);
+                throw new SearchException(ex.getMessage(), ex);
             }
         } else {
-            LOGGER.error("active local server " + DOMAIN + "not found"); // NOI18N
+            final String message = "active local server " + DOMAIN + "not found";
+            LOGGER.error(message); // NOI18N
+            throw new SearchException(message);
         }
 
         LOGGER.info(result.size() + " objects found in "

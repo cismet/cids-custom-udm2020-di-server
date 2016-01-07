@@ -47,9 +47,7 @@ public class PostFilterTagsSearch extends AbstractCidsServerSearch {
 
     protected final String getPostfilterTagsTpl;
 
-    @Getter
-    @Setter
-    protected Map<Integer, Collection<Integer>> objectIdMap;
+    @Getter @Setter protected Map<Integer, Collection<Integer>> objectIdMap;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -137,9 +135,12 @@ public class PostFilterTagsSearch extends AbstractCidsServerSearch {
                     }
                 } catch (RemoteException ex) {
                     LOGGER.error(ex.getMessage(), ex);
+                    throw new SearchException(ex.getMessage(), ex);
                 }
             } else {
-                LOGGER.error("active local server " + DOMAIN + " not found"); // NOI18N
+                final String message = "active local server " + DOMAIN + "not found";
+                LOGGER.error(message); // NOI18N
+                throw new SearchException(message);
             }
         } else {
             LOGGER.warn("missing parameters, returning empty collection");

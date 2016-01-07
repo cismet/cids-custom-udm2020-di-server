@@ -62,21 +62,17 @@ public class Standort {
     )
     private float rechtswert;
 
-    @JacksonXmlProperty
-    private List<Standortparameter> standortparameter;
+    @JacksonXmlProperty private List<Standortparameter> standortparameter;
 
-    @JacksonXmlProperty
-    private List<Probenparameter> probenparameter;
+    @JacksonXmlProperty private List<Probenparameter> probenparameter;
 
-    @JacksonXmlProperty
-    private List<Tag> tags;
+    @JacksonXmlProperty private List<Tag> tags;
 
     @JacksonXmlProperty(localName = "aggregationvalues")
     @JsonProperty("aggregationvalues")
     private List<AggregationValue> aggregationValues;
 
-    @JacksonXmlProperty
-    private List<String> proben;
+    @JacksonXmlProperty private List<String> proben;
 
     //~ Methods ----------------------------------------------------------------
 

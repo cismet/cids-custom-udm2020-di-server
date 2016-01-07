@@ -35,14 +35,11 @@ public class Tag implements Cloneable, Comparable<Tag> {
 
     //~ Instance fields --------------------------------------------------------
 
-    @JacksonXmlProperty
-    private long id;
+    @JacksonXmlProperty private long id;
 
-    @JacksonXmlProperty
-    private String key;
+    @JacksonXmlProperty private String key;
 
-    @JacksonXmlProperty
-    private String description;
+    @JacksonXmlProperty private String description;
 
     @JacksonXmlProperty(localName = "taggroupid")
     @JsonProperty("taggroupid")
@@ -52,11 +49,9 @@ public class Tag implements Cloneable, Comparable<Tag> {
     @JsonProperty("taggroupkey")
     private String taggroupKey;
 
-    @JacksonXmlProperty
-    private String name;
+    @JacksonXmlProperty private String name;
 
-    @JacksonXmlProperty
-    private boolean selected = false;
+    @JacksonXmlProperty private boolean selected = false;
 
     //~ Constructors -----------------------------------------------------------
 

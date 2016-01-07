@@ -36,17 +36,11 @@ public class Parameter implements Serializable, Comparable<Parameter>, Cloneable
 
     //~ Static fields/initializers ---------------------------------------------
 
-    @JsonIgnore
-    @XmlTransient
-    public static final String PROP_SELECTED = "selected";
+    @JsonIgnore @XmlTransient public static final String PROP_SELECTED = "selected";
 
-    @JsonIgnore
-    @XmlTransient
-    public static final char UNIT_SEPARATOR = '[';
+    @JsonIgnore @XmlTransient public static final char UNIT_SEPARATOR = '[';
 
-    @JsonIgnore
-    @XmlTransient
-    public static final Pattern UNIT_REGEX = Pattern.compile("(?<=\\[)[^\\[.]+?(?=\\])");
+    @JsonIgnore @XmlTransient public static final Pattern UNIT_REGEX = Pattern.compile("(?<=\\[)[^\\[.]+?(?=\\])");
 
     //~ Instance fields --------------------------------------------------------
 
@@ -81,9 +75,7 @@ public class Parameter implements Serializable, Comparable<Parameter>, Cloneable
     @JsonProperty("parametereinheit")
     private String parameterEinheit;
 
-    @JsonIgnore
-    @XmlTransient
-    private boolean selected;
+    @JsonIgnore @XmlTransient private boolean selected;
 
     private final transient PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 

@@ -31,17 +31,12 @@ public class AggregationValue implements Serializable, Cloneable, Comparable<Agg
 
     //~ Static fields/initializers ---------------------------------------------
 
-    @JsonIgnore
-    @XmlTransient
-    public static final char UNIT_SEPARATOR = Parameter.UNIT_SEPARATOR;
-    @JsonIgnore
-    @XmlTransient
-    public static final Pattern UNIT_REGEX = Parameter.UNIT_REGEX;
+    @JsonIgnore @XmlTransient public static final char UNIT_SEPARATOR = Parameter.UNIT_SEPARATOR;
+    @JsonIgnore @XmlTransient public static final Pattern UNIT_REGEX = Parameter.UNIT_REGEX;
 
     //~ Instance fields --------------------------------------------------------
 
-    @JacksonXmlProperty
-    private String name;
+    @JacksonXmlProperty private String name;
 
     @JacksonXmlProperty(localName = "pollutantkey")
     @JsonProperty("pollutantkey")

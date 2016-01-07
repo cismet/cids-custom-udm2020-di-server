@@ -44,13 +44,9 @@ public class AggregationValues extends AbstractCollection<AggregationValue> impl
 
     private final TreeMap<String, AggregationValue> aggregationValues = new TreeMap<String, AggregationValue>();
 
-    @JsonProperty
-    @Getter
-    private Date minDate = null;
+    @JsonProperty @Getter private Date minDate = null;
 
-    @JsonProperty
-    @Getter
-    private Date maxDate = null;
+    @JsonProperty @Getter private Date maxDate = null;
 
     //~ Constructors -----------------------------------------------------------
 

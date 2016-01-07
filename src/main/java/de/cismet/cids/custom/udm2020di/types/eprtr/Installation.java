@@ -106,8 +106,7 @@ public class Installation {
     @Setter(AccessLevel.NONE)
     private List<Activity> activities;
 
-    @JacksonXmlProperty
-    private List<Address> addresses;
+    @JacksonXmlProperty private List<Address> addresses;
 
     @JacksonXmlProperty(localName = "releaseparameters")
     @JsonProperty("releaseparameters")

@@ -60,9 +60,11 @@ public class WaImport extends OracleImport {
     //~ Instance fields --------------------------------------------------------
 
     protected final String waSource;
+    protected final boolean isIncremental;
     protected final String getStationsQry;
     protected final PreparedStatement getSampleValuesStmnt;
     protected final OraclePreparedStatement insertStationStmnt;
+    protected final OraclePreparedStatement findStationStmnt;
     protected final PreparedStatement deleteStationStmnt;
     protected final OraclePreparedStatement insertSampleValuesStmnt;
     protected final OraclePreparedStatement insertStationTagsRelStmnt;
@@ -75,12 +77,13 @@ public class WaImport extends OracleImport {
     /**
      * Creates a new BorisImport object.
      *
-     * @param   waSource  DOCUMENT ME!
+     * @param   waSource       DOCUMENT ME!
+     * @param   isIncremental  DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public WaImport(final String waSource) throws Exception {
-        this(WaImport.class.getResourceAsStream(waSource + ".properties"), waSource);
+    public WaImport(final String waSource, final boolean isIncremental) throws Exception {
+        this(WaImport.class.getResourceAsStream(waSource + ".properties"), waSource, isIncremental);
     }
 
     /**
@@ -88,12 +91,15 @@ public class WaImport extends OracleImport {
      *
      * @param   propertiesFile  DOCUMENT ME!
      * @param   waSource        DOCUMENT ME!
+     * @param   isIncremental   DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public WaImport(final InputStream propertiesFile, final String waSource) throws Exception {
+    public WaImport(final InputStream propertiesFile, final String waSource, final boolean isIncremental)
+            throws Exception {
         super(propertiesFile);
         this.waSource = waSource;
+        this.isIncremental = isIncremental;
         this.log = Logger.getLogger(WaImport.class);
 
         getStationsQry = IOUtils.toString(this.getClass().getResourceAsStream(
@@ -125,14 +131,14 @@ public class WaImport extends OracleImport {
                 insertStationTpl,
                 new String[] { "ID" });
 
-        final String deleteBorisStationTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+        final String deleteWaStationTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/"
                             + waSource
                             + "/delete-"
                             + waSource
                             + "-station.prs.sql"),
                 "UTF-8");
-        deleteStationStmnt = this.targetConnection.prepareStatement(deleteBorisStationTpl);
+        deleteStationStmnt = this.targetConnection.prepareStatement(deleteWaStationTpl);
 
         final String insertSampleValuesTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/"
@@ -174,6 +180,15 @@ public class WaImport extends OracleImport {
         updateStationJsonStmnt = (OraclePreparedStatement)this.targetConnection.prepareStatement(
                 updateStationJsonTpl);
 
+        final String findStationStmntTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                    "/de/cismet/cids/custom/udm2020di/indeximport/"
+                            + waSource
+                            + "/select-"
+                            + waSource
+                            + "-station.prs.sql"),
+                "UTF-8");
+        findStationStmnt = (OraclePreparedStatement)this.targetConnection.prepareStatement(findStationStmntTpl);
+
         // load and cache mappings
         final String selectParameterMappingsTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/"
@@ -204,11 +219,12 @@ public class WaImport extends OracleImport {
      *
      * @param   propertiesFile  DOCUMENT ME!
      * @param   waSource        DOCUMENT ME!
+     * @param   isIncremental   DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public WaImport(final Path propertiesFile, final String waSource) throws Exception {
-        this(Files.newInputStream(propertiesFile, StandardOpenOption.READ), waSource);
+    public WaImport(final Path propertiesFile, final String waSource, final boolean isIncremental) throws Exception {
+        this(Files.newInputStream(propertiesFile, StandardOpenOption.READ), waSource, isIncremental);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -220,18 +236,24 @@ public class WaImport extends OracleImport {
      * @throws  SQLException  DOCUMENT ME!
      */
     public void doBootstrap() throws IOException, SQLException {
-        if (log.isDebugEnabled()) {
-            log.debug("Cleaning and Bootstrapping " + this.waSource.toUpperCase() + " Tables");
-        }
+        if (!isIncremental) {
+            if (log.isDebugEnabled()) {
+                log.debug("Cleaning and Bootstrapping " + this.waSource.toUpperCase() + " Tables");
+            }
 
-        final String truncateWaTablesTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/indeximport/"
-                            + waSource
-                            + "/truncate-"
-                            + waSource
-                            + "-tables.sql"),
-                "UTF-8");
-        this.executeBatchStatement(targetConnection, truncateWaTablesTpl);
+            final String truncateWaTablesTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                        "/de/cismet/cids/custom/udm2020di/indeximport/"
+                                + waSource
+                                + "/truncate-"
+                                + waSource
+                                + "-tables.sql"),
+                    "UTF-8");
+            this.executeBatchStatement(targetConnection, truncateWaTablesTpl);
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Bootstrapping " + this.waSource.toUpperCase() + " Tables (incremental update)");
+            }
+        }
 
         final String insertWaTaggroupsTpl = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/indeximport/"
@@ -269,16 +291,39 @@ public class WaImport extends OracleImport {
                         + "s");
         }
         int i = 0;
+        int j = 0;
 
         while (stationsResultSet.next()) {
             try {
                 startTime = System.currentTimeMillis();
                 ++i;
+                ++j;
 
                 String tmpStr = stationsResultSet.getNString("MESSSTELLE_PK");
                 final String stationSrcPk = tmpStr;
                 if (log.isDebugEnabled()) {
                     log.debug("processing " + this.waSource.toUpperCase() + " Station #" + (i) + ": " + stationSrcPk);
+                }
+
+                if (this.isIncremental) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("incremental update: checking for existanc of " + this.waSource.toUpperCase()
+                                    + " Station #" + (i) + ": " + stationSrcPk);
+                    }
+                    this.findStationStmnt.setStringAtName("SRC_MESSSTELLE_PK", stationSrcPk);
+                    if (this.findStationStmnt.execute()) {
+                        log.info("incremental update: " + this.waSource.toUpperCase() + " Station #" + (i) + ": "
+                                    + stationSrcPk
+                                    + " exists, skipping insertion of station!");
+                        --j;
+                        continue;
+                    } else {
+                        if (log.isDebugEnabled()) {
+                            log.debug("incremental update: " + this.waSource.toUpperCase() + " Station #" + (i) + ": "
+                                        + stationSrcPk
+                                        + " does not exist, processing station!");
+                        }
+                    }
                 }
 
                 // key
@@ -344,7 +389,7 @@ public class WaImport extends OracleImport {
                 // -> INSERT GEOM and GET ID!
                 final long stationGeomId = this.insertGeomPoint(stationRechtswert, stationHochwert, 31287, 4326);
                 if (stationGeomId == -1) {
-                    --i;
+                    --j;
                     continue;
                 }
 
@@ -359,7 +404,7 @@ public class WaImport extends OracleImport {
                         stationSrcPk,
                         null);
                 if (waStationId == -1) {
-                    --i;
+                    --j;
                     continue;
                 }
 
@@ -424,7 +469,7 @@ public class WaImport extends OracleImport {
                     log.error("could not rollback target connection", sx);
                 }
 
-                --i;
+                --j;
             }
 
             // test mode:
@@ -444,11 +489,12 @@ public class WaImport extends OracleImport {
         this.insertStationTagsRelStmnt.close();
         this.updateStationJsonStmnt.close();
         this.getTagsStmnt.close();
+        this.findStationStmnt.close();
 
         this.sourceConnection.close();
         this.targetConnection.close();
 
-        return i;
+        return j;
     }
 
     /**
@@ -721,21 +767,22 @@ public class WaImport extends OracleImport {
      */
     public static void main(final String[] args) {
         final Logger logger = Logger.getLogger(WaImport.class);
-        final String waSource = WAOW;
+        final String waSource = WAGW;
+        final boolean incrementalUpdate = true;
         WaImport waImport = null;
         try {
-            if (args.length > 0) {
+            if (args.length == 2) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("loading " + waSource.toUpperCase() + " properties from: " + args[0]);
                 }
-                waImport = new WaImport(FileSystems.getDefault().getPath(args[0]),
-                        waSource);
+                waImport = new WaImport(FileSystems.getDefault().getPath(args[0]), waSource, incrementalUpdate);
             } else {
-                waImport = new WaImport(waSource);
+                waImport = new WaImport(waSource, incrementalUpdate);
             }
 
             final long startTime = System.currentTimeMillis();
-            logger.info("Starting " + waSource.toUpperCase() + " Import ......");
+            logger.info("Starting " + waSource.toUpperCase() + " Import ...... (incremental update: "
+                        + incrementalUpdate + ")");
 
             waImport.doBootstrap();
             final int stations = waImport.doImport();

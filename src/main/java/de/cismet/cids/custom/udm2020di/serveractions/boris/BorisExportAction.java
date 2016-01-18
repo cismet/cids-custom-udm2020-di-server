@@ -208,7 +208,9 @@ public class BorisExportAction extends AbstractExportAction {
                 } else if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_XLSX)) {
                     result = this.createXlsx(exportBorisMesswerteResult, name);
                 } else if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_SHP)) {
-                    result = this.createShapeFile(exportBorisMesswerteResult, name);
+                    final String message = "SHP Export of BORIS Stations not permitted!";
+                    log.error(message);
+                    throw new Exception(message);
                 } else {
                     final String message = "unsupported export format '" + exportFormat + "'";
                     log.error(message);

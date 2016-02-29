@@ -267,7 +267,7 @@ public abstract class AbstractMaxValuesSearch extends AbstractCidsServerSearch i
                     final int objectID = ((BigDecimal)row.get(1)).intValue();
                     final String name = (String)row.get(2);
 
-                    final MetaObjectNode node = new MetaObjectNode(DOMAIN, objectID, classID, name);
+                    final MetaObjectNode node = new MetaObjectNode(DOMAIN, objectID, classID, name,null,null);// TODO: Check4CashedGeomAndLightweightJson
 
                     result.add(node);
                 }

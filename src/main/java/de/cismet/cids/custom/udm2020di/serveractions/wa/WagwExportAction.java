@@ -32,7 +32,7 @@ import de.cismet.cids.server.actions.ServerActionParameter;
  * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
-@org.openide.util.lookup.ServiceProvider(service = ServerAction.class)
+//@org.openide.util.lookup.ServiceProvider(service = ServerAction.class)
 public class WagwExportAction extends WaExportAction {
 
     //~ Static fields/initializers ---------------------------------------------

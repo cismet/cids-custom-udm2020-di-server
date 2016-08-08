@@ -79,7 +79,7 @@ import static de.cismet.cids.custom.udm2020di.indeximport.moss.MossImport.DEFAUL
  * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
-@org.openide.util.lookup.ServiceProvider(service = ServerAction.class)
+//@org.openide.util.lookup.ServiceProvider(service = ServerAction.class)
 public class MossExportAction extends AbstractExportAction {
 
     //~ Static fields/initializers ---------------------------------------------

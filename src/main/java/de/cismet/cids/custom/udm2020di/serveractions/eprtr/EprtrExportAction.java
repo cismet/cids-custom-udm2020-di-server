@@ -64,7 +64,7 @@ import de.cismet.cismap.commons.tools.SimpleFeatureCollection;
  * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
-@org.openide.util.lookup.ServiceProvider(service = ServerAction.class)
+//@org.openide.util.lookup.ServiceProvider(service = ServerAction.class)
 public class EprtrExportAction extends AbstractExportAction {
 
     //~ Static fields/initializers ---------------------------------------------

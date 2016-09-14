@@ -27,6 +27,13 @@ import java.util.Map.Entry;
 
 import de.cismet.cids.server.search.AbstractCidsServerSearch;
 import de.cismet.cids.server.search.SearchException;
+import de.cismet.cidsx.base.types.Type;
+import de.cismet.cidsx.server.api.types.SearchInfo;
+import de.cismet.cidsx.server.api.types.SearchParameterInfo;
+import java.util.LinkedList;
+import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * DOCUMENT ME!
@@ -46,61 +53,74 @@ public abstract class AbstractMaxValuesSearch extends AbstractCidsServerSearch i
 
     //~ Instance fields --------------------------------------------------------
 
-    protected Map<String, Float> maxValues;
-
     protected String maxSampleValueConditionTpl;
     protected String searchTpl;
+    
+    @Getter @Setter protected Map<String, Float> maxValues;
 
-    private Collection<Integer> objectIds;
+    @Getter @Setter private Collection<Integer> objectIds;
 
-    private int classId = -1;
+    @Getter @Setter private int classId = -1;
 
-    private Date minDate;
+    @Getter @Setter private Date minDate;
 
-    private Date maxDate;
+    @Getter @Setter private Date maxDate;
+    
+    @Getter private final SearchInfo searchInfo;
 
     //~ Methods ----------------------------------------------------------------
 
-    /**
-     * Get the value of minDate.
-     *
-     * @return  the value of minDate
-     */
-    @Override
-    public Date getMinDate() {
-        return minDate;
-    }
+    protected AbstractMaxValuesSearch() {
+        searchInfo = new SearchInfo();
+        searchInfo.setKey(this.getClass().getName());
+        searchInfo.setName(this.getClass().getSimpleName());
+        searchInfo.setDescription(this.getClass().getSimpleName() 
+                + "Post Filter Search Search for Nodes by date an may values");
 
-    /**
-     * Set the value of minDate.
-     *
-     * @param  minDate  new value of minDate
-     */
-    @Override
-    public void setMinDate(final Date minDate) {
-        this.minDate = minDate;
-    }
+        final List<SearchParameterInfo> parameterDescription = new LinkedList<SearchParameterInfo>();
+        SearchParameterInfo searchParameterInfo;
 
-    /**
-     * Get the value of maxDate.
-     *
-     * @return  the value of maxDate
-     */
-    @Override
-    public Date getMaxDate() {
-        return maxDate;
-    }
+        searchParameterInfo = new SearchParameterInfo();
+        searchParameterInfo.setDescription("class ID of the objects to be filtered");
+        searchParameterInfo.setKey("classId");
+        searchParameterInfo.setType(Type.INTEGER);
+        parameterDescription.add(searchParameterInfo);        
+        
+        searchParameterInfo = new SearchParameterInfo();
+        searchParameterInfo.setKey("objectIds");
+        searchParameterInfo.setDescription("IDs of the objects to be filtered");
+        searchParameterInfo.setType(Type.JAVA_CLASS);
+        //searchParameterInfo.setArray(true);
+        searchParameterInfo.setAdditionalTypeInfo("java.util.Collection<Integer>");
+        parameterDescription.add(searchParameterInfo);
+        
+        searchParameterInfo = new SearchParameterInfo();
+        searchParameterInfo.setKey("maxValues");
+        searchParameterInfo.setDescription("map of max values");
+        searchParameterInfo.setType(Type.INTEGER);
+        searchParameterInfo.setAdditionalTypeInfo("java.util.Map<String, Float>");
+        parameterDescription.add(searchParameterInfo);
+        
+        searchParameterInfo = new SearchParameterInfo();
+        searchParameterInfo.setKey("minDate");
+        searchParameterInfo.setDescription("minDate");
+        searchParameterInfo.setType(Type.DATE);
+        parameterDescription.add(searchParameterInfo);
+        
+        searchParameterInfo = new SearchParameterInfo();
+        searchParameterInfo.setKey("maxDate");
+        searchParameterInfo.setType(Type.DATE);
+        parameterDescription.add(searchParameterInfo);
 
-    /**
-     * Set the value of maxDate.
-     *
-     * @param  maxDate  new value of maxDate
-     */
-    @Override
-    public void setMaxDate(final Date maxDate) {
-        this.maxDate = maxDate;
-    }
+        searchInfo.setParameterDescription(parameterDescription);
 
+        final SearchParameterInfo resultParameterInfo = new SearchParameterInfo();
+        resultParameterInfo.setKey("return");
+        //resultParameterInfo.setArray(true);
+        resultParameterInfo.setType(Type.NODE);
+        searchInfo.setResultDescription(resultParameterInfo);
+    }
+    
     /**
      * DOCUMENT ME!
      *
@@ -170,66 +190,6 @@ public abstract class AbstractMaxValuesSearch extends AbstractCidsServerSearch i
         }
 
         return customSearchStatementBuilder.toString();
-    }
-
-    /**
-     * Get the value of maxValues.
-     *
-     * @return  the value of maxValues
-     */
-    @Override
-    public Map<String, Float> getMaxValues() {
-        return maxValues;
-    }
-
-    /**
-     * Set the value of maxValues.
-     *
-     * @param  maxValues  new value of maxValues
-     */
-    @Override
-    public void setMaxValues(final Map<String, Float> maxValues) {
-        this.maxValues = maxValues;
-    }
-
-    /**
-     * Get the value of objectIds.
-     *
-     * @return  the value of objectIds
-     */
-    @Override
-    public Collection<Integer> getObjectIds() {
-        return objectIds;
-    }
-
-    /**
-     * Set the value of objectIds.
-     *
-     * @param  objectIds  new value of objectIds
-     */
-    @Override
-    public void setObjectIds(final Collection<Integer> objectIds) {
-        this.objectIds = objectIds;
-    }
-
-    /**
-     * Get the value of classId.
-     *
-     * @return  the value of classId
-     */
-    @Override
-    public int getClassId() {
-        return classId;
-    }
-
-    /**
-     * Set the value of classId.
-     *
-     * @param  classId  new value of classId
-     */
-    @Override
-    public void setClassId(final int classId) {
-        this.classId = classId;
     }
 
     @Override

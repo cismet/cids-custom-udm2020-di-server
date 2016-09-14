@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.Map;
 
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
+import de.cismet.cidsx.server.search.RestApiCidsServerSearch;
 
 /**
  * DOCUMENT ME!
@@ -19,7 +20,7 @@ import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
  * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
-public interface CustomMaxValuesSearch extends MetaObjectNodeServerSearch {
+public interface CustomMaxValuesSearch extends MetaObjectNodeServerSearch, RestApiCidsServerSearch {
 
     //~ Methods ----------------------------------------------------------------
 

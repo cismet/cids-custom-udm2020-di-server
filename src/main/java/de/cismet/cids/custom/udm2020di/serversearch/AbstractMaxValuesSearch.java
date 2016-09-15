@@ -10,6 +10,9 @@ package de.cismet.cids.custom.udm2020di.serversearch;
 import Sirius.server.middleware.interfaces.domainserver.MetaService;
 import Sirius.server.middleware.types.MetaObjectNode;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.apache.log4j.Logger;
 
 import java.math.BigDecimal;
@@ -22,18 +25,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import de.cismet.cids.server.search.AbstractCidsServerSearch;
 import de.cismet.cids.server.search.SearchException;
+
 import de.cismet.cidsx.base.types.Type;
+
 import de.cismet.cidsx.server.api.types.SearchInfo;
 import de.cismet.cidsx.server.api.types.SearchParameterInfo;
-import java.util.LinkedList;
-import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * DOCUMENT ME!
@@ -55,7 +58,7 @@ public abstract class AbstractMaxValuesSearch extends AbstractCidsServerSearch i
 
     protected String maxSampleValueConditionTpl;
     protected String searchTpl;
-    
+
     @Getter @Setter protected Map<String, Float> maxValues;
 
     @Getter @Setter private Collection<Integer> objectIds;
@@ -65,17 +68,20 @@ public abstract class AbstractMaxValuesSearch extends AbstractCidsServerSearch i
     @Getter @Setter private Date minDate;
 
     @Getter @Setter private Date maxDate;
-    
+
     @Getter private final SearchInfo searchInfo;
 
-    //~ Methods ----------------------------------------------------------------
+    //~ Constructors -----------------------------------------------------------
 
+    /**
+     * Creates a new AbstractMaxValuesSearch object.
+     */
     protected AbstractMaxValuesSearch() {
         searchInfo = new SearchInfo();
         searchInfo.setKey(this.getClass().getName());
         searchInfo.setName(this.getClass().getSimpleName());
-        searchInfo.setDescription(this.getClass().getSimpleName() 
-                + "Post Filter Search Search for Nodes by date an may values");
+        searchInfo.setDescription(this.getClass().getSimpleName()
+                    + "Post Filter Search Search for Nodes by date an may values");
 
         final List<SearchParameterInfo> parameterDescription = new LinkedList<SearchParameterInfo>();
         SearchParameterInfo searchParameterInfo;
@@ -84,29 +90,29 @@ public abstract class AbstractMaxValuesSearch extends AbstractCidsServerSearch i
         searchParameterInfo.setDescription("class ID of the objects to be filtered");
         searchParameterInfo.setKey("classId");
         searchParameterInfo.setType(Type.INTEGER);
-        parameterDescription.add(searchParameterInfo);        
-        
+        parameterDescription.add(searchParameterInfo);
+
         searchParameterInfo = new SearchParameterInfo();
         searchParameterInfo.setKey("objectIds");
         searchParameterInfo.setDescription("IDs of the objects to be filtered");
         searchParameterInfo.setType(Type.JAVA_CLASS);
-        //searchParameterInfo.setArray(true);
+        // searchParameterInfo.setArray(true);
         searchParameterInfo.setAdditionalTypeInfo("java.util.Collection<Integer>");
         parameterDescription.add(searchParameterInfo);
-        
+
         searchParameterInfo = new SearchParameterInfo();
         searchParameterInfo.setKey("maxValues");
         searchParameterInfo.setDescription("map of max values");
         searchParameterInfo.setType(Type.INTEGER);
         searchParameterInfo.setAdditionalTypeInfo("java.util.Map<String, Float>");
         parameterDescription.add(searchParameterInfo);
-        
+
         searchParameterInfo = new SearchParameterInfo();
         searchParameterInfo.setKey("minDate");
         searchParameterInfo.setDescription("minDate");
         searchParameterInfo.setType(Type.DATE);
         parameterDescription.add(searchParameterInfo);
-        
+
         searchParameterInfo = new SearchParameterInfo();
         searchParameterInfo.setKey("maxDate");
         searchParameterInfo.setType(Type.DATE);
@@ -116,11 +122,13 @@ public abstract class AbstractMaxValuesSearch extends AbstractCidsServerSearch i
 
         final SearchParameterInfo resultParameterInfo = new SearchParameterInfo();
         resultParameterInfo.setKey("return");
-        //resultParameterInfo.setArray(true);
+        // resultParameterInfo.setArray(true);
         resultParameterInfo.setType(Type.NODE);
         searchInfo.setResultDescription(resultParameterInfo);
     }
-    
+
+    //~ Methods ----------------------------------------------------------------
+
     /**
      * DOCUMENT ME!
      *

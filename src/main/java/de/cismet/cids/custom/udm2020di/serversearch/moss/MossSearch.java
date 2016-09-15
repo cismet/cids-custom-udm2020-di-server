@@ -10,13 +10,15 @@ package de.cismet.cids.custom.udm2020di.serversearch.moss;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
+import org.openide.util.lookup.ServiceProvider;
+
 import java.io.IOException;
 
 import java.util.HashMap;
 
 import de.cismet.cids.custom.udm2020di.serversearch.AbstractMaxValuesSearch;
+
 import de.cismet.cidsx.server.search.RestApiCidsServerSearch;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
  * DOCUMENT ME!

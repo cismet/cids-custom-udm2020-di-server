@@ -17,7 +17,6 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 
 import java.sql.Blob;
-import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;

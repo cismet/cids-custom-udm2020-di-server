@@ -10,9 +10,13 @@ package de.cismet.cids.custom.udm2020di.serversearch.wa;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
+import org.openide.util.lookup.ServiceProvider;
+
 import java.io.IOException;
 
 import de.cismet.cids.custom.udm2020di.serversearch.AbstractMaxValuesSearch;
+
+import de.cismet.cidsx.server.search.RestApiCidsServerSearch;
 
 /**
  * DOCUMENT ME!
@@ -20,6 +24,7 @@ import de.cismet.cids.custom.udm2020di.serversearch.AbstractMaxValuesSearch;
  * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
+@ServiceProvider(service = RestApiCidsServerSearch.class)
 public class WaowStationSearch extends AbstractMaxValuesSearch {
 
     //~ Static fields/initializers ---------------------------------------------

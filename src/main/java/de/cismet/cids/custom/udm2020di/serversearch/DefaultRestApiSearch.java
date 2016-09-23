@@ -1,57 +1,60 @@
-/**
- * *************************************************
- *
- * cismet GmbH, Saarbruecken, Germany
- *
- *              ... and it just works.
- *
- ***************************************************
- */
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package de.cismet.cids.custom.udm2020di.serversearch;
 
+import Sirius.server.middleware.interfaces.domainserver.MetaService;
 import Sirius.server.middleware.types.MetaObjectNode;
-import Sirius.server.newuser.permission.Policy;
+import Sirius.server.sql.SQLTools;
 
 import com.vividsolutions.jts.geom.Geometry;
 
 import lombok.Getter;
 import lombok.Setter;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+
 import org.openide.util.lookup.ServiceProvider;
+
+import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.cismet.cids.dynamics.CidsBeanJsonDeserializer;
+import de.cismet.cids.nodepermissions.NoNodePermissionProvidedException;
 
 import de.cismet.cids.server.search.AbstractCidsServerSearch;
+import de.cismet.cids.server.search.QueryPostProcessor;
 import de.cismet.cids.server.search.SearchException;
 
 import de.cismet.cidsx.base.types.Type;
 
 import de.cismet.cidsx.server.api.types.SearchInfo;
 import de.cismet.cidsx.server.api.types.SearchParameterInfo;
-import de.cismet.cidsx.server.api.types.legacy.CidsClassFactory;
 import de.cismet.cidsx.server.search.RestApiCidsServerSearch;
-import java.util.Arrays;
-import java.util.Iterator;
 
 /**
  * DOCUMENT ME!
  *
- * @author Pascal Dihé <pascal.dihe@cismet.de>
- * @version $Revision$, $Date$
+ * @author   Pascal Dihé <pascrow.dihe@cismet.de>
+ * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = RestApiCidsServerSearch.class)
 public class DefaultRestApiSearch extends AbstractCidsServerSearch implements RestApiCidsServerSearch {
 
     //~ Static fields/initializers ---------------------------------------------
+
     protected static final String DOMAIN = "UDM2020-DI";
 
     protected static Logger LOGGER = Logger.getLogger(DefaultRestApiSearch.class);
-    
+
     public static final SearchInfo SEARCH_INFO;
 
     static {
@@ -59,16 +62,17 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
         SEARCH_INFO.setKey(DefaultRestApiSearch.class.getName());
         SEARCH_INFO.setName(DefaultRestApiSearch.class.getSimpleName());
         SEARCH_INFO.setDescription(
-                "Meta Object Node Universal Search for SWITCH-ON pure REST clients");
+            "Meta Object Node Universal Search for SWITCH-ON pure REST clients");
 
         final List<SearchParameterInfo> parameterDescription = new LinkedList<SearchParameterInfo>();
         SearchParameterInfo searchParameterInfo;
 
         searchParameterInfo = new SearchParameterInfo();
         searchParameterInfo.setKey("themes");
-        searchParameterInfo.setType(Type.INTEGER);
+        searchParameterInfo.setType(Type.STRING);
         searchParameterInfo.setArray(true);
-        searchParameterInfo.setDescription("list of class name (table names) of search themes (e.g. EPRTR, BORIS_SITE)");
+        searchParameterInfo.setDescription(
+            "list of class name (table names) of search themes (e.g. EPRTR, BORIS_SITE)");
         parameterDescription.add(searchParameterInfo);
 
         searchParameterInfo = new SearchParameterInfo();
@@ -96,147 +100,228 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
     }
 
     //~ Instance fields --------------------------------------------------------
-    @Getter
-    @Setter
-    private int[] themes;
 
-    @Getter
-    @Setter
-    private String[] pollutants;
-
-    @Getter
-    @Setter
-    private String geometry;
-    
     protected final String defaultSearchStatementTpl;
+    @Getter @Setter private int[] themes;
+
+    @Getter @Setter private String[] pollutants;
+
+    @Getter @Setter private String geometry;
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new DefaultRestApiSearch object.
+     *
+     * @throws  IOException  DOCUMENT ME!
+     */
+    public DefaultRestApiSearch() throws IOException {
+        this.defaultSearchStatementTpl = IOUtils.toString(
+                DefaultRestApiSearch.class.getResourceAsStream(
+                    "/de/cismet/cids/custom/udm2020di/serversearch/default-search-statement.tpl.sql"),
+                "UTF-8");
+    }
 
     //~ Methods ----------------------------------------------------------------
+
     @Override
     public Collection<MetaObjectNode> performServerSearch() throws SearchException {
-        /*public MetaObjectNode(
-         *  int id,  String name, String description,  String domain,  int objectId,  int classId,  boolean isLeaf,
-         * Policy policy,  int iconFactory,  String icon,  boolean derivePermissionsFromClass,  String artificialId,
-         * Geometry cashedGeometry,  String lightweightJson)
-         */
-        final ArrayList<MetaObjectNode> nodes = new ArrayList<MetaObjectNode>(themes.length);
+        final long startTime = System.currentTimeMillis();
 
-        final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("{\"pollutants\": [{\n"
-                + "                \"name\": \"PCP\",\n"
-                + "                \"id\": 1\n"
-                + "            }, {\n"
-                + "                \"name\": \"Cd\",\n"
-                + "                \"id\": 2\n"
-                + "            }, {\n"
-                + "                \"name\": \"Heptachlor\",\n"
-                + "                \"id\": 3\n"
-                + "            }, {\n"
-                + "                \"name\": \"Xylole\",\n"
-                + "                \"id\": 4\n"
-                + "            }, {\n"
-                + "                \"name\": \"Lindan\",\n"
-                + "                \"id\": 5\n"
-                + "            }, {\n"
-                + "                \"name\": \"PER\",\n"
-                + "                \"id\": 6\n"
-                + "            }, {\n"
-                + "                \"name\": \"Cl\",\n"
-                + "                \"id\": 7\n"
-                + "            }, {\n"
-                + "                \"name\": \"Ca\",\n"
-                + "                \"id\": 8\n"
-                + "            }, {\n"
-                + "                \"name\": \"HFKW\",\n"
-                + "                \"id\": 9\n"
-                + "            }, {\n"
-                + "                \"name\": \"AOX\",\n"
-                + "                \"id\": 10\n"
-                + "            }]\n"
-                + "    }");
+        if ((this.geometry != null) && !this.geometry.isEmpty()
+                    && (this.pollutants != null)
+                    && (this.pollutants.length != 0)
+                    && (this.themes != null)
+                    && (this.themes.length != 0)) {
+            LOGGER.info("performing default search for " + themes.length + " themes and "
+                        + this.pollutants.length + " pollutants with geometry (length: " + this.geometry.length()
+                        + ")");
+        } else {
+            final String message = "cannot perform default search, missing parameters: "
+                        + "geometry = " + ((this.geometry != null) ? this.geometry.length() : "null")
+                        + this.geometry
+                        + ", themes = " + ((this.themes != null) ? this.themes.length : "null")
+                        + ", pollutants = " + ((this.pollutants != null) ? this.pollutants.length : "null");
+            LOGGER.error(message); // NOI18N
+            throw new SearchException(message);
+        }
 
-        /*int i = 0;
-        for (final String pollutant : pollutants) {
-            stringBuilder.append("{\"pollutant\":\"").append(pollutant).append("\"}");
-            if (i < (pollutants.length - 1)) {
-                stringBuilder.append(',');
+        final MetaService metaService = (MetaService)getActiveLocalServers().get(DOMAIN);
+        if (metaService == null) {
+            final String message = "active local server " + DOMAIN + "not found";
+            LOGGER.error(message); // NOI18N
+            throw new SearchException(message);
+        }
+
+        try {
+            final String defaultSearchStatement = this.createDefaultSearchStatement();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(defaultSearchStatement);
             }
+
+            final ArrayList<MetaObjectNode> resultNodes = new ArrayList<MetaObjectNode>();
+            final ArrayList<MetaObjectNode> filteredNodes = new ArrayList<MetaObjectNode>();
+
+            final ArrayList<ArrayList> resultSet = metaService.performCustomSearch(
+                    defaultSearchStatement,
+                    new QueryPostProcessor() {
+
+                        @Override
+                        public ArrayList<ArrayList> postProcess(final ArrayList<ArrayList> resultSet) {
+                            for (final ArrayList row : resultSet) {
+                                // Cashed Geometry
+                                Geometry cachedGeometry = null;
+                                try {
+                                    final Object cachedGeometryTester = row.get(3);
+
+                                    if (cachedGeometryTester != null) {
+                                        cachedGeometry = SQLTools.getGeometryFromResultSetObject(
+                                                cachedGeometryTester);
+                                        row.set(3, cachedGeometry);
+                                    }
+                                } catch (Exception e) {
+                                    if (LOGGER.isDebugEnabled()) {
+                                        LOGGER.warn(
+                                            "cachedGeometry was not in the resultset for object "
+                                                    + row.get(0),
+                                            e); // NOI18N
+                                    }
+                                }
+                            }
+                            return resultSet;
+                        }
+                    });
+
+            for (final ArrayList row : resultSet) {
+                // FIXME: yet another hack to circumvent odd type behaviour
+                final int cid = ((Number)row.get(0)).intValue();
+                final int oid = ((Number)row.get(1)).intValue();
+                String name = null;
+                try {
+                    name = (String)row.get(2);
+                } catch (final Exception e) {
+                    if (LOGGER.isTraceEnabled()) {
+                        LOGGER.trace("no name present for object " + row.get(0), e); // NOI18N
+                    }
+                }
+
+                // Cached Geometry
+                final Geometry cachedGeometry = (Geometry)row.get(3);
+
+                // Lightweight Json
+                String lightweightJson = null;
+                try {
+                    final Object tester = row.get(4);
+                    if ((tester != null) && (tester instanceof String)) { // NOI18N
+                        lightweightJson = (String)tester;                 // NOI18N
+                    }
+                } catch (Exception e) {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.warn(
+                            "lightweightJson was not in the result set for object "
+                                    + row.get(0),
+                            e);                                           // NOI18N
+                    }
+                }
+
+                try {
+                    final MetaObjectNode resultNode = new MetaObjectNode(
+                            DOMAIN,
+                            getUser(),
+                            oid,
+                            cid,
+                            name,
+                            cachedGeometry,
+                            lightweightJson);
+
+                    resultNodes.add(resultNode);
+                } catch (NoNodePermissionProvidedException noNodePermissionProvidedException) {
+                    filteredNodes.add(noNodePermissionProvidedException.getMon());
+                }
+            }
+
+            if (filteredNodes.size() > 0) {
+                LOGGER.warn(filteredNodes.size() + " Objcets filtered due to insufficient permissions");
+            }
+
+            LOGGER.info(resultNodes.size() + " object found during default search for " + themes.length + " themes and "
+                        + this.pollutants.length + " pollutants with geometry (length: " + this.geometry.length()
+                        + ")");
+
+            return resultNodes;
+        } catch (final Throwable t) {
+            final String message = "Could not perform default search for " + themes.length + " themes and "
+                        + this.pollutants.length + " pollutants with geometry (length: "
+                        + this.geometry.length() + "): " + t.getMessage();
+            LOGGER.error(message, t);              // NOI18N
+            throw new SearchException(message, t); // NOI18N
         }
-        stringBuilder.append("]");*/
-        final String lightweightJson = stringBuilder.toString();
 
-        final String wktGeometry
-                = "SRID=4326;POLYGON((8.61328125 51.23440735163459,7.734374999999999 48.922499263758255,12.480468749999998 48.28319289548349,13.095703125 49.83798245308484,11.074218749999998 51.890053935216926,8.61328125 51.23440735163459))";
-        final Geometry geometry = CidsBeanJsonDeserializer.fromEwkt(wktGeometry);
-
-        int i = 0;
-        for (final int classId : themes) {
-            final Policy policy = CidsClassFactory.getFactory().createPolicy("STANDARD");
-
-            final MetaObjectNode node = new MetaObjectNode(
-                    themes[0],
-                    "TEST NODE #"
-                    + i,
-                    "Description of TEST NODE #"
-                    + i,
-                    "UDM2020-DI",
-                    i,
-                    classId,
-                    false,
-                    policy,
-                    0,
-                    null,
-                    true,
-                    null,
-                    geometry,
-                    lightweightJson);
-
-            nodes.add(node);
-            i++;
-        }
-
-        return nodes;
+//        int i = 0;
+//        for (final int classId : themes) {
+//            final Policy policy = CidsClassFactory.getFactory().createPolicy("STANDARD");
+//
+//            final MetaObjectNode node = new MetaObjectNode(
+//                    themes[0],
+//                    "TEST NODE #"
+//                            + i,
+//                    "Description of TEST NODE #"
+//                            + i,
+//                    "UDM2020-DI",
+//                    i,
+//                    classId,
+//                    false,
+//                    policy,
+//                    0,
+//                    null,
+//                    true,
+//                    null,
+//                    geometry,
+//                    lightweightJson);
+//
+//            nodes.add(node);
+//            i++;
+//        }
+//
+//        return nodes;
     }
 
     @Override
     public SearchInfo getSearchInfo() {
         return SEARCH_INFO;
     }
-    
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     protected String createDefaultSearchStatement() {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("building default search sql statement for " + this.themes.length 
-                    + " themes and " + this.pollutants.length + " pollutants");
+            LOGGER.debug("building default search sql statement for " + this.themes.length
+                        + " themes and " + this.pollutants.length + " pollutants");
         }
 
-        final StringBuilder classIdsBuilder = new StringBuilder();
-        for(int i = 0; i < this.themes.length; i++) {
-             classIdsBuilder.append(this.themes[i]);
-             
-             if (i < this.themes.length-1) {
-                classIdsBuilder.append(',');
+        final StringBuilder classNamesBuilder = new StringBuilder();
+        for (int i = 0; i < this.themes.length; i++) {
+            classNamesBuilder.append('\'').append(this.themes[i]).append('\'');
+            if (i < (this.themes.length - 1)) {
+                classNamesBuilder.append(',');
             }
         }
-        
+
         final StringBuilder tagKeysBuilder = new StringBuilder();
-        for(int i = 0; i < this.pollutants.length; i++) {
-             tagKeysBuilder.append('\'').append(this.pollutants[i]).append('\'');
-             
-             if (i < this.themes.length-1) {
+        for (int i = 0; i < this.pollutants.length; i++) {
+            tagKeysBuilder.append('\'').append(this.pollutants[i]).append('\'');
+
+            if (i < (this.themes.length - 1)) {
                 tagKeysBuilder.append(',');
             }
         }
 
-        
-        
-        
-        final String defaultSearchStatement = this.defaultSearchStatementTpl
-                .replace("%GEOMETRY%", this.geometry)
-                .replace("%CLASS_IDS%",classIdsBuilder.toString())
-                .replace("%TAG_KEYS%",classIdsBuilder.toString());
-        
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(defaultSearchStatement);
-        }
+        final String defaultSearchStatement = this.defaultSearchStatementTpl.replace("%GEOMETRY%", this.geometry)
+                    .replace("%CLASS_NAMES%", classNamesBuilder.toString())
+                    .replace("%TAG_KEYS%", classNamesBuilder.toString());
 
         return defaultSearchStatement;
     }

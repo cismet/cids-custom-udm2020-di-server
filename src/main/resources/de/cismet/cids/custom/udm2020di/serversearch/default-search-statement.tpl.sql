@@ -24,7 +24,7 @@ FROM
   AND cs_attr_object_derived.attr_class_id =
     (SELECT cs_class.id FROM cs_class WHERE cs_class.table_name = 'GEOM')
   AND cs_attr_object_derived.attr_object_id = geom.id
-  AND cs_attr_object_derived.class_id IN (%CLASS_IDS%)
+  AND cs_attr_object_derived.class_id IN (SELECT ID FROM CS_CLASS WHERE NAME IN (%CLASS_NAMES%))
   AND sdo_relate(geom.geo_field, sdo_geometry('%GEOMETRY%', 4326), 'mask=anyinteract') = 'TRUE'
   ORDER BY 1,
     2,

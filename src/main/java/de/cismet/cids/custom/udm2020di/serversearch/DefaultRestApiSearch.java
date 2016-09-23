@@ -292,10 +292,9 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
     }
 
     /**
-     * Many think that ; is statement terminator in SQL on Oracle. It isn't. 
-     * The ; at an end of statement is used by the client (for example SQLPlus) to 
-     * tell where the statement ends and then sends the statement but not 
-     * the ';' to the Oracle server.
+     * Many think that ; is statement terminator in SQL on Oracle. It isn't. The ; at an end of statement is used by the
+     * client (for example SQLPlus) to tell where the statement ends and then sends the statement but not the ';' to the
+     * Oracle server.
      *
      * @return  DOCUMENT ME!
      */

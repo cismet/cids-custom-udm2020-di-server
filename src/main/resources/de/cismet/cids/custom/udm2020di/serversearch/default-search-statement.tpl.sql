@@ -7,7 +7,7 @@ FROM
   (SELECT cs_attr_object_derived.class_id ocid,
     cs_attr_object_derived.object_id oid,
     cs_cache.stringrep,
-    geom.geo_field geometry,
+    cs_cache.geometry,
     cs_cache.lightweight_json,
     row_number() over (partition BY cs_attr_object_derived.class_id, cs_attr_object_derived.object_id order by rownum) rn
   FROM geom,

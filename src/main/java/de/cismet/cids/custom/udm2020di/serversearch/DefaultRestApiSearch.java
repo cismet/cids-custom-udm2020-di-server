@@ -102,7 +102,7 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
     //~ Instance fields --------------------------------------------------------
 
     protected final String defaultSearchStatementTpl;
-    @Getter @Setter private int[] themes;
+    @Getter @Setter private String[] themes;
 
     @Getter @Setter private String[] pollutants;
 
@@ -292,7 +292,10 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
     }
 
     /**
-     * DOCUMENT ME!
+     * Many think that ; is statement terminator in SQL on Oracle. It isn't. 
+     * The ; at an end of statement is used by the client (for example SQLPlus) to 
+     * tell where the statement ends and then sends the statement but not 
+     * the ';' to the Oracle server.
      *
      * @return  DOCUMENT ME!
      */
@@ -314,14 +317,14 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
         for (int i = 0; i < this.pollutants.length; i++) {
             tagKeysBuilder.append('\'').append(this.pollutants[i]).append('\'');
 
-            if (i < (this.themes.length - 1)) {
+            if (i < (this.pollutants.length - 1)) {
                 tagKeysBuilder.append(',');
             }
         }
 
         final String defaultSearchStatement = this.defaultSearchStatementTpl.replace("%GEOMETRY%", this.geometry)
                     .replace("%CLASS_NAMES%", classNamesBuilder.toString())
-                    .replace("%TAG_KEYS%", classNamesBuilder.toString());
+                    .replace("%TAG_KEYS%", tagKeysBuilder.toString());
 
         return defaultSearchStatement;
     }

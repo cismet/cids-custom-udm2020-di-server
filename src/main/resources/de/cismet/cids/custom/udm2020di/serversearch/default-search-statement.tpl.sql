@@ -6,16 +6,16 @@ SELECT ocid,
 FROM
   (SELECT cs_attr_object_derived.class_id ocid,
     cs_attr_object_derived.object_id oid,
-    cs_cache.stringrep,
-    cs_cache.geometry,
-    cs_cache.lightweight_json,
+    CSX_CACHE.stringrep,
+    CSX_CACHE.geometry,
+    CSX_CACHE.lightweight_json,
     row_number() over (partition BY cs_attr_object_derived.class_id, cs_attr_object_derived.object_id order by rownum) rn
   FROM geom,
     CSX_OBJECT_TAG,
     cs_attr_object_derived
-  LEFT OUTER JOIN cs_cache
-  ON ( cs_cache.class_id        = cs_attr_object_derived.class_id
-  AND cs_cache.object_id        = cs_attr_object_derived.object_id )
+  LEFT OUTER JOIN CSX_CACHE
+  ON ( CSX_CACHE.class_id        = cs_attr_object_derived.class_id
+  AND CSX_CACHE.object_id        = cs_attr_object_derived.object_id )
   WHERE CSX_OBJECT_TAG.CLASS_ID = cs_attr_object_derived.class_id
   AND CSX_OBJECT_TAG.OBJECT_ID  = cs_attr_object_derived.object_id
   AND CSX_OBJECT_TAG.TAG_ID    IN
@@ -29,8 +29,6 @@ FROM
     (SELECT ID FROM CS_CLASS WHERE CS_CLASS.NAME IN (%CLASS_NAMES%)
     )
   AND sdo_relate(geom.geo_field, sdo_geometry('%GEOMETRY%', 4326), 'mask=anyinteract') = 'TRUE'
-  ORDER BY 1,
-    2,
-    3
+  ORDER BY ocid, oid
   )
 WHERE rn = 1

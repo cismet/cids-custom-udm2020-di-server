@@ -62,7 +62,7 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
         SEARCH_INFO.setKey(DefaultRestApiSearch.class.getName());
         SEARCH_INFO.setName(DefaultRestApiSearch.class.getSimpleName());
         SEARCH_INFO.setDescription(
-            "Meta Object Node Universal Search for SWITCH-ON pure REST clients");
+            "Search for entities (e.g. stations, installations) by geometry, themes and pollutants in UDM2020-DI Index");
 
         final List<SearchParameterInfo> parameterDescription = new LinkedList<SearchParameterInfo>();
         SearchParameterInfo searchParameterInfo;
@@ -72,28 +72,28 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
         searchParameterInfo.setType(Type.STRING);
         searchParameterInfo.setArray(true);
         searchParameterInfo.setDescription(
-            "list of class name (table names) of search themes (e.g. EPRTR, BORIS_SITE)");
+            "List of class name (table names) of search themes (e.g. EPRTR, BORIS_SITE)");
         parameterDescription.add(searchParameterInfo);
 
         searchParameterInfo = new SearchParameterInfo();
         searchParameterInfo.setKey("pollutants");
         searchParameterInfo.setType(Type.STRING);
         searchParameterInfo.setArray(true);
-        searchParameterInfo.setDescription("list of pollutant (tag) keys");
+        searchParameterInfo.setDescription("List of pollutant (tag) keys (e.g. Cd, Hg, Pb)");
         parameterDescription.add(searchParameterInfo);
 
         searchParameterInfo = new SearchParameterInfo();
         searchParameterInfo.setKey("geometry");
         searchParameterInfo.setType(Type.STRING);
         searchParameterInfo.setArray(false);
-        searchParameterInfo.setDescription("WKT Search Geometry");
+        searchParameterInfo.setDescription("WKT Search Geometry (e.g. POLYGON(....)");
         parameterDescription.add(searchParameterInfo);
 
         SEARCH_INFO.setParameterDescription(parameterDescription);
 
         final SearchParameterInfo resultParameterInfo = new SearchParameterInfo();
         resultParameterInfo.setKey("return");
-        resultParameterInfo.setDescription("Collection of Object Nodes");
+        resultParameterInfo.setDescription("Collection of CIDS Object Nodes");
         resultParameterInfo.setArray(true);
         resultParameterInfo.setType(Type.NODE);
         SEARCH_INFO.setResultDescription(resultParameterInfo);

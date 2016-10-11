@@ -9,6 +9,7 @@ package de.cismet.cids.custom.udm2020di.serversearch;
 
 import Sirius.server.middleware.interfaces.domainserver.MetaService;
 import Sirius.server.middleware.types.MetaObjectNode;
+import Sirius.server.sql.PreparableStatement;
 import Sirius.server.sql.SQLTools;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -22,6 +23,8 @@ import org.apache.log4j.Logger;
 import org.openide.util.lookup.ServiceProvider;
 
 import java.io.IOException;
+
+import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -154,7 +157,7 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
         }
 
         try {
-            final String defaultSearchStatement = this.createDefaultSearchStatement();
+            final PreparableStatement defaultSearchStatement = this.createDefaultSearchStatement();
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(defaultSearchStatement);
             }
@@ -241,7 +244,7 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
             }
 
             if (filteredNodes.size() > 0) {
-                LOGGER.warn(filteredNodes.size() + " Objcets filtered due to insufficient permissions");
+                LOGGER.warn(filteredNodes.size() + " Objects filtered due to insufficient permissions");
             }
 
             LOGGER.info(resultNodes.size() + " object found during default search for " + themes.length + " themes and "
@@ -298,7 +301,7 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
      *
      * @return  DOCUMENT ME!
      */
-    protected String createDefaultSearchStatement() {
+    protected PreparableStatement createDefaultSearchStatement() {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("building default search sql statement for " + this.themes.length
                         + " themes and " + this.pollutants.length + " pollutants");
@@ -321,10 +324,17 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
             }
         }
 
-        final String defaultSearchStatement = this.defaultSearchStatementTpl.replace("%GEOMETRY%", this.geometry)
-                    .replace("%CLASS_NAMES%", classNamesBuilder.toString())
+        // #24
+        final String defaultSearchStatement = this.defaultSearchStatementTpl.replace(
+                    "%CLASS_NAMES%",
+                    classNamesBuilder.toString())
                     .replace("%TAG_KEYS%", tagKeysBuilder.toString());
 
-        return defaultSearchStatement;
+        final PreparableStatement preparableStatement = new PreparableStatement(
+                defaultSearchStatement,
+                Types.CLOB);
+        preparableStatement.setObjects(this.geometry);
+
+        return preparableStatement;
     }
 }

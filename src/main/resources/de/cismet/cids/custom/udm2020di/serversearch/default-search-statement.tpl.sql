@@ -28,7 +28,7 @@ FROM
   AND cs_attr_object_derived.class_id      IN
     (SELECT ID FROM CS_CLASS WHERE CS_CLASS.NAME IN (%CLASS_NAMES%)
     )
-  AND sdo_relate(geom.geo_field, sdo_geometry('%GEOMETRY%', 4326), 'mask=anyinteract') = 'TRUE'
+  AND sdo_relate(geom.geo_field, sdo_geometry(?, 4326), 'mask=anyinteract') = 'TRUE'
   ORDER BY ocid, oid
   )
 WHERE rn = 1

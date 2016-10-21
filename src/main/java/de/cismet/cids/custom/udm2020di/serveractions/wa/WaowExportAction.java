@@ -21,7 +21,7 @@ import de.cismet.cids.server.actions.ServerAction;
  * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
-//@org.openide.util.lookup.ServiceProvider(service = ServerAction.class)
+@org.openide.util.lookup.ServiceProvider(service = ServerAction.class)
 public class WaowExportAction extends WaExportAction {
 
     //~ Static fields/initializers ---------------------------------------------

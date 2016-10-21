@@ -75,7 +75,7 @@ public abstract class AbstractExportAction extends OracleExport implements Serve
      * @throws  SQLException  DOCUMENT ME!
      * @throws  IOException   DOCUMENT ME!
      */
-    protected Object createXlsx(final ResultSet resultSet, final String name) throws SQLException, IOException {
+    protected byte[] createXlsx(final ResultSet resultSet, final String name) throws SQLException, IOException {
         final ResultSetMetaData metaData = resultSet.getMetaData();
         final Workbook workbook = new XSSFWorkbook();
         final Sheet exportSheet = workbook.createSheet(name);
@@ -106,7 +106,7 @@ public abstract class AbstractExportAction extends OracleExport implements Serve
         output.close();
         resultSet.close();
 
-        log.info((rowIndex - 1) + " resources exported from Database.");
+        log.info((rowIndex - 1) + " resources exported from Database and written to XSLX File.");
         return bytes;
     }
 

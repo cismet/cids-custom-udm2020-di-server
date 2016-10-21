@@ -200,6 +200,10 @@ public class EprtrExportAction extends AbstractExportAction {
             }
 
             if ((installationPks != null) && (parameters != null)) {
+                log.info("performing '" + TASK_NAME + "' for " + installationPks.size()
+                            + " EPRTR INSTALLATIONS and " + parameters.size() + " parameters to '"
+                            + name + "' (" + exportFormat + ")");
+
                 final String exportEprtrRelease = this.createExportEprtrReleaseStatement(installationPks, parameters);
 
                 exportEprtrReleaseStatement = this.sourceConnection.createStatement();

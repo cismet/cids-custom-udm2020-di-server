@@ -48,7 +48,6 @@ import de.cismet.cids.custom.udm2020di.indeximport.boris.BorisImport;
 import de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction;
 import de.cismet.cids.custom.udm2020di.types.Parameter;
 
-import de.cismet.cids.server.actions.ServerAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
 
 import de.cismet.cismap.commons.features.DefaultFeatureServiceFeature;
@@ -198,6 +197,10 @@ public class BorisExportAction extends AbstractExportAction {
             }
 
             if ((standortPks != null) && (parameters != null)) {
+                log.info("performing '" + TASK_NAME + "' for " + standortPks.size()
+                            + " BORIS STANDORTE and " + parameters.size() + " parameters to '"
+                            + name + "' (" + exportFormat + ")");
+
                 final String exportBorisMesswerte = this.createExportBorisMesswerteStatement(standortPks, parameters);
 
                 exportBorisMesswerteStatement = this.sourceConnection.createStatement();

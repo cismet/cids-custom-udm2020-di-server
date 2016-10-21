@@ -194,7 +194,7 @@ public class OracleExport {
                 }
                 log.info("SOURCE Connection established: " + sourceJdbcUrl + "/" + sourceJdbcSchema);
             } catch (SQLException sqeex) {
-                log.error("Could not connection to source database: " + sourceJdbcUrl, sqeex);
+                log.error("Could not connect to source database: " + sourceJdbcUrl, sqeex);
                 throw sqeex;
             }
         } else {

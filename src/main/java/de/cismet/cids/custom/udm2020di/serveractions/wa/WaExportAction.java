@@ -50,6 +50,8 @@ import de.cismet.cismap.commons.featureservice.FeatureServiceAttribute;
 import de.cismet.cismap.commons.gui.shapeexport.ShapeExportHelper;
 import de.cismet.cismap.commons.tools.SimpleFeatureCollection;
 
+import static de.cismet.cids.custom.udm2020di.serveractions.eprtr.EprtrExportAction.TASK_NAME;
+
 /**
  * DOCUMENT ME!
  *
@@ -124,7 +126,7 @@ public abstract class WaExportAction extends AbstractExportAction {
             final Collection<Parameter> parameters) {
         if (log.isDebugEnabled()) {
             log.debug("creating export statements for " + messstellePks.size() + " Messstellen and "
-                        + parameters.size() + parameters);
+                        + parameters.size() + " parameters.");
         }
 
         final StringBuilder messstelleeBuilder = new StringBuilder();
@@ -202,6 +204,10 @@ public abstract class WaExportAction extends AbstractExportAction {
             }
 
             if ((messstellePks != null) && (parameters != null)) {
+                log.info("performing '" + TASK_NAME + "' for " + messstellePks.size()
+                            + " WAxW Stations and " + parameters.size() + " parameters to '"
+                            + name + "' (" + exportFormat + ")");
+
                 final String exportWaMesswerte = this.createExportWaMesswerteStatement(messstellePks, parameters);
 
                 exportWaMesswerteStatement = this.sourceConnection.createStatement();
@@ -215,7 +221,7 @@ public abstract class WaExportAction extends AbstractExportAction {
                     if (waSource.equalsIgnoreCase(WAOW)) {
                         result = this.createShapeFile(exportWaMesswerteResult, name);
                     } else {
-                        final String message = "SHP Export of WAGW Stations not permitted!";
+                        final String message = "SHP Export of WAGW Stations not permitted! (" + exportFormat + ")";
                         log.error(message);
                         throw new Exception(message);
                     }

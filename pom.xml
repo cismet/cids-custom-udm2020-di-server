@@ -78,6 +78,7 @@
     <properties>
         <de.cismet.libDir>lib/localUdm2020-di</de.cismet.libDir>
         <netbeans.version>RELEASE701</netbeans.version>
+        <jackson.version>2.6.7</jackson.version>
     </properties>
 
     <dependencies>
@@ -115,7 +116,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
-            <version>2.6.3</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.woodstox</groupId>
@@ -125,12 +126,12 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.6.3</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.6.3</version>
+            <version>${jackson.version}</version>
         </dependency>
         <!--       <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
@@ -152,7 +153,7 @@
             <artifactId>hibernate-entitymanager</artifactId>
             <version>4.3.1.Final</version>
         </dependency>-->
-        <dependency>
+        <dependency> 
             <groupId>oracle.jdbc</groupId>
             <artifactId>ojdbc7_g</artifactId>
             <version>1.0</version>
@@ -160,22 +161,22 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.6.3</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-base</artifactId>
-            <version>2.6.3</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-json-provider</artifactId>
-            <version>2.6.3</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-jaxb-annotations</artifactId>
-            <version>2.6.3</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>

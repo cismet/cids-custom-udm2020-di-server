@@ -76,12 +76,20 @@ public class RestApiExportAction implements RestApiCidsServerAction {
     // public static final String PARAM_MERGE_DATASOURCE = "isMergeExternalDatasource";
 
     public static final HashMap<String, String> EXPORT_FORMATS = new HashMap<String, String>();
+    public static final HashMap<String, String> CONTENT_TYPES = new HashMap<String, String>();
 
     static {
         EXPORT_FORMATS.put("csv", AbstractExportAction.PARAM_EXPORTFORMAT_CSV);
         EXPORT_FORMATS.put("xls", AbstractExportAction.PARAM_EXPORTFORMAT_XLS);
         EXPORT_FORMATS.put("xlsx", AbstractExportAction.PARAM_EXPORTFORMAT_XLSX);
         EXPORT_FORMATS.put("shp", AbstractExportAction.PARAM_EXPORTFORMAT_SHP);
+
+        CONTENT_TYPES.put(AbstractExportAction.PARAM_EXPORTFORMAT_CSV, MediaTypes.TEXT_CSV + "; charset=UTF-8");
+        CONTENT_TYPES.put(AbstractExportAction.PARAM_EXPORTFORMAT_XLS, "application/vnd.ms-excel");
+        CONTENT_TYPES.put(
+            AbstractExportAction.PARAM_EXPORTFORMAT_XLSX,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        CONTENT_TYPES.put(AbstractExportAction.PARAM_EXPORTFORMAT_SHP, MediaTypes.APPLICATION_ZIP);
     }
 
     //~ Instance fields --------------------------------------------------------
@@ -131,6 +139,8 @@ public class RestApiExportAction implements RestApiCidsServerAction {
         returnDescription.setMediaType(MediaTypes.APPLICATION_ZIP);
         returnDescription.setDescription("Returns the zipped export files");
         actionInfo.setResultDescription(returnDescription);
+
+        LOGGER.info("new RestApiExportAction created");
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -195,8 +205,12 @@ public class RestApiExportAction implements RestApiCidsServerAction {
                     || !(exportOptionsParameter.getValue() instanceof String)
                     || ((String)exportOptionsParameter.getValue()).isEmpty()) {
             final String message = "could not execute '" + this.getTaskName()
-                        + "': value of Server Action Parameter '" + PARAM_EXPORT_OPTIONS + "' is no java.lang.String";
+                        + "': value of Server Action Parameter '" + PARAM_EXPORT_OPTIONS
+                        + "' is no java.lang.String or empty";
             LOGGER.error(message);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(exportOptionsParameter.getValue());
+            }
             throw new RuntimeException(message);
         }
 
@@ -210,6 +224,9 @@ public class RestApiExportAction implements RestApiCidsServerAction {
             final String message = "could not execute '" + this.getTaskName()
                         + "': could not deserialize '" + PARAM_EXPORT_OPTIONS + "' from JSON: " + ex.getMessage();
             LOGGER.error(message, ex);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(exportOptionsJson);
+            }
             throw new RuntimeException(message, ex);
         }
 
@@ -297,23 +314,41 @@ public class RestApiExportAction implements RestApiCidsServerAction {
 
         /*if(exportOptions.isMergeExternalDatasource()) {
          *      //TODO: implement merging with external datasource } else {*/
-        // one already zipped SH PFile exported
-        if ((exportResults.size() == 1)
-                    && AbstractExportAction.PARAM_EXPORTFORMAT_SHP.equals(
-                        EXPORT_FORMATS.get(exportOptions.getExportFormat()))) {
+        // one already zipped SHP File exported
+        if ((exportResults.size() == 1)) {
             final Object exportResult = exportResults.values().iterator().next();
-            if (!(exportResult instanceof byte[])) {
+            final String contentType;
+
+            if ("csv".equalsIgnoreCase(exportOptions.getExportFormat())) {
+                if (!(exportResult instanceof String)) {
+                    final String message = "could not execute '" + this.getTaskName()
+                                + "': expected result (" + exportOptions.getExportFormat() + ") of '"
+                                + exportResults.keySet().iterator().next().getClassName()
+                                + "' is not of type String: " + exportResult.getClass().getSimpleName();
+                    LOGGER.error(message);
+                    throw new RuntimeException(message);
+                }
+            } else if (!(exportResult instanceof byte[])) {
                 final String message = "could not execute '" + this.getTaskName()
-                            + "': expected result of '" + exportResults.keySet().iterator().next().getClassName()
-                            + "' is not of type byte[]!";
+                            + "': expected result (" + exportOptions.getExportFormat() + ") of '"
+                            + exportResults.keySet().iterator().next().getClassName()
+                            + "' is not of type byte[]: " + exportResult.getClass().getSimpleName();
+                LOGGER.error(message);
+                throw new RuntimeException(message);
+            }
+
+            contentType = CONTENT_TYPES.get(EXPORT_FORMATS.get(exportOptions.getExportFormat()));
+            if (contentType == null) {
+                final String message = "could not execute '" + this.getTaskName()
+                            + "': contant type of result (" + exportOptions.getExportFormat() + ") not found!";
                 LOGGER.error(message);
                 throw new RuntimeException(message);
             }
 
             LOGGER.info("Export successfully performed for " + exportOptions.getExportThemes()
-                        + " themes in " + ((System.currentTimeMillis() - current) / 1000) + "s.");
-
-            return new GenericResourceWithContentType(MediaTypes.APPLICATION_ZIP, (byte[])exportResult);
+                        + " themes to '" + MediaTypes.APPLICATION_ZIP
+                        + "' in " + ((System.currentTimeMillis() - current) / 1000) + "s.");
+            return new GenericResourceWithContentType(contentType, exportResult);
         } else {
             final ByteArrayOutputStream combinedExportResults = new ByteArrayOutputStream();
             try(final ZipOutputStream zipStream = new ZipOutputStream(combinedExportResults)) {

@@ -79,7 +79,7 @@ import static de.cismet.cids.custom.udm2020di.indeximport.moss.MossImport.DEFAUL
  * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
-//@org.openide.util.lookup.ServiceProvider(service = ServerAction.class)
+@org.openide.util.lookup.ServiceProvider(service = ServerAction.class)
 public class MossExportAction extends AbstractExportAction {
 
     //~ Static fields/initializers ---------------------------------------------
@@ -137,7 +137,7 @@ public class MossExportAction extends AbstractExportAction {
             final Collection<Long> sitePks,
             final Collection<Parameter> parameters) {
         if (log.isDebugEnabled()) {
-            log.debug("creating export statements for " + sitePks.size() + "site and "
+            log.debug("creating export statements for " + sitePks.size() + " MOSS Sites and "
                         + parameters.size() + " parameters");
         }
 
@@ -192,6 +192,8 @@ public class MossExportAction extends AbstractExportAction {
         Statement exportMossStatement = null;
         ResultSet exportMossResult = null;
         try {
+            this.checkConnection();
+
             Object result = null;
 
             Collection<Long> objectIds = null;
@@ -220,6 +222,10 @@ public class MossExportAction extends AbstractExportAction {
             if ((parameters != null)) {
                 if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_XLS)) {
                     if ((sampleIds != null) && !sampleIds.isEmpty()) {
+                        log.info("performing '" + TASK_NAME + "' for " + sampleIds.size()
+                                    + " MOSS Samples and " + parameters.size() + " parameters to '"
+                                    + name + "' (" + exportFormat + ")");
+
                         final Collection<String> parameterPks = new HashSet();
                         for (final Parameter parameter : parameters) {
                             parameterPks.add(parameter.getParameterPk());
@@ -231,6 +237,10 @@ public class MossExportAction extends AbstractExportAction {
                                     + "returning null");
                     }
                 } else if ((objectIds != null)) {
+                    log.info("performing '" + TASK_NAME + "' for " + objectIds.size()
+                                + " MOSS Objects and " + parameters.size() + " parameters to '"
+                                + name + "' (" + exportFormat + ")");
+
                     final String exportMoss = this.createExportMossStatement(objectIds, parameters);
                     exportMossStatement = this.sourceConnection.createStatement();
                     exportMossResult = exportMossStatement.executeQuery(exportMoss);

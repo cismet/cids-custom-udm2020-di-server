@@ -64,7 +64,7 @@ import de.cismet.cismap.commons.tools.SimpleFeatureCollection;
  * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
-//@org.openide.util.lookup.ServiceProvider(service = ServerAction.class)
+@org.openide.util.lookup.ServiceProvider(service = ServerAction.class)
 public class EprtrExportAction extends AbstractExportAction {
 
     //~ Static fields/initializers ---------------------------------------------
@@ -177,6 +177,8 @@ public class EprtrExportAction extends AbstractExportAction {
         Statement exportEprtrReleaseStatement = null;
         ResultSet exportEprtrReleaseResult = null;
         try {
+            this.checkConnection();
+
             Object result = null;
 
             Collection<Long> installationPks = null;
@@ -200,6 +202,10 @@ public class EprtrExportAction extends AbstractExportAction {
             }
 
             if ((installationPks != null) && (parameters != null)) {
+                log.info("performing '" + TASK_NAME + "' for " + installationPks.size()
+                            + " EPRTR INSTALLATIONS and " + parameters.size() + " parameters to '"
+                            + name + "' (" + exportFormat + ")");
+
                 final String exportEprtrRelease = this.createExportEprtrReleaseStatement(installationPks, parameters);
 
                 exportEprtrReleaseStatement = this.sourceConnection.createStatement();

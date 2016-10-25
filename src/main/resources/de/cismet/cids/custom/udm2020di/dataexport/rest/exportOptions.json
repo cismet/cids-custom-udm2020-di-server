@@ -1,0 +1,754 @@
+{
+    "isMergeExternalDatasource": false,
+    "isMergeExternalDatasourceEnabled": true,
+    "exportFormat": "xlsx",
+    "selectedExportDatasource": {
+        "name": "Einzugsgebiet 100km",
+        "filename": null,
+        "groupName": "Eigene lokale Datenquellen",
+        "selected": true,
+        "global": true,
+        "parameters": [{
+                "parameterpk": "C",
+                "parametername": "C",
+                "selected": false
+            }, {
+                "parameterpk": "D",
+                "parametername": "D",
+                "selected": false
+            }, {
+                "parameterpk": "H",
+                "parametername": "H",
+                "selected": false
+            }, {
+                "parameterpk": "J",
+                "parametername": "J",
+                "selected": false
+            }]
+    },
+    "selectedExportThemes": [{
+            "exportFormat": "xlsx",
+            "className": "MOSS",
+            "title": "Moose",
+            "parameters": [{
+                    "parameterpk": "As",
+                    "parametergruppepk": null,
+                    "parametername": "Arsen",
+                    "parametergruppename": null,
+                    "parametereinheit": null
+                }, {
+                    "parameterpk": "Cd",
+                    "parametergruppepk": null,
+                    "parametername": "Cadmium",
+                    "parametergruppename": null,
+                    "parametereinheit": null
+                }, {
+                    "parameterpk": "Co",
+                    "parametergruppepk": null,
+                    "parametername": "Cobalt",
+                    "parametergruppename": null,
+                    "parametereinheit": null,
+                    "selected": true
+                }, {
+                    "parameterpk": "Cr",
+                    "parametergruppepk": null,
+                    "parametername": "Chrom",
+                    "parametergruppename": null,
+                    "parametereinheit": null,
+                    "selected": true
+                }, {
+                    "parameterpk": "Cu",
+                    "parametergruppepk": null,
+                    "parametername": "Kupfer",
+                    "parametergruppename": null,
+                    "parametereinheit": null
+                }, {
+                    "parameterpk": "Fe",
+                    "parametergruppepk": null,
+                    "parametername": "Eisen",
+                    "parametergruppename": null,
+                    "parametereinheit": null,
+                    "selected": true
+                }, {
+                    "parameterpk": "Mo",
+                    "parametergruppepk": null,
+                    "parametername": "Molybdän",
+                    "parametergruppename": null,
+                    "parametereinheit": null
+                }, {
+                    "parameterpk": "Ni",
+                    "parametergruppepk": null,
+                    "parametername": "Nickel",
+                    "parametergruppename": null,
+                    "parametereinheit": null
+                }, {
+                    "parameterpk": "Pb",
+                    "parametergruppepk": null,
+                    "parametername": "Blei",
+                    "parametergruppename": null,
+                    "parametereinheit": null
+                }, {
+                    "parameterpk": "S",
+                    "parametergruppepk": null,
+                    "parametername": "Schwefel",
+                    "parametergruppename": null,
+                    "parametereinheit": null,
+                    "selected": true
+                }, {
+                    "parameterpk": "V",
+                    "parametergruppepk": null,
+                    "parametername": "Vanadium",
+                    "parametergruppename": null,
+                    "parametereinheit": null
+                }, {
+                    "parameterpk": "Sb",
+                    "parametergruppepk": null,
+                    "parametername": "Antimon",
+                    "parametergruppename": null,
+                    "parametereinheit": null
+                }, {
+                    "parameterpk": "Zn",
+                    "parametergruppepk": null,
+                    "parametername": "Zinn",
+                    "parametergruppename": null,
+                    "parametereinheit": null
+                }, {
+                    "parameterpk": "Hg",
+                    "parametergruppepk": null,
+                    "parametername": "Quecksilber",
+                    "parametergruppename": null,
+                    "parametereinheit": null
+                }, {
+                    "parameterpk": "N",
+                    "parametergruppepk": null,
+                    "parametername": "Gesamtstickstoff (Elementaranalyse)",
+                    "parametergruppename": null,
+                    "parametereinheit": null
+                }, {
+                    "parameterpk": "Al",
+                    "parametergruppepk": null,
+                    "parametername": "Aluminium",
+                    "parametergruppename": null,
+                    "parametereinheit": null,
+                    "selected": true
+                }],
+            "parametersKeys": ["As", "Cd", "Co", "Cr", "Cu", "Fe", "Mo", "Ni", "Pb", "S", "V", "Sb", "Zn", "Hg", "N", "Al"],
+            "objectIds": [1063, 1075, 1094, 1105, 1106],
+            "exportPKs": ["54-1"],
+            "selected": true,
+            "exportDatasource": {
+                "name": "Einzugsgebiet 100km",
+                "filename": null,
+                "groupName": "Eigene lokale Datenquellen",
+                "selected": true,
+                "global": true,
+                "parameters": [{
+                        "parameterpk": "C",
+                        "parametername": "C",
+                        "selected": false
+                    }, {
+                        "parameterpk": "D",
+                        "parametername": "D",
+                        "selected": false
+                    }, {
+                        "parameterpk": "H",
+                        "parametername": "H",
+                        "selected": true
+                    }, {
+                        "parameterpk": "J",
+                        "parametername": "J",
+                        "selected": true
+                    }]
+            },
+            "forbiddenParameters": []
+        }, {
+            "exportFormat": "xlsx",
+            "className": "WAGW_STATION",
+            "title": "Grundwassermesstellen",
+            "parameters": [{
+                    "parameterpk": "G109",
+                    "parametergruppepk": null,
+                    "parametername": "ABSTICH m",
+                    "parametergruppename": null,
+                    "parametereinheit": "KEINE"
+                }, {
+                    "parameterpk": "G152",
+                    "parametergruppepk": null,
+                    "parametername": "AMMONIUM mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G172",
+                    "parametergruppepk": null,
+                    "parametername": "AOX µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G150",
+                    "parametergruppepk": null,
+                    "parametername": "ARSEN mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G429",
+                    "parametergruppepk": null,
+                    "parametername": "ARSEN µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l",
+                    "selected": true
+                }, {
+                    "parameterpk": "G192",
+                    "parametergruppepk": null,
+                    "parametername": "ATRAZIN µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G147",
+                    "parametergruppepk": null,
+                    "parametername": "BLEI mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G426",
+                    "parametergruppepk": null,
+                    "parametername": "BLEI µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G151",
+                    "parametergruppepk": null,
+                    "parametername": "BOR mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G140",
+                    "parametergruppepk": null,
+                    "parametername": "CADMIUM mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G421",
+                    "parametergruppepk": null,
+                    "parametername": "CADMIUM µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G134",
+                    "parametergruppepk": null,
+                    "parametername": "CALCIUM mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G155",
+                    "parametergruppepk": null,
+                    "parametername": "CHLORID mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G148",
+                    "parametergruppepk": null,
+                    "parametername": "CHROM-GESAMT mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G427",
+                    "parametergruppepk": null,
+                    "parametername": "CHROM-GESAMT µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G193",
+                    "parametergruppepk": null,
+                    "parametername": "DESETHYLATRAZIN µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G379",
+                    "parametergruppepk": null,
+                    "parametername": "DESETHYLTERBUTHYLAZIN µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G164",
+                    "parametergruppepk": null,
+                    "parametername": "DOC mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l",
+                    "selected": true
+                }, {
+                    "parameterpk": "G401",
+                    "parametergruppepk": null,
+                    "parametername": "Desphenyl-Chloridazon µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G138",
+                    "parametergruppepk": null,
+                    "parametername": "EISEN mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l",
+                    "selected": true
+                }, {
+                    "parameterpk": "G366",
+                    "parametergruppepk": null,
+                    "parametername": "ELEKTR. LEITF. (bei 20°C) µS/cm",
+                    "parametergruppename": null,
+                    "parametereinheit": "µS/cm"
+                }, {
+                    "parameterpk": "G117",
+                    "parametergruppepk": null,
+                    "parametername": "ELEKTR. LEITF. (bei 25°C) µS/cm",
+                    "parametergruppename": null,
+                    "parametereinheit": "µS/cm"
+                }, {
+                    "parameterpk": "G113",
+                    "parametergruppepk": null,
+                    "parametername": "FAERBUNG",
+                    "parametergruppename": null,
+                    "parametereinheit": "KEINE"
+                }, {
+                    "parameterpk": "G215",
+                    "parametergruppepk": null,
+                    "parametername": "FÖRDERSTROM BEI PN l/s",
+                    "parametergruppename": null,
+                    "parametereinheit": "l/s"
+                }, {
+                    "parameterpk": "G325",
+                    "parametergruppepk": null,
+                    "parametername": "GESAMTFÖRDERVOLUMEN BEI PN l",
+                    "parametergruppename": null,
+                    "parametereinheit": "KEINE"
+                }, {
+                    "parameterpk": "G122",
+                    "parametergruppepk": null,
+                    "parametername": "GESAMTHAERTE °dH",
+                    "parametergruppename": null,
+                    "parametereinheit": "°dH"
+                }, {
+                    "parameterpk": "G157",
+                    "parametergruppepk": null,
+                    "parametername": "HYDROGENK. mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G137",
+                    "parametergruppepk": null,
+                    "parametername": "KALIUM mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G123",
+                    "parametergruppepk": null,
+                    "parametername": "KARBONATHAERTE °dH",
+                    "parametergruppename": null,
+                    "parametereinheit": "°dH"
+                }, {
+                    "parameterpk": "G145",
+                    "parametergruppepk": null,
+                    "parametername": "KUPFER mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G424",
+                    "parametergruppepk": null,
+                    "parametername": "KUPFER µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G135",
+                    "parametergruppepk": null,
+                    "parametername": "MAGNESIUM mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G139",
+                    "parametergruppepk": null,
+                    "parametername": "MANGAN mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G402",
+                    "parametergruppepk": null,
+                    "parametername": "Methyldesphenylchloridazon µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G136",
+                    "parametergruppepk": null,
+                    "parametername": "NATRIUM mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G149",
+                    "parametergruppepk": null,
+                    "parametername": "NICKEL mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G428",
+                    "parametergruppepk": null,
+                    "parametername": "NICKEL µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G154",
+                    "parametergruppepk": null,
+                    "parametername": "NITRAT mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G153",
+                    "parametergruppepk": null,
+                    "parametername": "NITRIT mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G159",
+                    "parametergruppepk": null,
+                    "parametername": "ORTHOPHOSPHAT mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G118",
+                    "parametergruppepk": null,
+                    "parametername": "PH-WERT",
+                    "parametergruppename": null,
+                    "parametereinheit": "KEINE"
+                }, {
+                    "parameterpk": "G119",
+                    "parametergruppepk": null,
+                    "parametername": "SAUERSTOFFGEHALT mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G156",
+                    "parametergruppepk": null,
+                    "parametername": "SULFAT mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G221",
+                    "parametergruppepk": null,
+                    "parametername": "TERBUTHYLAZIN µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G175",
+                    "parametergruppepk": null,
+                    "parametername": "TETRACHLORETHEN µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G176",
+                    "parametergruppepk": null,
+                    "parametername": "TRICHLORETHEN µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G433",
+                    "parametergruppepk": null,
+                    "parametername": "URAN µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G116",
+                    "parametergruppepk": null,
+                    "parametername": "WASSERTEMPERATUR °C",
+                    "parametergruppename": null,
+                    "parametereinheit": " °C"
+                }, {
+                    "parameterpk": "G142",
+                    "parametergruppepk": null,
+                    "parametername": "ZINK mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G423",
+                    "parametergruppepk": null,
+                    "parametername": "ZINK µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G146",
+                    "parametergruppepk": null,
+                    "parametername": "ALUMINIUM mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l",
+                    "selected": true
+                }, {
+                    "parameterpk": "G425",
+                    "parametergruppepk": null,
+                    "parametername": "ALUMINIUM µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G177",
+                    "parametergruppepk": null,
+                    "parametername": "1,1,1-TRICHLORETHAN µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l",
+                    "selected": false
+                }, {
+                    "parameterpk": "G194",
+                    "parametergruppepk": null,
+                    "parametername": "DESISOPROPYLATRAZIN µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G183",
+                    "parametergruppepk": null,
+                    "parametername": "DIBROMCHLORMETHAN µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G386",
+                    "parametergruppepk": null,
+                    "parametername": "Desethyl-Desisopropylatrazin µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G216",
+                    "parametergruppepk": null,
+                    "parametername": "METOLACHLOR µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G328",
+                    "parametergruppepk": null,
+                    "parametername": "MTBE µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l",
+                    "selected": true
+                }, {
+                    "parameterpk": "G510",
+                    "parametergruppepk": null,
+                    "parametername": "METOLACHLOR-SULFONSÄURE µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G511",
+                    "parametergruppepk": null,
+                    "parametername": "METOLACHLOR-SÄURE µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G141",
+                    "parametergruppepk": null,
+                    "parametername": "QUECKSILBER mg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "mg/l"
+                }, {
+                    "parameterpk": "G422",
+                    "parametergruppepk": null,
+                    "parametername": "QUECKSILBER µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G195",
+                    "parametergruppepk": null,
+                    "parametername": "SIMAZIN µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G200",
+                    "parametergruppepk": null,
+                    "parametername": "BENTAZON µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l",
+                    "selected": true
+                }, {
+                    "parameterpk": "G180",
+                    "parametergruppepk": null,
+                    "parametername": "CHLOROFORM (Trichlormethan) µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G506",
+                    "parametergruppepk": null,
+                    "parametername": "METAZACHLOR-SULFONSÄURE µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G219",
+                    "parametergruppepk": null,
+                    "parametername": "PROMETRYN µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G285",
+                    "parametergruppepk": null,
+                    "parametername": "RADON-222 Bq/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "Bq/l"
+                }, {
+                    "parameterpk": "G482",
+                    "parametergruppepk": null,
+                    "parametername": "AZOXYSTROBIN µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G486",
+                    "parametergruppepk": null,
+                    "parametername": "CYPM µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G395",
+                    "parametergruppepk": null,
+                    "parametername": "Ethofumesate µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G533",
+                    "parametergruppepk": null,
+                    "parametername": "IRGAROL µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G384",
+                    "parametergruppepk": null,
+                    "parametername": "Iodosulfuron methyl µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G517",
+                    "parametergruppepk": null,
+                    "parametername": "PETHOXAMID µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G343",
+                    "parametergruppepk": null,
+                    "parametername": "PRIMISULFURONMETHYL µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G466",
+                    "parametergruppepk": null,
+                    "parametername": "PROPAZIN-2-HYDROXY µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G467",
+                    "parametergruppepk": null,
+                    "parametername": "TERBUTHYLAZIN-2-HYDROXY µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G181",
+                    "parametergruppepk": null,
+                    "parametername": "TRIBROMMETHAN µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G347",
+                    "parametergruppepk": null,
+                    "parametername": "TRIFLUSULFURONMETHYL µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G187",
+                    "parametergruppepk": null,
+                    "parametername": "1,2-DICHLORETHAN µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l",
+                    "selected": false
+                }, {
+                    "parameterpk": "G182",
+                    "parametergruppepk": null,
+                    "parametername": "BROMDICHLORMETHAN µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G541",
+                    "parametergruppepk": null,
+                    "parametername": "DIMETHENAMID-SULFONSÄURE µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G179",
+                    "parametergruppepk": null,
+                    "parametername": "TETRACHLORMETHAN µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G378",
+                    "parametergruppepk": null,
+                    "parametername": "2,6-DICHLORBENZAMID µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G324",
+                    "parametergruppepk": null,
+                    "parametername": "RADIUM-226 Bq/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "Bq/l"
+                }, {
+                    "parameterpk": "G383",
+                    "parametergruppepk": null,
+                    "parametername": "N,N-DIMETHYLSULFAMID µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l",
+                    "selected": true
+                }, {
+                    "parameterpk": "G269",
+                    "parametergruppepk": null,
+                    "parametername": "HEXACHLORBENZOL µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G530",
+                    "parametergruppepk": null,
+                    "parametername": "α-Hexachlorcyclohexan µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G199",
+                    "parametergruppepk": null,
+                    "parametername": "PYRIDAT µg/l (als CL9673)",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G499",
+                    "parametergruppepk": null,
+                    "parametername": "FLUFENACET-SULFONSÄURE µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }, {
+                    "parameterpk": "G523",
+                    "parametergruppepk": null,
+                    "parametername": "SACCHARIN µg/l",
+                    "parametergruppename": null,
+                    "parametereinheit": "µg/l"
+                }],
+            "parametersKeys": ["G109", "G152", "G172", "G150", "G429", "G192", "G147", "G426", "G151", "G140", "G421", "G134", "G155", "G148", "G427", "G193", "G379", "G164", "G401", "G138", "G366", "G117", "G113", "G215", "G325", "G122", "G157", "G137", "G123", "G145", "G424", "G135", "G139", "G402", "G136", "G149", "G428", "G154", "G153", "G159", "G118", "G119", "G156", "G221", "G175", "G176", "G433", "G116", "G142", "G423", "G146", "G425", "G177", "G194", "G183", "G386", "G216", "G328", "G510", "G511", "G141", "G422", "G195", "G200", "G180", "G506", "G219", "G285", "G482", "G486", "G395", "G533", "G384", "G517", "G343", "G466", "G467", "G181", "G347", "G187", "G182", "G541", "G179", "G378", "G324", "G383", "G269", "G530", "G199", "G499", "G523"],
+            "exportPKs": ["PG30500542", "PG30500562", "PG30500622", "PG30500662", "PG30500682", "PG30501092", "PG31500012", "PG31500022", "PG31500052", "PG31500082", "PG31500162", "PG31500182", "PG31500422", "PG31500432", "PG31500462", "PG31500472", "PG31500492", "PG31500502", "PG31500522", "PG31500532", "PG31500542", "PG31500642", "PG31500722", "PG31500742", "PG31500752", "PG31500772", "PG31500852", "PG31500862", "PG31500882", "PG31500892", "PG32000202", "PG32000362"],
+            "selected": true,
+            "exportDatasource": {
+                "name": "Einzugsgebiet 100km",
+                "filename": null,
+                "groupName": "Eigene lokale Datenquellen",
+                "selected": true,
+                "global": true,
+                "parameters": [{
+                        "parameterpk": "C",
+                        "parametername": "C",
+                        "selected": true
+                    }, {
+                        "parameterpk": "D",
+                        "parametername": "D",
+                        "selected": true
+                    }, {
+                        "parameterpk": "H",
+                        "parametername": "H",
+                        "selected": false
+                    }, {
+                        "parameterpk": "J",
+                        "parametername": "J",
+                        "selected": false
+                    }]
+            },
+            "forbiddenParameters": []
+        }],
+    "exportOptionsOpen": false
+}

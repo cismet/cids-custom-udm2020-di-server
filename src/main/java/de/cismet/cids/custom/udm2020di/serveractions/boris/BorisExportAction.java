@@ -12,6 +12,8 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
+import oracle.jdbc.OracleConnection;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
@@ -64,7 +66,7 @@ import de.cismet.cismap.commons.tools.SimpleFeatureCollection;
  * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
-//@org.openide.util.lookup.ServiceProvider(service = ServerAction.class)
+@org.openide.util.lookup.ServiceProvider(service = ServerAction.class)
 public class BorisExportAction extends AbstractExportAction {
 
     //~ Static fields/initializers ---------------------------------------------
@@ -175,6 +177,8 @@ public class BorisExportAction extends AbstractExportAction {
         Statement exportBorisMesswerteStatement = null;
         ResultSet exportBorisMesswerteResult = null;
         try {
+            this.checkConnection();
+
             Object result = null;
 
             Collection<String> standortPks = null;
@@ -198,6 +202,10 @@ public class BorisExportAction extends AbstractExportAction {
             }
 
             if ((standortPks != null) && (parameters != null)) {
+                log.info("performing '" + TASK_NAME + "' for " + standortPks.size()
+                            + " BORIS STANDORTE and " + parameters.size() + " parameters to '"
+                            + name + "' (" + exportFormat + ")");
+
                 final String exportBorisMesswerte = this.createExportBorisMesswerteStatement(standortPks, parameters);
 
                 exportBorisMesswerteStatement = this.sourceConnection.createStatement();

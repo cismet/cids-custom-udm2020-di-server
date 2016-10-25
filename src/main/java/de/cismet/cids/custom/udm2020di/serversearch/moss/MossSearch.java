@@ -10,15 +10,11 @@ package de.cismet.cids.custom.udm2020di.serversearch.moss;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
-import org.openide.util.lookup.ServiceProvider;
-
 import java.io.IOException;
 
 import java.util.HashMap;
 
 import de.cismet.cids.custom.udm2020di.serversearch.AbstractMaxValuesSearch;
-
-import de.cismet.cidsx.server.search.RestApiCidsServerSearch;
 
 /**
  * DOCUMENT ME!
@@ -26,7 +22,6 @@ import de.cismet.cidsx.server.search.RestApiCidsServerSearch;
  * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
-@ServiceProvider(service = RestApiCidsServerSearch.class)
 public class MossSearch extends AbstractMaxValuesSearch {
 
     //~ Static fields/initializers ---------------------------------------------

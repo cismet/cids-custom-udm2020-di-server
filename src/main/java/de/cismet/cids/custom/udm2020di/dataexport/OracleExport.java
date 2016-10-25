@@ -18,6 +18,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
+import lombok.Getter;
+
+import oracle.jdbc.OracleConnection;
+
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -130,7 +134,7 @@ public class OracleExport {
     protected String sourceJdbcDriver = null;
 
     protected Properties properties = null;
-    protected Connection sourceConnection;
+    @Getter protected OracleConnection sourceConnection;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -164,7 +168,7 @@ public class OracleExport {
             PropertyConfigurator.configure(properties);
         }
 
-        this.sourceJdbcDriver = properties.getProperty("source.jdbc.driver");
+        sourceJdbcDriver = properties.getProperty("source.jdbc.driver");
         if ((sourceJdbcDriver != null) && !sourceJdbcDriver.isEmpty()) {
             try {
                 Class.forName(sourceJdbcDriver);
@@ -173,36 +177,57 @@ public class OracleExport {
                 throw cnfe;
             }
 
-            String sourceJdbcUrl = null;
-            final String sourceJdbcUsername;
-            final String sourceJdbcPassword;
-            final String sourceJdbcSchema;
+            final String sourceJdbcUrl = properties.getProperty("source.jdbc.url");
+            final String sourceJdbcUsername = properties.getProperty("source.jdbc.username");
+            final String sourceJdbcPassword = properties.getProperty("source.jdbc.password");
+            final String sourceJdbcSchema = properties.getProperty("source.jdbc.schema");
 
-            try {
-                sourceJdbcUrl = properties.getProperty("source.jdbc.url");
-                sourceJdbcUsername = properties.getProperty("source.jdbc.username");
-                sourceJdbcPassword = properties.getProperty("source.jdbc.password");
-                sourceJdbcSchema = properties.getProperty("source.jdbc.schema");
-
-                sourceConnection = DriverManager.getConnection(
-                        sourceJdbcUrl,
-                        sourceJdbcUsername,
-                        sourceJdbcPassword);
-
-                if (sourceJdbcSchema != null) {
-                    sourceConnection.createStatement().execute("ALTER SESSION set current_schema=" + sourceJdbcSchema);
-                }
-                log.info("SOURCE Connection established: " + sourceJdbcUrl + "/" + sourceJdbcSchema);
-            } catch (SQLException sqeex) {
-                log.error("Could not connect to source database: " + sourceJdbcUrl, sqeex);
-                throw sqeex;
-            }
+            this.sourceConnection = createConnection(
+                    sourceJdbcUrl,
+                    sourceJdbcUsername,
+                    sourceJdbcPassword,
+                    sourceJdbcSchema);
         } else {
             log.warn("no source connection specified!");
         }
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   sourceJdbcUrl       DOCUMENT ME!
+     * @param   sourceJdbcUsername  DOCUMENT ME!
+     * @param   sourceJdbcPassword  DOCUMENT ME!
+     * @param   sourceJdbcSchema    DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  SQLException  DOCUMENT ME!
+     */
+    protected final OracleConnection createConnection(final String sourceJdbcUrl,
+            final String sourceJdbcUsername,
+            final String sourceJdbcPassword,
+            final String sourceJdbcSchema) throws SQLException {
+        try {
+            final OracleConnection connection = (OracleConnection)DriverManager.getConnection(
+                    sourceJdbcUrl,
+                    sourceJdbcUsername,
+                    sourceJdbcPassword);
+
+            if (sourceJdbcSchema != null) {
+                connection.createStatement().execute("ALTER SESSION set current_schema=" + sourceJdbcSchema);
+            }
+
+            log.info("SOURCE Connection established: " + sourceJdbcUrl + "/" + sourceJdbcSchema);
+
+            return connection;
+        } catch (SQLException sqeex) {
+            log.error("Could not connect to source database: " + sourceJdbcUrl, sqeex);
+            throw sqeex;
+        }
+    }
 
     /**
      * DOCUMENT ME!
@@ -232,18 +257,17 @@ public class OracleExport {
     protected final int[] executeBatchStatement(final Connection connection, final String batchStatementStr)
             throws SQLException {
         final String[] batchStatements = batchStatementStr.split(";");
-        final Statement batchStatement = connection.createStatement();
-        for (final String StatementStr : batchStatements) {
+        final int[] ret;
+        try(final Statement batchStatement = connection.createStatement()) {
+            for (final String StatementStr : batchStatements) {
 //            if (log.isDebugEnabled()) {
 //                log.debug(StatementStr);
 //            }
-            batchStatement.addBatch(StatementStr);
+                batchStatement.addBatch(StatementStr);
+            }
+            ret = batchStatement.executeBatch();
+            connection.commit();
         }
-
-        final int[] ret = batchStatement.executeBatch();
-
-        connection.commit();
-        batchStatement.close();
 
         return ret;
     }
@@ -323,14 +347,5 @@ public class OracleExport {
         final T mappedObject = JSON_MAPPER.treeToValue(resultSetNode, type);
 
         return mappedObject;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public final Connection getSourceConnection() {
-        return sourceConnection;
     }
 }

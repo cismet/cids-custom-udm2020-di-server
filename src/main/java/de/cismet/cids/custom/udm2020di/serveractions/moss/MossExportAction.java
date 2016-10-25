@@ -192,6 +192,8 @@ public class MossExportAction extends AbstractExportAction {
         Statement exportMossStatement = null;
         ResultSet exportMossResult = null;
         try {
+            this.checkConnection();
+
             Object result = null;
 
             Collection<Long> objectIds = null;

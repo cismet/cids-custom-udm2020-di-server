@@ -12,6 +12,8 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
+import oracle.jdbc.OracleConnection;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
@@ -175,6 +177,8 @@ public class BorisExportAction extends AbstractExportAction {
         Statement exportBorisMesswerteStatement = null;
         ResultSet exportBorisMesswerteResult = null;
         try {
+            this.checkConnection();
+
             Object result = null;
 
             Collection<String> standortPks = null;

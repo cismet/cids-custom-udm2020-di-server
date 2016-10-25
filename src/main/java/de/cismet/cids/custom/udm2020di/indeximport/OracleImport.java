@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.cids.custom.udm2020di.indeximport;
 
+import lombok.Getter;
+
 import oracle.jdbc.OracleConnection;
 
 import org.apache.commons.io.IOUtils;
@@ -15,7 +17,6 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,7 +41,7 @@ public class OracleImport extends OracleExport {
 
     //~ Instance fields --------------------------------------------------------
 
-    protected Connection targetConnection = null;
+    @Getter protected OracleConnection targetConnection = null;
     protected PreparedStatement insertUniqueTagStmnt = null;
     protected PreparedStatement insertGenericGeomStmnt = null;
     protected PreparedStatement deleteGeomStmnt = null;
@@ -70,8 +71,7 @@ public class OracleImport extends OracleExport {
         String targetJdbcDriver = null;
 
         try {
-            targetJdbcDriver = properties.getProperty("target.jdbc.driver");
-
+            targetJdbcDriver = this.properties.getProperty("target.jdbc.driver");
             if ((this.sourceJdbcDriver == null) || !targetJdbcDriver.equals(this.sourceJdbcDriver)) {
                 Class.forName(targetJdbcDriver);
             }
@@ -80,53 +80,18 @@ public class OracleImport extends OracleExport {
             throw cnfe;
         }
 
-        String targetJdbcUrl = null;
-        final String targetJdbcUsername;
-        final String targetJdbcPassword;
-        final String targetJdbcSchema;
+        final String targetJdbcUrl = properties.getProperty("target.jdbc.url");
+        final String targetJdbcUsername = properties.getProperty("target.jdbc.username");
+        final String targetJdbcPassword = properties.getProperty("target.jdbc.password");
+        final String targetJdbcSchema = properties.getProperty("target.jdbc.schema");
+        final String oracleLogProperties = this.properties.getProperty("oracle.jdbc.logging.properties");
 
-        try {
-            targetJdbcUrl = properties.getProperty("target.jdbc.url");
-            targetJdbcUsername = properties.getProperty("target.jdbc.username");
-            targetJdbcPassword = properties.getProperty("target.jdbc.password");
-            targetJdbcSchema = properties.getProperty("target.jdbc.schema");
-
-            final String oracleLogProperties = this.properties.getProperty("oracle.jdbc.logging.properties");
-            if ((oracleLogProperties != null) && !oracleLogProperties.isEmpty()) {
-                try {
-                    this.enableOracleLogging(oracleLogProperties, true);
-                    if (log.isDebugEnabled()) {
-                        log.debug("Oracle JDBC Logging is enabled");
-                    }
-                } catch (Exception ex) {
-                    log.error("could not enable oracle logging with properties file '"
-                                + oracleLogProperties + "'", ex);
-                }
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("Oracle JDBC Logging is disabled");
-                }
-            }
-            targetConnection = DriverManager.getConnection(
-                    targetJdbcUrl,
-                    targetJdbcUsername,
-                    targetJdbcPassword);
-
-            if (targetJdbcSchema != null) {
-                targetConnection.createStatement().execute("ALTER SESSION set current_schema=" + targetJdbcSchema);
-            }
-
-            targetConnection.setAutoCommit(false);
-            if (log.isDebugEnabled()) {
-                log.debug("DefaultExecuteBatch of targetConnection: "
-                            + ((OracleConnection)targetConnection).getDefaultExecuteBatch());
-            }
-
-            log.info("TARGET Connection established: " + targetJdbcUrl + "/" + targetJdbcSchema);
-        } catch (SQLException sqeex) {
-            log.error("Could not connection to target database: " + targetJdbcUrl, sqeex);
-            throw sqeex;
-        }
+        this.targetConnection = this.createConnection(
+                targetJdbcUrl,
+                targetJdbcUsername,
+                targetJdbcPassword,
+                targetJdbcSchema,
+                oracleLogProperties);
 
         // STATEMENTS ----------------------------------------------------------
         try {
@@ -154,6 +119,66 @@ public class OracleImport extends OracleExport {
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   targetJdbcUrl        DOCUMENT ME!
+     * @param   targetJdbcUsername   DOCUMENT ME!
+     * @param   targetJdbcPassword   DOCUMENT ME!
+     * @param   targetJdbcSchema     DOCUMENT ME!
+     * @param   oracleLogProperties  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  SQLException  DOCUMENT ME!
+     */
+    protected final OracleConnection createConnection(
+            final String targetJdbcUrl,
+            final String targetJdbcUsername,
+            final String targetJdbcPassword,
+            final String targetJdbcSchema,
+            final String oracleLogProperties) throws SQLException {
+        try {
+            final OracleConnection connection;
+
+            if ((oracleLogProperties != null) && !oracleLogProperties.isEmpty()) {
+                try {
+                    this.enableOracleLogging(oracleLogProperties, true);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Oracle JDBC Logging is enabled");
+                    }
+                } catch (Exception ex) {
+                    log.error("could not enable oracle logging with properties file '"
+                                + oracleLogProperties + "'", ex);
+                }
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("Oracle JDBC Logging is disabled");
+                }
+            }
+            connection = (OracleConnection)DriverManager.getConnection(
+                    targetJdbcUrl,
+                    targetJdbcUsername,
+                    targetJdbcPassword);
+
+            if (targetJdbcSchema != null) {
+                connection.createStatement().execute("ALTER SESSION set current_schema=" + targetJdbcSchema);
+            }
+
+            connection.setAutoCommit(false);
+            if (log.isDebugEnabled()) {
+                log.debug("DefaultExecuteBatch of targetConnection: "
+                            + connection.getDefaultExecuteBatch());
+            }
+
+            log.info("TARGET Connection established: " + targetJdbcUrl + "/" + targetJdbcSchema);
+            return connection;
+        } catch (SQLException sqeex) {
+            log.error("Could not connection to target database: " + properties.getProperty("target.jdbc.url"), sqeex);
+            throw sqeex;
+        }
+    }
 
     /**
      * DOCUMENT ME!
@@ -220,15 +245,6 @@ public class OracleImport extends OracleExport {
         }
 
         return generatedKey;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public final Connection getTargerConnection() {
-        return targetConnection;
     }
 
     /**

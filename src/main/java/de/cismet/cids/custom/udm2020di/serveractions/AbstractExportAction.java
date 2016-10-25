@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.cids.custom.udm2020di.serveractions;
 
+import oracle.jdbc.OracleConnection;
+
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -67,6 +69,28 @@ public abstract class AbstractExportAction extends OracleExport implements Serve
     /**
      * DOCUMENT ME!
      *
+     * @throws  SQLException  DOCUMENT ME!
+     */
+    protected synchronized void checkConnection() throws SQLException {
+        if ((this.sourceConnection == null) || (this.sourceConnection.pingDatabase() != OracleConnection.DATABASE_OK)) {
+            final String sourceJdbcUrl = properties.getProperty("source.jdbc.url");
+            final String sourceJdbcUsername = properties.getProperty("source.jdbc.username");
+            final String sourceJdbcPassword = properties.getProperty("source.jdbc.password");
+            final String sourceJdbcSchema = properties.getProperty("source.jdbc.schema");
+
+            log.warn("Oracle Connection to '" + sourceJdbcUrl + "' lost, trying to reconnect");
+
+            this.sourceConnection = createConnection(
+                    sourceJdbcUrl,
+                    sourceJdbcUsername,
+                    sourceJdbcPassword,
+                    sourceJdbcSchema);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param   resultSet  DOCUMENT ME!
      * @param   name       DOCUMENT ME!
      *
@@ -99,11 +123,11 @@ public abstract class AbstractExportAction extends OracleExport implements Serve
             }
         }
 
-        final ByteArrayOutputStream output = new ByteArrayOutputStream();
-        workbook.write(output);
-        final byte[] bytes = output.toByteArray();
-
-        output.close();
+        final byte[] bytes;
+        try(final ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            workbook.write(output);
+            bytes = output.toByteArray();
+        }
         resultSet.close();
 
         log.info((rowIndex - 1) + " resources exported from Database and written to XSLX File.");
@@ -169,11 +193,11 @@ public abstract class AbstractExportAction extends OracleExport implements Serve
                 log.debug("zipping output");
             }
             final ByteArrayOutputStream output = new ByteArrayOutputStream();
-            final ZipOutputStream zipStream = new ZipOutputStream(output);
-            zipStream.putNextEntry(new ZipEntry(name));
-            zipStream.write(csvBuilder.toString().getBytes("UTF-8"));
-            zipStream.closeEntry();
-            zipStream.close();
+            try(final ZipOutputStream zipStream = new ZipOutputStream(output)) {
+                zipStream.putNextEntry(new ZipEntry(name));
+                zipStream.write(csvBuilder.toString().getBytes("UTF-8"));
+                zipStream.closeEntry();
+            }
 
             return output.toByteArray();
         } else {

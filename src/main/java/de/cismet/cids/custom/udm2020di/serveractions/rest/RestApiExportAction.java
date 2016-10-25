@@ -363,7 +363,7 @@ public class RestApiExportAction implements RestApiCidsServerAction {
                     if (exportResult instanceof byte[]) {
                         zipStream.write((byte[])exportResult);
                     } else if (exportResult instanceof String) {
-                        zipStream.write(body.toString().getBytes("UTF-8"));
+                        zipStream.write(((String)exportResult).getBytes("UTF-8"));
                     } else {
                         final String message = "could not execute '" + this.getTaskName()
                                     + "': expected result of '" + exportTheme.getClassName()

@@ -181,6 +181,8 @@ public abstract class WaExportAction extends AbstractExportAction {
         Statement exportWaMesswerteStatement = null;
         ResultSet exportWaMesswerteResult = null;
         try {
+            this.checkConnection();
+
             Object result = null;
 
             Collection<String> messstellePks = null;

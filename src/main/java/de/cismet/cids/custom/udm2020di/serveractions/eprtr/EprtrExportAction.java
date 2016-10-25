@@ -177,6 +177,8 @@ public class EprtrExportAction extends AbstractExportAction {
         Statement exportEprtrReleaseStatement = null;
         ResultSet exportEprtrReleaseResult = null;
         try {
+            this.checkConnection();
+
             Object result = null;
 
             Collection<Long> installationPks = null;

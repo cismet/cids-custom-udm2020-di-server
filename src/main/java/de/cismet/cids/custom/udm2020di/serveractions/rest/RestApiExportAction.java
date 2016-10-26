@@ -13,6 +13,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -27,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import de.cismet.cids.custom.udm2020di.dataexport.OracleExport;
@@ -129,8 +131,8 @@ public class RestApiExportAction implements RestApiCidsServerAction {
         final ActionParameterInfo bodyDescription = new ActionParameterInfo();
         bodyDescription.setKey("datasource");
         bodyDescription.setType(Type.STRING);
-        bodyDescription.setMediaType("application/json");
-        bodyDescription.setDescription("Optional Datasource");
+        bodyDescription.setMediaType(MediaTypes.APPLICATION_ZIP);
+        bodyDescription.setDescription("Optional Datasource (zipped GeoJson Data)");
         actionInfo.setBodyDescription(bodyDescription);
 
         final ActionParameterInfo returnDescription = new ActionParameterInfo();
@@ -242,7 +244,14 @@ public class RestApiExportAction implements RestApiCidsServerAction {
         // FIXME: if server-side global datasources are used, the body parameter can be null!
         if ((exportOptions.isMergeExternalDatasource() == true) && (body == null)) {
             final String message = "could not execute '" + this.getTaskName()
-                        + "': merge datasource is true but body parameter (SHP FILE) is empty!";
+                        + "': merge datasource is true but body parameter (ZIPPED GeoJson FILE) is empty!";
+            LOGGER.error(message);
+            throw new RuntimeException(message);
+        }
+
+        if ((exportOptions.isMergeExternalDatasource() == true) && !(body instanceof byte[])) {
+            final String message = "could not execute '" + this.getTaskName()
+                        + "': merge datasource is true but body parameter (ZIPPED GeoJson FILE) is not of type byte[]!";
             LOGGER.error(message);
             throw new RuntimeException(message);
         }
@@ -265,6 +274,20 @@ public class RestApiExportAction implements RestApiCidsServerAction {
                         + "' for " + exportOptions.getExportThemes().size()
                         + " themes and merge with external datasource: "
                         + exportOptions.isMergeExternalDatasource());
+        }
+
+        if (exportOptions.isMergeExternalDatasource() == true) {
+            final ByteArrayInputStream bodyInputStream = new ByteArrayInputStream((byte[])body);
+            try(final ZipInputStream zipInputStream = new ZipInputStream(bodyInputStream)) {
+                final ZipEntry zipEntry = zipInputStream.getNextEntry();
+                LOGGER.info("reading zip entry: " + zipEntry.getName());
+            } catch (IOException ex) {
+                final String message = "could not execute '" + this.getTaskName()
+                            + "': could process zip file from body parameter: "
+                            + ex.getMessage();
+                LOGGER.error(message);
+                throw new RuntimeException(message);
+            }
         }
 
         // TODO: use thread to parallelise multiple exports

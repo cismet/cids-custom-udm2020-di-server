@@ -65,8 +65,6 @@ import static de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction
 import static de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction.PARAM_INTERNAL;
 import static de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction.PARAM_NAME;
 import static de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction.PARAM_PARAMETER;
-import org.geotools.referencing.CRS;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * DOCUMENT ME!
@@ -301,6 +299,18 @@ public class RestApiExportAction implements RestApiCidsServerAction {
         // TODO: use thread to parallelise multiple exports
         int i = 1;
         for (final ExportTheme exportTheme : exportOptions.getExportThemes()) {
+            
+            if(exportOptions.isMergeExternalDatasource() == true) {
+                if(exportTheme.getExportDatasource() == null) {
+                    final String message = "could not execute '" + this.getTaskName()
+                            + "': export data source of '" + exportTheme.getTitle() + "' is null!";
+                    LOGGER.error(message);
+                }
+                
+                
+            
+           }
+            
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("executing parallel export '" + exportTheme.getTitle() + "' #"
                             + i + "/" + exportOptions.getExportThemes().size());
@@ -356,9 +366,39 @@ public class RestApiExportAction implements RestApiCidsServerAction {
             LOGGER.error(message);
             throw new RuntimeException(message);
         }
+        
+        
 
-        /*if(exportOptions.isMergeExternalDatasource()) {
-         *      //TODO: implement merging with external datasource } else {*/
+        if(exportOptions.isMergeExternalDatasource()) {
+            for (final ExportTheme exportTheme : exportResults.keySet()) {
+                try {
+                    final Object exportResult = exportResults.get(exportTheme).get();
+                    final String extension =
+                            AbstractExportAction.PARAM_EXPORTFORMAT_SHP.equals(EXPORT_FORMATS.get(
+                                    exportTheme.getExportFormat())) ? "zip" : exportTheme.getExportFormat();
+                    
+                    
+                    
+                   
+                } catch (InterruptedException ex) {
+                   
+                } catch (ExecutionException ex) {
+                    
+                }
+                    
+
+                    
+                    }
+
+                    
+                
+            
+            
+            return null;
+            
+            
+            
+        } else {
         // one already zipped SHP File exported
         if ((exportResults.size() == 1)) {
             try {
@@ -447,6 +487,7 @@ public class RestApiExportAction implements RestApiCidsServerAction {
                         + " themes in " + ((System.currentTimeMillis() - current) / 1000) + "s.");
 
             return new GenericResourceWithContentType(MediaTypes.APPLICATION_ZIP, result);
+        }
         }
     }
 
@@ -555,6 +596,8 @@ public class RestApiExportAction implements RestApiCidsServerAction {
     public String getTaskName() {
         return TASK_NAME;
     }
+    
+    
 
     /**
      * DOCUMENT ME!
@@ -574,54 +617,11 @@ public class RestApiExportAction implements RestApiCidsServerAction {
                 "ALL,Remote");
 
             PropertyConfigurator.configure(log4jProperties);
-            
-            
+
             final String exportOptionsJson = IOUtils.toString(RestApiExportAction.class.getResourceAsStream(
                         "/de/cismet/cids/custom/udm2020di/dataexport/rest/exportOptions.json"),
                     "UTF-8");
             
-
-            /*final String GCS_WGS_1984 = IOUtils.toString(RestApiExportAction.class.getResourceAsStream(
-                        "/de/cismet/cids/custom/udm2020di/dataexport/GCS_WGS_1984.prj"),
-                    "UTF-8");
-            final String MGI_Austria_Lambert = IOUtils.toString(RestApiExportAction.class.getResourceAsStream(
-                        "/de/cismet/cids/custom/udm2020di/dataexport/MGI_Austria_Lambert.prj"),
-                    "UTF-8");
-            
-            final CoordinateReferenceSystem GCS_WGS_1984_crs = CRS.parseWKT(GCS_WGS_1984); 
-            final CoordinateReferenceSystem MGI_Austria_Lambert_crs = CRS.parseWKT(MGI_Austria_Lambert); 
-            
-            //System.out.println("GCS_WGS_1984 CRS = " + CRS.lookupEpsgCode(GCS_WGS_1984_crs, true));
-            System.out.println("GCS_WGS_1984 CRS = " + CRS.lookupIdentifier(GCS_WGS_1984_crs, true));
-            //System.out.println("MGI_Austria_Lambert CRS = " + CRS.lookupEpsgCode(MGI_Austria_Lambert_crs, true));
-            System.out.println("MGI_Austria_Lambert CRS = " + CRS.lookupIdentifier(MGI_Austria_Lambert_crs, true));*/
-            
-            System.out.println("Bessel_1841_Lambert_Conformal_Conic = " + CRS.lookupIdentifier(CRS.parseWKT("PROJCS[\"Bessel_1841_Lambert_Conformal_Conic\",GEOGCS[\"GCS_Bessel_1841\",DATUM[\"D_Bessel_1841\",SPHEROID[\"Bessel_1841\",6377397.155,299.1528128]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Lambert_Conformal_Conic\"],PARAMETER[\"False_Easting\",400000.0],PARAMETER[\"False_Northing\",400000.0],PARAMETER[\"Central_Meridian\",13.33333333333333],PARAMETER[\"Standard_Parallel_1\",46.0],PARAMETER[\"Standard_Parallel_2\",49.0],PARAMETER[\"Latitude_Of_Origin\",47.5],UNIT[\"Meter\",1.0]]"), false));
-            System.out.println("LAM_CC_4730_AUT = " + CRS.lookupIdentifier(CRS.parseWKT("PROJCS[\"LAM_CC_4730_AUT\",GEOGCS[\"GCS_MGI\",DATUM[\"D_MGI\",SPHEROID[\"Bessel_1841\",6377397.155,299.1528128]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Lambert_Conformal_Conic\"],PARAMETER[\"False_Easting\",400000.0],PARAMETER[\"False_Northing\",400000.0],PARAMETER[\"Central_Meridian\",13.33333333333333],PARAMETER[\"Standard_Parallel_1\",46.0],PARAMETER[\"Standard_Parallel_2\",49.0],PARAMETER[\"Scale_Factor\",1.0],PARAMETER[\"Latitude_Of_Origin\",47.5],UNIT[\"Meter\",1.0]]"), false));
-            System.out.println("LAMBERT = " + CRS.lookupIdentifier(CRS.parseWKT("PROJCS[\"LAMBERT\",GEOGCS[\"GCS_MGI\",DATUM[\"D_MGI\",SPHEROID[\"Bessel_1841\",6377397.155,299.1528128]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Lambert_Conformal_Conic\"],PARAMETER[\"False_Easting\",400000.0],PARAMETER[\"False_Northing\",400000.0],PARAMETER[\"Central_Meridian\",13.33333333333333],PARAMETER[\"Standard_Parallel_1\",46.0],PARAMETER[\"Standard_Parallel_2\",49.0],PARAMETER[\"Scale_Factor\",1.0],PARAMETER[\"Latitude_Of_Origin\",47.5],UNIT[\"Meter\",1.0]]"), false));
-            System.out.println("Austria Lambert = " + CRS.lookupIdentifier(CRS.parseWKT("PROJCS[\"MGI / Austria Lambert\", GEOGCS[\"MGI\", DATUM[\"Militar-Geographische Institut\", SPHEROID[\"Bessel 1841\", 6377397.155, 299.1528128, AUTHORITY[\"EPSG\",\"7004\"]], TOWGS84[601.705, 84.263, 485.227, 4.7354, -1.3145, -5.393, -2.3887], AUTHORITY[\"EPSG\",\"6312\"]], PRIMEM[\"Greenwich\", 0.0, AUTHORITY[\"EPSG\",\"8901\"]], UNIT[\"degree\", 0.017453292519943295], AXIS[\"Geodetic longitude\", EAST], AXIS[\"Geodetic latitude\", NORTH], AUTHORITY[\"EPSG\",\"4312\"]], PROJECTION[\"Lambert_Conformal_Conic_2SP\"], PARAMETER[\"central_meridian\", 13.333333333333334], PARAMETER[\"latitude_of_origin\", 47.5], PARAMETER[\"standard_parallel_1\", 49.0], PARAMETER[\"false_easting\", 400000.0], PARAMETER[\"false_northing\", 400000.0], PARAMETER[\"scale_factor\", 1.0], PARAMETER[\"standard_parallel_2\", 46.0], UNIT[\"m\", 1.0], AXIS[\"Easting\", EAST], AXIS[\"Northing\", NORTH], AUTHORITY[\"EPSG\",\"31287\"]]"), false));
-            System.out.println("GCS_WGS_1984 = " + CRS.lookupIdentifier(CRS.parseWKT("GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]]"), true));
-            System.out.println("MGI_Austria_Lambert = " + CRS.lookupIdentifier(CRS.parseWKT("PROJCS[\"MGI_Austria_Lambert\",GEOGCS[\"GCS_MGI\",DATUM[\"D_MGI\",SPHEROID[\"Bessel_1841\",6377397.155,299.1528128]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Lambert_Conformal_Conic\"],PARAMETER[\"standard_parallel_1\",49],PARAMETER[\"standard_parallel_2\",46],PARAMETER[\"latitude_of_origin\",47.5],PARAMETER[\"central_meridian\",13.33333333333333],PARAMETER[\"false_easting\",400000],PARAMETER[\"false_northing\",400000],UNIT[\"Meter\",1]]"), false));
-            System.out.println("MGI = " + CRS.lookupIdentifier(CRS.parseWKT("PROJCS[\"MGI / Austria Lambert\",\n" +
-                "  BASEGEODCRS[\"MGI\",\n" +
-                "    DATUM[\"Militar-Geographische Institut\",\n" +
-                "      ELLIPSOID[\"Bessel 1841\",6377397.155,299.1528128,LENGTHUNIT[\"metre\",1.0]]]],\n" +
-                "  CONVERSION[\"Austria Lambert\",\n" +
-                "    METHOD[\"Lambert Conic Conformal (2SP)\",ID[\"EPSG\",9802]],\n" +
-                "    PARAMETER[\"Latitude of false origin\",47.5,ANGLEUNIT[\"degree\",0.01745329252]],\n" +
-                "    PARAMETER[\"Longitude of false origin\",13.333333333333,ANGLEUNIT[\"degree\",0.01745329252]],\n" +
-                "    PARAMETER[\"Latitude of 1st standard parallel\",49,ANGLEUNIT[\"degree\",0.01745329252]],\n" +
-                "    PARAMETER[\"Latitude of 2nd standard parallel\",46,ANGLEUNIT[\"degree\",0.01745329252]],\n" +
-                "    PARAMETER[\"Easting at false origin\",400000,LENGTHUNIT[\"metre\",1.0]],\n" +
-                "    PARAMETER[\"Northing at false origin\",400000,LENGTHUNIT[\"metre\",1.0]]],\n" +
-                "  CS[cartesian,2],\n" +
-                "    AXIS[\"northing (X)\",north,ORDER[1]],\n" +
-                "    AXIS[\"easting (Y)\",east,ORDER[2]],\n" +
-                "    LENGTHUNIT[\"metre\",1.0],\n" +
-                "  ID[\"EPSG\",31287]]"), false));
-
-            System.exit(0);
-
             final ServerActionParameter[] serverActionParameters = new ServerActionParameter[] {
                     new ServerActionParameter<String>(PARAM_EXPORT_OPTIONS, exportOptionsJson)
                 };

@@ -9,9 +9,11 @@ package de.cismet.cids.custom.udm2020di.serveractions.rest;
 
 import com.fasterxml.jackson.databind.ObjectReader;
 
+
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -24,9 +26,15 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -57,6 +65,8 @@ import static de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction
 import static de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction.PARAM_INTERNAL;
 import static de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction.PARAM_NAME;
 import static de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction.PARAM_PARAMETER;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * DOCUMENT ME!
@@ -100,6 +110,8 @@ public class RestApiExportAction implements RestApiCidsServerAction {
     private final ActionInfo actionInfo;
 
     private final HashMap<String, AbstractExportAction> exportActions = new HashMap<String, AbstractExportAction>();
+
+    private final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
     //~ Constructors -----------------------------------------------------------
 
@@ -175,7 +187,8 @@ public class RestApiExportAction implements RestApiCidsServerAction {
         final ServerActionParameter exportOptionsParameter;
         final String exportOptionsJson;
         final ExportOptions exportOptions;
-        final HashMap<ExportTheme, Object> exportResults = new HashMap<ExportTheme, Object>();
+        final LinkedHashMap<ExportTheme, Future<Object>> exportResults =
+            new LinkedHashMap<ExportTheme, Future<Object>>();
 
         if (params.length == 0) {
             final String message = "could not execute '" + this.getTaskName()
@@ -286,9 +299,14 @@ public class RestApiExportAction implements RestApiCidsServerAction {
         }
 
         // TODO: use thread to parallelise multiple exports
+        int i = 1;
         for (final ExportTheme exportTheme : exportOptions.getExportThemes()) {
-            final AbstractExportAction exportAction = this.exportActions.get(exportTheme.getClassName());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("executing parallel export '" + exportTheme.getTitle() + "' #"
+                            + i + "/" + exportOptions.getExportThemes().size());
+            }
 
+            final AbstractExportAction exportAction = this.exportActions.get(exportTheme.getClassName());
             if (exportAction == null) {
                 final String message = "could not execute '" + this.getTaskName()
                             + "': legacy ExportAction not found: unsupported export theme '"
@@ -312,9 +330,18 @@ public class RestApiExportAction implements RestApiCidsServerAction {
                 throw new RuntimeException(message);
             }
 
-            // execute the legacy export .........
-            final Object exportResult = exportAction.execute(null, serverActionParameters);
-            exportResults.put(exportTheme, exportResult);
+            final Future<Object> exportResultFuture = executorService.submit(new Callable<Object>() {
+
+                        @Override
+                        public Object call() {
+                            // execute the legacy export .........
+                            final Object exportResult = exportAction.execute(null, serverActionParameters);
+                            return exportResult;
+                        }
+                    });
+
+            exportResults.put(exportTheme, exportResultFuture);
+            i++;
         }
 
         if (exportResults.isEmpty()) {
@@ -334,44 +361,51 @@ public class RestApiExportAction implements RestApiCidsServerAction {
          *      //TODO: implement merging with external datasource } else {*/
         // one already zipped SHP File exported
         if ((exportResults.size() == 1)) {
-            final Object exportResult = exportResults.values().iterator().next();
-            final String contentType;
+            try {
+                final Object exportResult = exportResults.values().iterator().next().get();
+                final String contentType;
 
-            if ("csv".equalsIgnoreCase(exportOptions.getExportFormat())) {
-                if (!(exportResult instanceof String)) {
+                if ("csv".equalsIgnoreCase(exportOptions.getExportFormat())) {
+                    if (!(exportResult instanceof String)) {
+                        final String message = "could not execute '" + this.getTaskName()
+                                    + "': expected result (" + exportOptions.getExportFormat() + ") of '"
+                                    + exportResults.keySet().iterator().next().getClassName()
+                                    + "' is not of type String: " + exportResult.getClass().getSimpleName();
+                        LOGGER.error(message);
+                        throw new RuntimeException(message);
+                    }
+                } else if (!(exportResult instanceof byte[])) {
                     final String message = "could not execute '" + this.getTaskName()
                                 + "': expected result (" + exportOptions.getExportFormat() + ") of '"
                                 + exportResults.keySet().iterator().next().getClassName()
-                                + "' is not of type String: " + exportResult.getClass().getSimpleName();
+                                + "' is not of type byte[]: " + exportResult.getClass().getSimpleName();
                     LOGGER.error(message);
                     throw new RuntimeException(message);
                 }
-            } else if (!(exportResult instanceof byte[])) {
-                final String message = "could not execute '" + this.getTaskName()
-                            + "': expected result (" + exportOptions.getExportFormat() + ") of '"
-                            + exportResults.keySet().iterator().next().getClassName()
-                            + "' is not of type byte[]: " + exportResult.getClass().getSimpleName();
-                LOGGER.error(message);
-                throw new RuntimeException(message);
-            }
 
-            contentType = CONTENT_TYPES.get(EXPORT_FORMATS.get(exportOptions.getExportFormat()));
-            if (contentType == null) {
-                final String message = "could not execute '" + this.getTaskName()
-                            + "': contant type of result (" + exportOptions.getExportFormat() + ") not found!";
-                LOGGER.error(message);
-                throw new RuntimeException(message);
-            }
+                contentType = CONTENT_TYPES.get(EXPORT_FORMATS.get(exportOptions.getExportFormat()));
+                if (contentType == null) {
+                    final String message = "could not execute '" + this.getTaskName()
+                                + "': contant type of result (" + exportOptions.getExportFormat() + ") not found!";
+                    LOGGER.error(message);
+                    throw new RuntimeException(message);
+                }
 
-            LOGGER.info("Export successfully performed for " + exportOptions.getExportThemes()
-                        + " themes to '" + MediaTypes.APPLICATION_ZIP
-                        + "' in " + ((System.currentTimeMillis() - current) / 1000) + "s.");
-            return new GenericResourceWithContentType(contentType, exportResult);
+                LOGGER.info("Export successfully performed for " + exportOptions.getExportThemes()
+                            + " themes to '" + MediaTypes.APPLICATION_ZIP
+                            + "' in " + ((System.currentTimeMillis() - current) / 1000) + "s.");
+                return new GenericResourceWithContentType(contentType, exportResult);
+            } catch (final InterruptedException | ExecutionException ex) {
+                final String message = "could not execute '" + this.getTaskName()
+                            + "': error during thread execution: " + ex.getMessage();
+                LOGGER.error(message, ex);
+                throw new RuntimeException(message, ex);
+            }
         } else {
             final ByteArrayOutputStream combinedExportResults = new ByteArrayOutputStream();
             try(final ZipOutputStream zipStream = new ZipOutputStream(combinedExportResults)) {
                 for (final ExportTheme exportTheme : exportResults.keySet()) {
-                    final Object exportResult = exportResults.get(exportTheme);
+                    final Object exportResult = exportResults.get(exportTheme).get();
                     final String extension =
                         AbstractExportAction.PARAM_EXPORTFORMAT_SHP.equals(EXPORT_FORMATS.get(
                                 exportTheme.getExportFormat())) ? "zip" : exportTheme.getExportFormat();
@@ -400,6 +434,11 @@ public class RestApiExportAction implements RestApiCidsServerAction {
                             + "': error during zipping combined results: " + ioex.getMessage();
                 LOGGER.error(message, ioex);
                 throw new RuntimeException(message, ioex);
+            } catch (final InterruptedException | ExecutionException ex) {
+                final String message = "could not execute '" + this.getTaskName()
+                            + "': error during thread execution: " + ex.getMessage();
+                LOGGER.error(message, ex);
+                throw new RuntimeException(message, ex);
             }
 
             final byte[] result = combinedExportResults.toByteArray();
@@ -535,10 +574,53 @@ public class RestApiExportAction implements RestApiCidsServerAction {
                 "ALL,Remote");
 
             PropertyConfigurator.configure(log4jProperties);
-
+            
+            
             final String exportOptionsJson = IOUtils.toString(RestApiExportAction.class.getResourceAsStream(
                         "/de/cismet/cids/custom/udm2020di/dataexport/rest/exportOptions.json"),
                     "UTF-8");
+            
+
+            /*final String GCS_WGS_1984 = IOUtils.toString(RestApiExportAction.class.getResourceAsStream(
+                        "/de/cismet/cids/custom/udm2020di/dataexport/GCS_WGS_1984.prj"),
+                    "UTF-8");
+            final String MGI_Austria_Lambert = IOUtils.toString(RestApiExportAction.class.getResourceAsStream(
+                        "/de/cismet/cids/custom/udm2020di/dataexport/MGI_Austria_Lambert.prj"),
+                    "UTF-8");
+            
+            final CoordinateReferenceSystem GCS_WGS_1984_crs = CRS.parseWKT(GCS_WGS_1984); 
+            final CoordinateReferenceSystem MGI_Austria_Lambert_crs = CRS.parseWKT(MGI_Austria_Lambert); 
+            
+            //System.out.println("GCS_WGS_1984 CRS = " + CRS.lookupEpsgCode(GCS_WGS_1984_crs, true));
+            System.out.println("GCS_WGS_1984 CRS = " + CRS.lookupIdentifier(GCS_WGS_1984_crs, true));
+            //System.out.println("MGI_Austria_Lambert CRS = " + CRS.lookupEpsgCode(MGI_Austria_Lambert_crs, true));
+            System.out.println("MGI_Austria_Lambert CRS = " + CRS.lookupIdentifier(MGI_Austria_Lambert_crs, true));*/
+            
+            System.out.println("Bessel_1841_Lambert_Conformal_Conic = " + CRS.lookupIdentifier(CRS.parseWKT("PROJCS[\"Bessel_1841_Lambert_Conformal_Conic\",GEOGCS[\"GCS_Bessel_1841\",DATUM[\"D_Bessel_1841\",SPHEROID[\"Bessel_1841\",6377397.155,299.1528128]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Lambert_Conformal_Conic\"],PARAMETER[\"False_Easting\",400000.0],PARAMETER[\"False_Northing\",400000.0],PARAMETER[\"Central_Meridian\",13.33333333333333],PARAMETER[\"Standard_Parallel_1\",46.0],PARAMETER[\"Standard_Parallel_2\",49.0],PARAMETER[\"Latitude_Of_Origin\",47.5],UNIT[\"Meter\",1.0]]"), false));
+            System.out.println("LAM_CC_4730_AUT = " + CRS.lookupIdentifier(CRS.parseWKT("PROJCS[\"LAM_CC_4730_AUT\",GEOGCS[\"GCS_MGI\",DATUM[\"D_MGI\",SPHEROID[\"Bessel_1841\",6377397.155,299.1528128]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Lambert_Conformal_Conic\"],PARAMETER[\"False_Easting\",400000.0],PARAMETER[\"False_Northing\",400000.0],PARAMETER[\"Central_Meridian\",13.33333333333333],PARAMETER[\"Standard_Parallel_1\",46.0],PARAMETER[\"Standard_Parallel_2\",49.0],PARAMETER[\"Scale_Factor\",1.0],PARAMETER[\"Latitude_Of_Origin\",47.5],UNIT[\"Meter\",1.0]]"), false));
+            System.out.println("LAMBERT = " + CRS.lookupIdentifier(CRS.parseWKT("PROJCS[\"LAMBERT\",GEOGCS[\"GCS_MGI\",DATUM[\"D_MGI\",SPHEROID[\"Bessel_1841\",6377397.155,299.1528128]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Lambert_Conformal_Conic\"],PARAMETER[\"False_Easting\",400000.0],PARAMETER[\"False_Northing\",400000.0],PARAMETER[\"Central_Meridian\",13.33333333333333],PARAMETER[\"Standard_Parallel_1\",46.0],PARAMETER[\"Standard_Parallel_2\",49.0],PARAMETER[\"Scale_Factor\",1.0],PARAMETER[\"Latitude_Of_Origin\",47.5],UNIT[\"Meter\",1.0]]"), false));
+            System.out.println("Austria Lambert = " + CRS.lookupIdentifier(CRS.parseWKT("PROJCS[\"MGI / Austria Lambert\", GEOGCS[\"MGI\", DATUM[\"Militar-Geographische Institut\", SPHEROID[\"Bessel 1841\", 6377397.155, 299.1528128, AUTHORITY[\"EPSG\",\"7004\"]], TOWGS84[601.705, 84.263, 485.227, 4.7354, -1.3145, -5.393, -2.3887], AUTHORITY[\"EPSG\",\"6312\"]], PRIMEM[\"Greenwich\", 0.0, AUTHORITY[\"EPSG\",\"8901\"]], UNIT[\"degree\", 0.017453292519943295], AXIS[\"Geodetic longitude\", EAST], AXIS[\"Geodetic latitude\", NORTH], AUTHORITY[\"EPSG\",\"4312\"]], PROJECTION[\"Lambert_Conformal_Conic_2SP\"], PARAMETER[\"central_meridian\", 13.333333333333334], PARAMETER[\"latitude_of_origin\", 47.5], PARAMETER[\"standard_parallel_1\", 49.0], PARAMETER[\"false_easting\", 400000.0], PARAMETER[\"false_northing\", 400000.0], PARAMETER[\"scale_factor\", 1.0], PARAMETER[\"standard_parallel_2\", 46.0], UNIT[\"m\", 1.0], AXIS[\"Easting\", EAST], AXIS[\"Northing\", NORTH], AUTHORITY[\"EPSG\",\"31287\"]]"), false));
+            System.out.println("GCS_WGS_1984 = " + CRS.lookupIdentifier(CRS.parseWKT("GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]]"), true));
+            System.out.println("MGI_Austria_Lambert = " + CRS.lookupIdentifier(CRS.parseWKT("PROJCS[\"MGI_Austria_Lambert\",GEOGCS[\"GCS_MGI\",DATUM[\"D_MGI\",SPHEROID[\"Bessel_1841\",6377397.155,299.1528128]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Lambert_Conformal_Conic\"],PARAMETER[\"standard_parallel_1\",49],PARAMETER[\"standard_parallel_2\",46],PARAMETER[\"latitude_of_origin\",47.5],PARAMETER[\"central_meridian\",13.33333333333333],PARAMETER[\"false_easting\",400000],PARAMETER[\"false_northing\",400000],UNIT[\"Meter\",1]]"), false));
+            System.out.println("MGI = " + CRS.lookupIdentifier(CRS.parseWKT("PROJCS[\"MGI / Austria Lambert\",\n" +
+                "  BASEGEODCRS[\"MGI\",\n" +
+                "    DATUM[\"Militar-Geographische Institut\",\n" +
+                "      ELLIPSOID[\"Bessel 1841\",6377397.155,299.1528128,LENGTHUNIT[\"metre\",1.0]]]],\n" +
+                "  CONVERSION[\"Austria Lambert\",\n" +
+                "    METHOD[\"Lambert Conic Conformal (2SP)\",ID[\"EPSG\",9802]],\n" +
+                "    PARAMETER[\"Latitude of false origin\",47.5,ANGLEUNIT[\"degree\",0.01745329252]],\n" +
+                "    PARAMETER[\"Longitude of false origin\",13.333333333333,ANGLEUNIT[\"degree\",0.01745329252]],\n" +
+                "    PARAMETER[\"Latitude of 1st standard parallel\",49,ANGLEUNIT[\"degree\",0.01745329252]],\n" +
+                "    PARAMETER[\"Latitude of 2nd standard parallel\",46,ANGLEUNIT[\"degree\",0.01745329252]],\n" +
+                "    PARAMETER[\"Easting at false origin\",400000,LENGTHUNIT[\"metre\",1.0]],\n" +
+                "    PARAMETER[\"Northing at false origin\",400000,LENGTHUNIT[\"metre\",1.0]]],\n" +
+                "  CS[cartesian,2],\n" +
+                "    AXIS[\"northing (X)\",north,ORDER[1]],\n" +
+                "    AXIS[\"easting (Y)\",east,ORDER[2]],\n" +
+                "    LENGTHUNIT[\"metre\",1.0],\n" +
+                "  ID[\"EPSG\",31287]]"), false));
+
+            System.exit(0);
 
             final ServerActionParameter[] serverActionParameters = new ServerActionParameter[] {
                     new ServerActionParameter<String>(PARAM_EXPORT_OPTIONS, exportOptionsJson)
@@ -553,7 +635,7 @@ public class RestApiExportAction implements RestApiCidsServerAction {
                         + file.toAbsolutePath().toString());
             System.exit(0);
         } catch (Throwable ex) {
-            Logger.getLogger(RestApiExportAction.class).fatal(ex.getMessage(), ex);
+            RestApiExportAction.LOGGER.fatal(ex.getMessage(), ex);
             System.exit(1);
         }
     }

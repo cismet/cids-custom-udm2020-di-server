@@ -238,8 +238,9 @@ public class RestApiExportAction implements RestApiCidsServerAction {
 
         // deserialize EXPORT OPTIONS
         exportOptionsJson = (String)exportOptionsParameter.getValue();
-        /*if (LOGGER.isDebugEnabled()) {
-         *  LOGGER.debug(exportOptionsJson);}*/
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(exportOptionsJson);
+        }
         try {
             exportOptions = (ExportOptions)EXPORT_OPTIONS_READER.readValue(exportOptionsJson);
         } catch (IOException ex) {
@@ -718,6 +719,8 @@ public class RestApiExportAction implements RestApiCidsServerAction {
             final String exportOptionsJson = IOUtils.toString(RestApiExportAction.class.getResourceAsStream(
                         "/de/cismet/cids/custom/udm2020di/dataexport/rest/exportOptions.json"),
                     "UTF-8");
+            final byte[] geoJson = IOUtils.toByteArray(RestApiExportAction.class.getResourceAsStream(
+                        "/de/cismet/cids/custom/udm2020di/dataexport/rest/FAO_Bodentypen.zip"));
 
             final ServerActionParameter[] serverActionParameters = new ServerActionParameter[] {
                     new ServerActionParameter<String>(PARAM_EXPORT_OPTIONS, exportOptionsJson)
@@ -725,7 +728,7 @@ public class RestApiExportAction implements RestApiCidsServerAction {
 
             final RestApiExportAction exportAction = new RestApiExportAction();
 
-            final GenericResourceWithContentType result = exportAction.execute("DUMMY OBJECT", serverActionParameters);
+            final GenericResourceWithContentType result = exportAction.execute(geoJson, serverActionParameters);
             final Path file = Files.write(Paths.get("restApiExport.zip"), (byte[])result.getRes());
 
             System.out.println("Export File written to "

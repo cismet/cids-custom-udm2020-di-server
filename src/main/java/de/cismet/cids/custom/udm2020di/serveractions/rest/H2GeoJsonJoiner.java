@@ -125,12 +125,11 @@ public class H2GeoJsonJoiner {
                     + this.mergeCrs);
 
         this.initDatabase(exportConnection);
-        final String exportDataTable = importGeoJsonFileToDb(
+        final String exportDataTable = importShpFileToDb(
                 exportConnection,
-                exportDataShape.getAbsolutePath(),
-                mergeCrs,
-                exportCrs);
-        final String smuDataTable = importGeoJsonFileToDb(
+                exportDataShape.getAbsolutePath());
+
+        final String mergeDataTable = importGeoJsonFileToDb(
                 exportConnection,
                 mergeGeoJson.getAbsolutePath(),
                 mergeCrs,
@@ -138,7 +137,7 @@ public class H2GeoJsonJoiner {
         final StatementWrapper st = createStatement(exportConnection);
 
         String query = QUERY.replace("%EXPORT_TABLE%", exportDataTable);
-        query = query.replace("%MERGE_TABLE%", smuDataTable);
+        query = query.replace("%MERGE_TABLE%", mergeDataTable);
 
         final StringBuilder mergeParameterBuilder = new StringBuilder();
         final Iterator<Parameter> mergeParameterIterator = this.mergeParameters.iterator();
@@ -207,6 +206,33 @@ public class H2GeoJsonJoiner {
                 update = update.replace("%EXPORT_SRID%", String.valueOf(exportSrid));
                 statementWrapper.execute(update);
             }
+        }
+
+        createSpatialIndex("the_geom", table);
+
+        return table;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   connectionWrapper  DOCUMENT ME!
+     * @param   shpFile            DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  SQLException  DOCUMENT ME!
+     */
+    private String importShpFileToDb(
+            final ConnectionWrapper connectionWrapper,
+            final String shpFile) throws SQLException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("importing Shape File for merging: '" + shpFile + "'.");
+        }
+
+        final String table = TABLE_NAME + "_" + (++tableCount);
+        try(final StatementWrapper statementWrapper = createStatement(connectionWrapper)) {
+            statementWrapper.execute("CALL FILE_TABLE('" + shpFile + "', '" + table + "');");
         }
 
         createSpatialIndex("the_geom", table);

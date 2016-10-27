@@ -241,7 +241,8 @@ public class MossExportAction extends AbstractExportAction {
                                     + "returning null");
                     }
                 } else if ((objectIds != null)) {
-                    log.info("performing '" + TASK_NAME + "' for " + objectIds.size()
+                    log.info("performing " + ((isInternal == true) ? "INTERNAL '" : "'") + TASK_NAME + "' for "
+                                + objectIds.size()
                                 + " MOSS Objects and " + parameters.size() + " parameters to '"
                                 + name + "' (" + exportFormat + ")");
 

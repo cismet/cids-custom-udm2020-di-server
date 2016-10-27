@@ -33,6 +33,8 @@ import java.util.zip.ZipInputStream;
 
 import de.cismet.cids.custom.udm2020di.types.Parameter;
 
+import de.cismet.tools.FileUtils;
+
 /**
  * DOCUMENT ME!
  *
@@ -95,8 +97,8 @@ public class H2GeoJsonJoiner {
         this.mergeParameters = mergeParameters;
         this.dbPath = createTempDirectory().getAbsolutePath();
         this.exportConnection = getDBConnection(dbPath + "/" + DB_NAME);
-        this.exportDataShape = getUnzippedGeojsonFileFromByteArray(exportData);
-        this.mergeGeoJson = getUnzippedGeojsonFileFromByteArray(mergeData);
+        this.exportDataShape = getUnzippedFileFromByteArray(exportData, "shp");
+        this.mergeGeoJson = getUnzippedFileFromByteArray(mergeData, "geojson");
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -119,7 +121,7 @@ public class H2GeoJsonJoiner {
             throw new RuntimeException(message);
         }
 
-        LOG.info("mering Shape file '" + exportDataShape.getName() + "' (EPSG:"
+        LOG.info("merging Shape file '" + exportDataShape.getName() + "' (EPSG:"
                     + this.exportCrs + ") with " + this.mergeParameters.size()
                     + "' properties of GeoJSON file '" + mergeGeoJson.getName() + "' (EPSG:"
                     + this.mergeCrs);
@@ -144,8 +146,8 @@ public class H2GeoJsonJoiner {
         while (mergeParameterIterator.hasNext()) {
             final Parameter parameter = mergeParameterIterator.next();
 
-            mergeParameterBuilder.append('\'').append(parameter.getParameterName()).append('\'');
-            mergeParameterBuilder.append(" AS \'").append(parameter.getParameterName()).append('\'');
+            mergeParameterBuilder.append("merge.").append(parameter.getParameterName());
+            // mergeParameterBuilder.append(" AS \'").append(parameter.getParameterName()).append('\'');
             if (mergeParameterIterator.hasNext()) {
                 mergeParameterBuilder.append(',');
             }
@@ -156,9 +158,8 @@ public class H2GeoJsonJoiner {
             LOG.debug(query);
         }
 
-        try(final ResultSet rs = st.executeQuery(query)) {
-            return rs;
-        }
+        final ResultSet rs = st.executeQuery(query);
+        return rs;
     }
 
     /**
@@ -183,7 +184,7 @@ public class H2GeoJsonJoiner {
      * @param   mergeSrid          DOCUMENT ME!
      * @param   exportSrid         DOCUMENT ME!
      *
-     * @return  the name of the table, that contains the given shape file
+     * @return  the name of the table, that contains the given geojson file
      *
      * @throws  SQLException  DOCUMENT ME!
      */
@@ -201,6 +202,8 @@ public class H2GeoJsonJoiner {
             statementWrapper.execute("CALL GeoJsonRead('" + geojsonFile + "', '" + table + "');");
 
             if (mergeSrid != exportSrid) {
+                LOG.warn("transforming geoJson merge SRID '" + mergeSrid + "' to SHape EXPORT SRID '" + exportSrid
+                            + "'");
                 String update = TRANSFORM.replace("%TABLE_NAME%", table);
                 update = update.replace("%MERGE_SRID%", String.valueOf(mergeSrid));
                 update = update.replace("%EXPORT_SRID%", String.valueOf(exportSrid));
@@ -232,7 +235,7 @@ public class H2GeoJsonJoiner {
 
         final String table = TABLE_NAME + "_" + (++tableCount);
         try(final StatementWrapper statementWrapper = createStatement(connectionWrapper)) {
-            statementWrapper.execute("CALL FILE_TABLE('" + shpFile + "', '" + table + "');");
+            statementWrapper.execute("CALL SHPREAD('" + shpFile + "', '" + table + "');");
         }
 
         createSpatialIndex("the_geom", table);
@@ -264,13 +267,14 @@ public class H2GeoJsonJoiner {
     /**
      * Unzips the zip file in the given byte array.
      *
-     * @param   array  DOCUMENT ME!
+     * @param   array      DOCUMENT ME!
+     * @param   extension  DOCUMENT ME!
      *
      * @return  the unzipped shape file
      *
      * @throws  IOException  DOCUMENT ME!
      */
-    private File getUnzippedGeojsonFileFromByteArray(final byte[] array) throws IOException {
+    private File getUnzippedFileFromByteArray(final byte[] array, final String extension) throws IOException {
         try(final ZipInputStream zstream = new ZipInputStream(new ByteArrayInputStream(array))) {
             ZipEntry entry;
             final byte[] tmp = new byte[256];
@@ -290,13 +294,18 @@ public class H2GeoJsonJoiner {
                 }
             }
 
-            final File[] unzippedShpFiles = directory.listFiles();
+            final File[] unzippedFiles = directory.listFiles();
 
-            if ((unzippedShpFiles != null) && (unzippedShpFiles.length > 0)) {
-                return unzippedShpFiles[0];
-            } else {
-                return directory;
+            if ((unzippedFiles != null) && (unzippedFiles.length > 0)) {
+                for (final File file : unzippedFiles) {
+                    if (FileUtils.getExt(file).equalsIgnoreCase(extension)) {
+                        return file;
+                    }
+                }
             }
+
+            LOG.warn("ZIP file does not contain *." + extension);
+            return directory;
         }
     }
 

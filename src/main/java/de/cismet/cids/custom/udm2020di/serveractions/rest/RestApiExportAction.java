@@ -86,7 +86,7 @@ public class RestApiExportAction implements RestApiCidsServerAction {
 
     public static final String TASK_NAME = "restApiExportAction";
 
-    public static final int GEOJSON_CRS = 3128;
+    public static final int GEOJSON_CRS = 4326;
 
     public static final String PARAM_EXPORT_OPTIONS = "exportOptions";
     // public static final String PARAM_MERGE_DATASOURCE = "isMergeExternalDatasource";
@@ -431,7 +431,7 @@ public class RestApiExportAction implements RestApiCidsServerAction {
             actionResult = this.processExportResults(exportOptions, exportResults);
         }
 
-        LOGGER.info("Export successfully performed for " + exportOptions.getExportThemes()
+        LOGGER.info("Export successfully performed for " + exportOptions.getExportThemes().size()
                     + " themes to '" + MediaTypes.APPLICATION_ZIP
                     + "' in " + ((System.currentTimeMillis() - current) / 1000) + "s.");
         return actionResult;
@@ -534,7 +534,7 @@ public class RestApiExportAction implements RestApiCidsServerAction {
                 contentType = CONTENT_TYPES.get(EXPORT_FORMATS.get(exportOptions.getExportFormat()));
                 if (contentType == null) {
                     final String message = "could not execute '" + this.getTaskName()
-                                + "': contant type of result (" + exportOptions.getExportFormat() + ") not found!";
+                                + "': content type of result (" + exportOptions.getExportFormat() + ") not found!";
                     LOGGER.error(message);
                     throw new RuntimeException(message);
                 }
@@ -731,7 +731,7 @@ public class RestApiExportAction implements RestApiCidsServerAction {
             final GenericResourceWithContentType result = exportAction.execute(geoJson, serverActionParameters);
             final Path file = Files.write(Paths.get("restApiExport.zip"), (byte[])result.getRes());
 
-            System.out.println("Export File written to "
+            System.out.println("Export File (" + result.getContentType() + ") written to "
                         + file.toAbsolutePath().toString());
             System.exit(0);
         } catch (Throwable ex) {

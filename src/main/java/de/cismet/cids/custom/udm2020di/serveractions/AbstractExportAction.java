@@ -46,6 +46,7 @@ public abstract class AbstractExportAction extends OracleExport implements Serve
     public static final String PARAM_EXPORTFORMAT_SHP = "ESRI Shape Datei";
     public static final String PARAM_NAME = "name";
     public static final String PARAM_PARAMETER = "parameter";
+    public static final String PARAM_INTERNAL = "internal";
 
     //~ Constructors -----------------------------------------------------------
 
@@ -204,4 +205,16 @@ public abstract class AbstractExportAction extends OracleExport implements Serve
             return csvBuilder.toString();
         }
     }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   resultSet  DOCUMENT ME!
+     * @param   name       DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public abstract byte[] createShapeFile(final ResultSet resultSet, final String name) throws Exception;
 }

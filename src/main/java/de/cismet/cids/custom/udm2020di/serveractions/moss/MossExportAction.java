@@ -201,6 +201,7 @@ public class MossExportAction extends AbstractExportAction {
             Collection<Parameter> parameters = null;
             String exportFormat = PARAM_EXPORTFORMAT_CSV;
             String name = "export";
+            boolean isInternal = false;
 
             for (final ServerActionParameter param : params) {
                 if (param.getKey().equalsIgnoreCase(PARAM_OBJECT_IDS)) {
@@ -213,6 +214,8 @@ public class MossExportAction extends AbstractExportAction {
                     exportFormat = param.getValue().toString();
                 } else if (param.getKey().equalsIgnoreCase(PARAM_NAME)) {
                     name = param.getValue().toString();
+                } else if (param.getKey().equalsIgnoreCase(PARAM_INTERNAL)) {
+                    isInternal = (boolean)param.getValue();
                 } else {
                     log.warn("ignoring unsupported server action parameter: '"
                                 + param.getKey() + "' = '" + param.getValue() + "'!");
@@ -222,7 +225,8 @@ public class MossExportAction extends AbstractExportAction {
             if ((parameters != null)) {
                 if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_XLS)) {
                     if ((sampleIds != null) && !sampleIds.isEmpty()) {
-                        log.info("performing '" + TASK_NAME + "' for " + sampleIds.size()
+                        log.info("performing " + ((isInternal == true) ? "INTERNAL '" : "'") + TASK_NAME + "' for "
+                                    + sampleIds.size()
                                     + " MOSS Samples and " + parameters.size() + " parameters to '"
                                     + name + "' (" + exportFormat + ")");
 
@@ -305,7 +309,8 @@ public class MossExportAction extends AbstractExportAction {
      * @throws  UnknownTypeException  org.deegree.datatypes.UnknownTypeException
      * @throws  Exception             DOCUMENT ME!
      */
-    protected byte[] createShapeFile(final ResultSet resultSet, final String name) throws SQLException,
+    @Override
+    public byte[] createShapeFile(final ResultSet resultSet, final String name) throws SQLException,
         DBaseException,
         GeometryException,
         IOException,

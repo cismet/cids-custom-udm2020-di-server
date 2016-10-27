@@ -185,6 +185,7 @@ public class EprtrExportAction extends AbstractExportAction {
             Collection<Parameter> parameters = null;
             String exportFormat = PARAM_EXPORTFORMAT_CSV;
             String name = "export";
+            boolean isInternal = false;
 
             for (final ServerActionParameter param : params) {
                 if (param.getKey().equalsIgnoreCase(PARAM_INSTALLATIONS)) {
@@ -195,6 +196,8 @@ public class EprtrExportAction extends AbstractExportAction {
                     exportFormat = param.getValue().toString();
                 } else if (param.getKey().equalsIgnoreCase(PARAM_NAME)) {
                     name = param.getValue().toString();
+                } else if (param.getKey().equalsIgnoreCase(PARAM_INTERNAL)) {
+                    isInternal = (boolean)param.getValue();
                 } else {
                     log.warn("ignoring unsupported server action parameter: '"
                                 + param.getKey() + "' = '" + param.getValue() + "'!");
@@ -202,7 +205,8 @@ public class EprtrExportAction extends AbstractExportAction {
             }
 
             if ((installationPks != null) && (parameters != null)) {
-                log.info("performing '" + TASK_NAME + "' for " + installationPks.size()
+                log.info("performing " + ((isInternal == true) ? "INTERNAL '" : "'") + TASK_NAME + "' for "
+                            + installationPks.size()
                             + " EPRTR INSTALLATIONS and " + parameters.size() + " parameters to '"
                             + name + "' (" + exportFormat + ")");
 
@@ -267,7 +271,8 @@ public class EprtrExportAction extends AbstractExportAction {
      * @throws  UnknownTypeException  org.deegree.datatypes.UnknownTypeException
      * @throws  Exception             DOCUMENT ME!
      */
-    protected byte[] createShapeFile(final ResultSet resultSet, final String name) throws SQLException,
+    @Override
+    public byte[] createShapeFile(final ResultSet resultSet, final String name) throws SQLException,
         DBaseException,
         GeometryException,
         IOException,

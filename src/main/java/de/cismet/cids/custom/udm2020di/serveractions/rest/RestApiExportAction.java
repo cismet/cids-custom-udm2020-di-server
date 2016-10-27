@@ -54,6 +54,7 @@ import de.cismet.cidsx.server.api.types.ActionParameterInfo;
 import de.cismet.cidsx.server.api.types.GenericResourceWithContentType;
 
 import static de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction.PARAM_EXPORTFORMAT;
+import static de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction.PARAM_INTERNAL;
 import static de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction.PARAM_NAME;
 import static de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction.PARAM_PARAMETER;
 
@@ -121,12 +122,6 @@ public class RestApiExportAction implements RestApiCidsServerAction {
         parameterDescription.setMediaType("application/json");
         parameterDescription.setArray(true);
         parameterDescriptions.add(parameterDescription);
-
-//        parameterDescription.setKey(PARAM_MERGE_DATASOURCE);
-//        parameterDescription.setType(Type.BOOLEAN);
-//        parameterDescription.setDescription("merge with extermal datasource");
-//        parameterDescriptions.add(parameterDescription);
-//        actionInfo.setParameterDescription(parameterDescriptions);
 
         final ActionParameterInfo bodyDescription = new ActionParameterInfo();
         bodyDescription.setKey("datasource");
@@ -447,6 +442,10 @@ public class RestApiExportAction implements RestApiCidsServerAction {
 
         // export format
         serverActionParameter = new ServerActionParameter<String>(PARAM_EXPORTFORMAT, exportFormat);
+        sapList.add(serverActionParameter);
+
+        // internal export
+        serverActionParameter = new ServerActionParameter<Boolean>(PARAM_INTERNAL, true);
         sapList.add(serverActionParameter);
 
         // parameters

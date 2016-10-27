@@ -31,7 +31,7 @@ import de.cismet.cids.custom.udm2020di.types.Parameter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @AllArgsConstructor
 @NoArgsConstructor
-class ExportDatasource {
+public class ExportDatasource {
 
     //~ Instance fields --------------------------------------------------------
 

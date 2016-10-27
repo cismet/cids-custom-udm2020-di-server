@@ -5,10 +5,8 @@
 *              ... and it just works.
 *
 ****************************************************/
-
 package de.cismet.cids.custom.udm2020di.serveractions.rest;
 
-import de.cismet.cids.custom.udm2020di.types.Parameter;
 import org.apache.log4j.Logger;
 
 import org.h2gis.utilities.SFSUtilities;
@@ -27,11 +25,13 @@ import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import java.util.Collection;
 import java.util.Iterator;
-
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import de.cismet.cids.custom.udm2020di.types.Parameter;
 
 /**
  * DOCUMENT ME!
@@ -72,22 +72,24 @@ public class H2GeoJsonJoiner {
     //~ Constructors -----------------------------------------------------------
 
     /**
-     * Creates a new H2ShapeJoiner object.
+     * Creates a new H2GeoJsonJoiner object.
      *
-     * @param   exportData  DOCUMENT ME!
-     * @param   mergeData    DOCUMENT ME!
-     * @param   exportCrs   DOCUMENT ME!
-     * @param   sourceCrs   DOCUMENT ME!
+     * @param   exportData       DOCUMENT ME!
+     * @param   mergeData        DOCUMENT ME!
+     * @param   mergeParameters  DOCUMENT ME!
+     * @param   exportCrs        DOCUMENT ME!
+     * @param   mergeCrs         DOCUMENT ME!
      *
-     * @throws  IOException  DOCUMENT ME!
+     * @throws  IOException             DOCUMENT ME!
+     * @throws  ClassNotFoundException  DOCUMENT ME!
+     * @throws  SQLException            DOCUMENT ME!
      */
     public H2GeoJsonJoiner(
-            final byte[] exportData, 
-            final byte[] mergeData, 
-            final Collection<Parameter> mergeParameters, 
-            final int exportCrs, 
-            final int mergeCrs)
-            throws IOException, ClassNotFoundException, SQLException {
+            final byte[] exportData,
+            final byte[] mergeData,
+            final Collection<Parameter> mergeParameters,
+            final int exportCrs,
+            final int mergeCrs) throws IOException, ClassNotFoundException, SQLException {
         this.exportCrs = exportCrs;
         this.mergeCrs = mergeCrs;
         this.mergeParameters = mergeParameters;
@@ -95,7 +97,6 @@ public class H2GeoJsonJoiner {
         this.exportConnection = getDBConnection(dbPath + "/" + DB_NAME);
         this.exportDataShape = getUnzippedGeojsonFileFromByteArray(exportData);
         this.mergeGeoJson = getUnzippedGeojsonFileFromByteArray(mergeData);
-       
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -105,53 +106,60 @@ public class H2GeoJsonJoiner {
      *
      * @return  DOCUMENT ME!
      *
-     * @throws  IOException  DOCUMENT ME!
+     * @throws  IOException       DOCUMENT ME!
+     * @throws  SQLException      DOCUMENT ME!
+     * @throws  RuntimeException  DOCUMENT ME!
      */
     public ResultSet getResultSet() throws IOException, SQLException, RuntimeException {
         if (exportDataShape.isDirectory() || mergeGeoJson.isDirectory()) {
-            final String message = "importing and merging '" 
-                    + exportDataShape.getAbsolutePath() + "' or '" + mergeGeoJson.getAbsolutePath() 
-                    + "' is a directory";
+            final String message = "importing and merging '"
+                        + exportDataShape.getAbsolutePath() + "' or '" + mergeGeoJson.getAbsolutePath()
+                        + "' is a directory";
             LOG.error(message);
             throw new RuntimeException(message);
         }
-        
-        LOG.info("mering Shape file '" + exportDataShape.getName() + "' (EPSG:" 
-                + this.exportCrs + ") with " + this.mergeParameters.size() 
-                + "' properties of GeoJSON file '" + mergeGeoJson.getName() + "' (EPSG:"
-        + this.mergeCrs);
-        
-            this.initDatabase(exportConnection);
-            final String exportDataTable = importGeoJsonFileToDb(exportConnection,
-                    exportDataShape.getAbsolutePath(),
-                    mergeCrs,
-                    exportCrs);
-            final String smuDataTable = importGeoJsonFileToDb(exportConnection, mergeGeoJson.getAbsolutePath(), mergeCrs, exportCrs);
-            final StatementWrapper st = createStatement(exportConnection);
 
-            String query = QUERY.replace("%EXPORT_TABLE%", exportDataTable);
-            query = query.replace("%MERGE_TABLE%", smuDataTable);
-            
-            final StringBuilder mergeParameterBuilder = new StringBuilder();
-                    final Iterator<Parameter> mergeParameterIterator = this.mergeParameters.iterator();
-                    while (mergeParameterIterator.hasNext()) {
-                        
-                        final Parameter parameter = mergeParameterIterator.next();
-                        
-                    mergeParameterBuilder.append('\'').append(parameter.getParameterName()).append('\'');
-                    mergeParameterBuilder.append(" AS \'").append(parameter.getParameterName()).append('\'');
-                    if (mergeParameterIterator.hasNext()) {
-                    mergeParameterBuilder.append(',');
-                        }
-                    }   
-                    
-            query = query.replace("%EXPORT_PARAMETERS%", mergeParameterBuilder.toString());
-            
+        LOG.info("mering Shape file '" + exportDataShape.getName() + "' (EPSG:"
+                    + this.exportCrs + ") with " + this.mergeParameters.size()
+                    + "' properties of GeoJSON file '" + mergeGeoJson.getName() + "' (EPSG:"
+                    + this.mergeCrs);
+
+        this.initDatabase(exportConnection);
+        final String exportDataTable = importGeoJsonFileToDb(
+                exportConnection,
+                exportDataShape.getAbsolutePath(),
+                mergeCrs,
+                exportCrs);
+        final String smuDataTable = importGeoJsonFileToDb(
+                exportConnection,
+                mergeGeoJson.getAbsolutePath(),
+                mergeCrs,
+                exportCrs);
+        final StatementWrapper st = createStatement(exportConnection);
+
+        String query = QUERY.replace("%EXPORT_TABLE%", exportDataTable);
+        query = query.replace("%MERGE_TABLE%", smuDataTable);
+
+        final StringBuilder mergeParameterBuilder = new StringBuilder();
+        final Iterator<Parameter> mergeParameterIterator = this.mergeParameters.iterator();
+        while (mergeParameterIterator.hasNext()) {
+            final Parameter parameter = mergeParameterIterator.next();
+
+            mergeParameterBuilder.append('\'').append(parameter.getParameterName()).append('\'');
+            mergeParameterBuilder.append(" AS \'").append(parameter.getParameterName()).append('\'');
+            if (mergeParameterIterator.hasNext()) {
+                mergeParameterBuilder.append(',');
+            }
+        }
+
+        query = query.replace("%EXPORT_PARAMETERS%", mergeParameterBuilder.toString());
+        if (LOG.isDebugEnabled()) {
             LOG.debug(query);
-            
-            try(final ResultSet rs = st.executeQuery(query)) {
-                 return rs;
-            } 
+        }
+
+        try(final ResultSet rs = st.executeQuery(query)) {
+            return rs;
+        }
     }
 
     /**
@@ -171,10 +179,10 @@ public class H2GeoJsonJoiner {
     /**
      * Imports the given shape file.
      *
-     * @param   con          DOCUMENT ME!
-     * @param   geojsonFile  shpFile DOCUMENT ME!
-     * @param   mergeSrid   DOCUMENT ME!
-     * @param   exportSrid   DOCUMENT ME!
+     * @param   connectionWrapper  con DOCUMENT ME!
+     * @param   geojsonFile        shpFile DOCUMENT ME!
+     * @param   mergeSrid          DOCUMENT ME!
+     * @param   exportSrid         DOCUMENT ME!
      *
      * @return  the name of the table, that contains the given shape file
      *
@@ -185,11 +193,12 @@ public class H2GeoJsonJoiner {
             final String geojsonFile,
             final int mergeSrid,
             final int exportSrid) throws SQLException {
-       
-         LOG.debug("importing geojson File for merging: '" + geojsonFile+ "'.");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("importing geojson File for merging: '" + geojsonFile + "'.");
+        }
 
         final String table = TABLE_NAME + "_" + (++tableCount);
-        try (final StatementWrapper statementWrapper = createStatement(connectionWrapper)) {
+        try(final StatementWrapper statementWrapper = createStatement(connectionWrapper)) {
             statementWrapper.execute("CALL GeoJsonRead('" + geojsonFile + "', '" + table + "');");
 
             if (mergeSrid != exportSrid) {
@@ -199,7 +208,7 @@ public class H2GeoJsonJoiner {
                 statementWrapper.execute(update);
             }
         }
-        
+
         createSpatialIndex("the_geom", table);
 
         return table;
@@ -214,13 +223,13 @@ public class H2GeoJsonJoiner {
      * @throws  SQLException  DOCUMENT ME!
      */
     private void createSpatialIndex(final String geoField, final String tableName) throws SQLException {
-        try (StatementWrapper st = createStatement(exportConnection)) {
+        try(final StatementWrapper st = createStatement(exportConnection)) {
             final String indexName = geoField + tableName + "SpatialIndex";
             String update = CREATE_SPATIAL_INDEX.replace("%INDEX_NAME%", indexName);
             update = update.replace("%TABLE_NAME%", tableName);
             update = update.replace("%COLUMN_NAME%", geoField);
             st.execute(update);
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             LOG.error("could not create spatial index: " + e.getMessage(), e);
             throw e;
         }
@@ -236,7 +245,7 @@ public class H2GeoJsonJoiner {
      * @throws  IOException  DOCUMENT ME!
      */
     private File getUnzippedGeojsonFileFromByteArray(final byte[] array) throws IOException {
-            try (final ZipInputStream zstream = new ZipInputStream(new ByteArrayInputStream(array))) {
+        try(final ZipInputStream zstream = new ZipInputStream(new ByteArrayInputStream(array))) {
             ZipEntry entry;
             final byte[] tmp = new byte[256];
             final File directory = createTempDirectory();
@@ -262,8 +271,7 @@ public class H2GeoJsonJoiner {
             } else {
                 return directory;
             }
-            }
-        
+        }
     }
 
     /**
@@ -310,22 +318,13 @@ public class H2GeoJsonJoiner {
         }
     }
 
-
     /*public static void main(final String[] args) {
-        try {
-            final String smuFile = "/home/therter/Downloads/geojson-neues-format/FAO_Bodentypen.zip.geojson.zip";
-            final String exportFile = "/home/therter/Downloads/geojson-neues-format/Standorte.zip.geojson.zip";
-
-            final H2GeoJsonJoiner i = new H2GeoJsonJoiner(FileAsByteArray(new File(exportFile)),
-                    FileAsByteArray(new File(smuFile)),
-                    4326,
-                    31287);
-            i.getResultSet();
-            i.close();
-        } catch (Exception e) {
-            LOG.error("error", e);
-        }
-    }*/
+     *  try {     final String smuFile = "/home/therter/Downloads/geojson-neues-format/FAO_Bodentypen.zip.geojson.zip";
+     * final String exportFile = "/home/therter/Downloads/geojson-neues-format/Standorte.zip.geojson.zip";
+     *
+     * final H2GeoJsonJoiner i = new H2GeoJsonJoiner(FileAsByteArray(new File(exportFile)), FileAsByteArray(new
+     * File(smuFile)),             4326,             31287);     i.getResultSet();     i.close(); }
+     * catch (Exception e) {     LOG.error("error", e); }}*/
 
     /**
      * DOCUMENT ME!
@@ -374,16 +373,21 @@ public class H2GeoJsonJoiner {
      * @param   databasePath  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
+     *
+     * @throws  ClassNotFoundException  DOCUMENT ME!
+     * @throws  SQLException            DOCUMENT ME!
      */
     private ConnectionWrapper getDBConnection(final String databasePath) throws ClassNotFoundException, SQLException {
-        final String jdbcUrl = "jdbc:h2:"+ databasePath;
+        final String jdbcUrl = "jdbc:h2:" + databasePath;
         try {
-            LOG.debug("creating database connection: " + jdbcUrl);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("creating database connection: " + jdbcUrl);
+            }
             Class.forName("org.h2.Driver");
             return (ConnectionWrapper)SFSUtilities.wrapConnection(DriverManager.getConnection(jdbcUrl));
         } catch (ClassNotFoundException | SQLException e) {
             LOG.error("Error while creating database connection: '" + jdbcUrl
-                    +"': " + e.getMessage(), e);
+                        + "': " + e.getMessage(), e);
             throw e;
         }
     }
@@ -396,15 +400,15 @@ public class H2GeoJsonJoiner {
      * @throws  SQLException  DOCUMENT ME!
      */
     private void initDatabase(final ConnectionWrapper conn) throws SQLException {
-        try (ResultSet rs = conn.getMetaData().getTables(null, null, "GEOMETRY_COLUMNS", null)) {
+        try(final ResultSet rs = conn.getMetaData().getTables(null, null, "GEOMETRY_COLUMNS", null)) {
             if (!rs.next()) {
-                try (StatementWrapper st = createStatement(conn)) {
+                try(final StatementWrapper st = createStatement(conn)) {
                     st.execute(
-                            CREATE_SPATIAL_INIT_ALIAS);
+                        CREATE_SPATIAL_INIT_ALIAS);
                     st.execute(SPATIAL_INIT);
                 }
             }
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             LOG.error("could not init database: " + e.getMessage(), e);
             throw e;
         }

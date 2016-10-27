@@ -100,7 +100,7 @@ public abstract class AbstractExportAction extends OracleExport implements Serve
      * @throws  SQLException  DOCUMENT ME!
      * @throws  IOException   DOCUMENT ME!
      */
-    protected byte[] createXlsx(final ResultSet resultSet, final String name) throws SQLException, IOException {
+    public byte[] createXlsx(final ResultSet resultSet, final String name) throws SQLException, IOException {
         final ResultSetMetaData metaData = resultSet.getMetaData();
         final Workbook workbook = new XSSFWorkbook();
         final Sheet exportSheet = workbook.createSheet(name);
@@ -147,7 +147,7 @@ public abstract class AbstractExportAction extends OracleExport implements Serve
      * @throws  SQLException  DOCUMENT ME!
      * @throws  IOException   DOCUMENT ME!
      */
-    protected Object createCsv(final ResultSet resultSet, final String name, final boolean zip) throws SQLException,
+    public Object createCsv(final ResultSet resultSet, final String name, final boolean zip) throws SQLException,
         IOException {
         final ResultSetMetaData metaData = resultSet.getMetaData();
         final StringBuilder csvBuilder = new StringBuilder();

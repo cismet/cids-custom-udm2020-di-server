@@ -67,6 +67,10 @@ public class H2GeoJsonJoiner {
     static {
         EXCLUDED_COLUMN_NAMES.add("PK");
         EXCLUDED_COLUMN_NAMES.add("THE_GEOM");
+        EXCLUDED_COLUMN_NAMES.add("XKOORDINATE"); // WAGW_STATION
+        EXCLUDED_COLUMN_NAMES.add("YKOORDINATE"); // WAGW_STATION
+        EXCLUDED_COLUMN_NAMES.add("RECHTSWERT"); // BORIS_SITE
+        EXCLUDED_COLUMN_NAMES.add("HOCHWERT");  // BORIS_SITE        
     }
 
     //~ Instance fields --------------------------------------------------------
@@ -131,6 +135,8 @@ public class H2GeoJsonJoiner {
             LOG.error(message);
             throw new RuntimeException(message);
         }
+        
+        this.initDatabase(exportConnection);
 
         LOG.info("merging " + this.exportParameters.size()
                     + " properties of Shape file '" + exportDataShape.getName() + "' (EPSG:"
@@ -138,7 +144,6 @@ public class H2GeoJsonJoiner {
                     + "' properties of GeoJSON file '" + mergeGeoJson.getName() + "' (EPSG:"
                     + this.mergeCrs);
 
-        this.initDatabase(exportConnection);
         final String exportDataTable = importShpFileToDb(
                 exportConnection,
                 exportDataShape.getAbsolutePath(),
@@ -157,7 +162,11 @@ public class H2GeoJsonJoiner {
         final StringBuilder exportParameterBuilder = new StringBuilder();
         final Iterator<String> exportParameterIterator = this.exportParameters.iterator();
         while (exportParameterIterator.hasNext()) {
-            exportParameterBuilder.append("export.").append(exportParameterIterator.next()).append(',');
+            exportParameterBuilder.append("export.")
+                    .append('\"')
+                    .append(exportParameterIterator.next())
+                    .append('\"')
+                    .append(',');
         }
 
         final StringBuilder mergeParameterBuilder = new StringBuilder();
@@ -165,7 +174,7 @@ public class H2GeoJsonJoiner {
         while (mergeParameterIterator.hasNext()) {
             final Parameter parameter = mergeParameterIterator.next();
 
-            mergeParameterBuilder.append("merge.").append(parameter.getParameterName());
+            mergeParameterBuilder.append("merge.").append('\"').append(parameter.getParameterName()).append('\"');
             // mergeParameterBuilder.append(" AS \'").append(parameter.getParameterName()).append('\'');
             if (mergeParameterIterator.hasNext()) {
                 mergeParameterBuilder.append(',');

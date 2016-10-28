@@ -108,7 +108,7 @@ public class RestApiExportAction implements RestApiCidsServerAction {
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         CONTENT_TYPES.put(AbstractExportAction.PARAM_EXPORTFORMAT_SHP, MediaTypes.APPLICATION_ZIP);
 
-        EXPORT_CRS.put("BORIS_SITE", 4326);
+        EXPORT_CRS.put("BORIS_SITE", 31287);
         EXPORT_CRS.put("WAGW_STATION", 31287);
         EXPORT_CRS.put("WAOW_STATION", 31287);
         EXPORT_CRS.put("EPRTR_INSTALLATION", 4326);

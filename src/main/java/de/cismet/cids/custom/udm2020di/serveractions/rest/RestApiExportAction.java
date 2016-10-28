@@ -108,11 +108,11 @@ public class RestApiExportAction implements RestApiCidsServerAction {
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         CONTENT_TYPES.put(AbstractExportAction.PARAM_EXPORTFORMAT_SHP, MediaTypes.APPLICATION_ZIP);
 
-        EXPORT_CRS.put("BORIS_SITE", 3128);
+        EXPORT_CRS.put("BORIS_SITE", 4326);
         EXPORT_CRS.put("WAGW_STATION", 31287);
         EXPORT_CRS.put("WAOW_STATION", 31287);
-        EXPORT_CRS.put("EPRTR_INSTALLATION", 3128);
-        EXPORT_CRS.put("MOSS", 3128);
+        EXPORT_CRS.put("EPRTR_INSTALLATION", 4326);
+        EXPORT_CRS.put("MOSS", 4326);
     }
 
     //~ Instance fields --------------------------------------------------------
@@ -729,7 +729,7 @@ public class RestApiExportAction implements RestApiCidsServerAction {
             final RestApiExportAction exportAction = new RestApiExportAction();
 
             final GenericResourceWithContentType result = exportAction.execute(geoJson, serverActionParameters);
-            final Path file = Files.write(Paths.get("restApiExport.zip"), (byte[])result.getRes());
+            final Path file = Files.write(Paths.get("restApiExport.xlsx"), (byte[])result.getRes());
 
             System.out.println("Export File (" + result.getContentType() + ") written to "
                         + file.toAbsolutePath().toString());

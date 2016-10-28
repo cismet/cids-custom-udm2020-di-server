@@ -72,6 +72,7 @@ public abstract class WaExportAction extends AbstractExportAction {
 
     protected final String decodeSampleValuesStatementTpl;
     protected final String exportWaMesswerteStatementTpl;
+    protected final String exportWaMesswerteStatementToShapefileTpl;
     protected final String projectionFile;
     protected final String waSource;
 
@@ -106,6 +107,14 @@ public abstract class WaExportAction extends AbstractExportAction {
                             + "-messwerte.tpl.sql"),
                 "UTF-8");
 
+        this.exportWaMesswerteStatementToShapefileTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                    "/de/cismet/cids/custom/udm2020di/dataexport/"
+                            + waSource
+                            + "/export-"
+                            + waSource
+                            + "-messwerte-to-shapefile.tpl.sql"),
+                "UTF-8");
+
         this.projectionFile = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/dataexport/MGI_Austria_Lambert.prj"),
                 "UTF-8");
@@ -116,12 +125,14 @@ public abstract class WaExportAction extends AbstractExportAction {
     /**
      * DOCUMENT ME!
      *
+     * @param   exportTpl      DOCUMENT ME!
      * @param   messstellePks  DOCUMENT ME!
      * @param   parameters     DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
     protected String createExportWaMesswerteStatement(
+            final String exportTpl,
             final Collection<String> messstellePks,
             final Collection<Parameter> parameters) {
         if (log.isDebugEnabled()) {
@@ -163,7 +174,7 @@ public abstract class WaExportAction extends AbstractExportAction {
             }
         }
 
-        String exportWaMesswerteStatement = exportWaMesswerteStatementTpl.replace(
+        String exportWaMesswerteStatement = exportTpl.replace(
                 "%MESSWERT_DECODE_STATEMENTS%",
                 decodeBuilder);
         exportWaMesswerteStatement = exportWaMesswerteStatement.replace(
@@ -214,7 +225,12 @@ public abstract class WaExportAction extends AbstractExportAction {
                             + " WAxW Stations and " + parameters.size() + " parameters to '"
                             + name + "' (" + exportFormat + ")");
 
-                final String exportWaMesswerte = this.createExportWaMesswerteStatement(messstellePks, parameters);
+                final String exportTpl = exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_SHP)
+                    ? this.exportWaMesswerteStatementToShapefileTpl : this.exportWaMesswerteStatementTpl;
+                final String exportWaMesswerte = this.createExportWaMesswerteStatement(
+                        exportTpl,
+                        messstellePks,
+                        parameters);
 
                 exportWaMesswerteStatement = this.sourceConnection.createStatement();
                 exportWaMesswerteResult = exportWaMesswerteStatement.executeQuery(exportWaMesswerte);

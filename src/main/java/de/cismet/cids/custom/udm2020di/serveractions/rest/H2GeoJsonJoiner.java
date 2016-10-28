@@ -26,7 +26,9 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -51,14 +53,21 @@ public class H2GeoJsonJoiner {
         "CREATE ALIAS IF NOT EXISTS SPATIAL_INIT FOR  \"org.h2gis.h2spatialext.CreateSpatialExtension.initSpatialExtension\";";
     private static final String TRANSFORM =
         "update %TABLE_NAME% set the_geom = st_transform(st_setsrid(the_geom, %MERGE_SRID%), %EXPORT_SRID%)";
+    private static final String SET_SRID = "update %TABLE_NAME% set the_geom = st_setsrid(the_geom, %EXPORT_SRID%)";
     private static final String QUERY =
-        "select export.*, %EXPORT_PARAMETERS% from %EXPORT_TABLE% export left join %MERGE_TABLE% merge on (export.the_geom && merge.the_geom and st_intersects(export.the_geom, merge.the_geom))";
+        "select %EXPORT_PARAMETERS% %MERGE_PARAMETERS% from %EXPORT_TABLE% export left join %MERGE_TABLE% merge on (export.the_geom && merge.the_geom and st_intersects(export.the_geom, merge.the_geom))";
     private static final String CREATE_SPATIAL_INDEX =
         "CREATE SPATIAL INDEX %INDEX_NAME% ON %TABLE_NAME% (%COLUMN_NAME%);";
 
     // Pfade und Tabellennamen eventuell aendern
     private static final String DB_NAME = "tmpDatabase";
     private static final String TABLE_NAME = "table";
+    private static final HashSet<String> EXCLUDED_COLUMN_NAMES = new HashSet<String>();
+
+    static {
+        EXCLUDED_COLUMN_NAMES.add("PK");
+        EXCLUDED_COLUMN_NAMES.add("THE_GEOM");
+    }
 
     //~ Instance fields --------------------------------------------------------
 
@@ -69,6 +78,7 @@ public class H2GeoJsonJoiner {
     private final File mergeGeoJson;
     private final int exportCrs;
     private final int mergeCrs;
+    private final Collection<String> exportParameters;
     private final Collection<Parameter> mergeParameters;
 
     //~ Constructors -----------------------------------------------------------
@@ -95,6 +105,7 @@ public class H2GeoJsonJoiner {
         this.exportCrs = exportCrs;
         this.mergeCrs = mergeCrs;
         this.mergeParameters = mergeParameters;
+        this.exportParameters = new ArrayList<String>();
         this.dbPath = createTempDirectory().getAbsolutePath();
         this.exportConnection = getDBConnection(dbPath + "/" + DB_NAME);
         this.exportDataShape = getUnzippedFileFromByteArray(exportData, "shp");
@@ -121,7 +132,8 @@ public class H2GeoJsonJoiner {
             throw new RuntimeException(message);
         }
 
-        LOG.info("merging Shape file '" + exportDataShape.getName() + "' (EPSG:"
+        LOG.info("merging " + this.exportParameters.size()
+                    + " properties of Shape file '" + exportDataShape.getName() + "' (EPSG:"
                     + this.exportCrs + ") with " + this.mergeParameters.size()
                     + "' properties of GeoJSON file '" + mergeGeoJson.getName() + "' (EPSG:"
                     + this.mergeCrs);
@@ -129,17 +141,24 @@ public class H2GeoJsonJoiner {
         this.initDatabase(exportConnection);
         final String exportDataTable = importShpFileToDb(
                 exportConnection,
-                exportDataShape.getAbsolutePath());
+                exportDataShape.getAbsolutePath(),
+                exportCrs);
 
         final String mergeDataTable = importGeoJsonFileToDb(
                 exportConnection,
                 mergeGeoJson.getAbsolutePath(),
-                mergeCrs,
-                exportCrs);
+                exportCrs,
+                mergeCrs);
         final StatementWrapper st = createStatement(exportConnection);
 
         String query = QUERY.replace("%EXPORT_TABLE%", exportDataTable);
         query = query.replace("%MERGE_TABLE%", mergeDataTable);
+
+        final StringBuilder exportParameterBuilder = new StringBuilder();
+        final Iterator<String> exportParameterIterator = this.exportParameters.iterator();
+        while (exportParameterIterator.hasNext()) {
+            exportParameterBuilder.append("export.").append(exportParameterIterator.next()).append(',');
+        }
 
         final StringBuilder mergeParameterBuilder = new StringBuilder();
         final Iterator<Parameter> mergeParameterIterator = this.mergeParameters.iterator();
@@ -153,7 +172,8 @@ public class H2GeoJsonJoiner {
             }
         }
 
-        query = query.replace("%EXPORT_PARAMETERS%", mergeParameterBuilder.toString());
+        query = query.replace("%EXPORT_PARAMETERS%", exportParameterBuilder.toString());
+        query = query.replace("%MERGE_PARAMETERS%", mergeParameterBuilder.toString());
         if (LOG.isDebugEnabled()) {
             LOG.debug(query);
         }
@@ -163,7 +183,7 @@ public class H2GeoJsonJoiner {
     }
 
     /**
-     * DOCUMENT ME!
+     * Performs Cleanup of connections and deletes temporary files.
      */
     public void close() {
         try {
@@ -177,12 +197,13 @@ public class H2GeoJsonJoiner {
     }
 
     /**
-     * Imports the given shape file.
+     * Imports the to-be-merged GeoJson file into the DB and transforms the SRID of the geoJson geometries (in general
+     * 4326) to the SRID of the Export Shape File.
      *
      * @param   connectionWrapper  con DOCUMENT ME!
      * @param   geojsonFile        shpFile DOCUMENT ME!
-     * @param   mergeSrid          DOCUMENT ME!
      * @param   exportSrid         DOCUMENT ME!
+     * @param   mergeSrid          DOCUMENT ME!
      *
      * @return  the name of the table, that contains the given geojson file
      *
@@ -191,8 +212,8 @@ public class H2GeoJsonJoiner {
     private String importGeoJsonFileToDb(
             final ConnectionWrapper connectionWrapper,
             final String geojsonFile,
-            final int mergeSrid,
-            final int exportSrid) throws SQLException {
+            final int exportSrid,
+            final int mergeSrid) throws SQLException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("importing geojson File for merging: '" + geojsonFile + "'.");
         }
@@ -217,10 +238,12 @@ public class H2GeoJsonJoiner {
     }
 
     /**
-     * DOCUMENT ME!
+     * Imports the Export Shape file that is to-be merged with the GeoJson File provided by the user to the temporary H2
+     * DB. The Export Shape is generated by the OracleExports and contains only Point Features.
      *
      * @param   connectionWrapper  DOCUMENT ME!
      * @param   shpFile            DOCUMENT ME!
+     * @param   exportSrid         DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
@@ -228,17 +251,22 @@ public class H2GeoJsonJoiner {
      */
     private String importShpFileToDb(
             final ConnectionWrapper connectionWrapper,
-            final String shpFile) throws SQLException {
+            final String shpFile,
+            final int exportSrid) throws SQLException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("importing Shape File for merging: '" + shpFile + "'.");
         }
 
         final String table = TABLE_NAME + "_" + (++tableCount);
+        final String update = SET_SRID.replace("%TABLE_NAME%", table)
+                    .replace("%EXPORT_SRID%", String.valueOf(exportSrid));
         try(final StatementWrapper statementWrapper = createStatement(connectionWrapper)) {
             statementWrapper.execute("CALL SHPREAD('" + shpFile + "', '" + table + "');");
+            statementWrapper.execute(update);
         }
 
-        createSpatialIndex("the_geom", table);
+        this.createSpatialIndex("the_geom", table);
+        this.exportParameters.addAll(this.getColumnNames(connectionWrapper, table, EXCLUDED_COLUMN_NAMES));
 
         return table;
     }
@@ -430,14 +458,14 @@ public class H2GeoJsonJoiner {
     /**
      * Add spatial extensions (H2Gis) to the database.
      *
-     * @param   conn  DOCUMENT ME!
+     * @param   connectionWrapper  DOCUMENT ME!
      *
      * @throws  SQLException  DOCUMENT ME!
      */
-    private void initDatabase(final ConnectionWrapper conn) throws SQLException {
-        try(final ResultSet rs = conn.getMetaData().getTables(null, null, "GEOMETRY_COLUMNS", null)) {
+    private void initDatabase(final ConnectionWrapper connectionWrapper) throws SQLException {
+        try(final ResultSet rs = connectionWrapper.getMetaData().getTables(null, null, "GEOMETRY_COLUMNS", null)) {
             if (!rs.next()) {
-                try(final StatementWrapper st = createStatement(conn)) {
+                try(final StatementWrapper st = createStatement(connectionWrapper)) {
                     st.execute(
                         CREATE_SPATIAL_INIT_ALIAS);
                     st.execute(SPATIAL_INIT);
@@ -445,6 +473,38 @@ public class H2GeoJsonJoiner {
             }
         } catch (SQLException e) {
             LOG.error("could not init database: " + e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   connectionWrapper  DOCUMENT ME!
+     * @param   tableName          DOCUMENT ME!
+     * @param   excludedColumns    DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  SQLException  DOCUMENT ME!
+     */
+    private Collection<String> getColumnNames(
+            final ConnectionWrapper connectionWrapper,
+            final String tableName,
+            final HashSet<String> excludedColumns) throws SQLException {
+        final ArrayList<String> columnNames = new ArrayList<String>();
+        try {
+            final ResultSet tableMetaData = connectionWrapper.getMetaData()
+                        .getColumns(null, null, tableName.toUpperCase(), "%");
+            while (tableMetaData.next()) {
+                final String columnName = tableMetaData.getString(4);
+                if (!excludedColumns.contains(columnName.toUpperCase())) {
+                    columnNames.add(columnName);
+                }
+            }
+            return columnNames;
+        } catch (SQLException e) {
+            LOG.error("could not get column names from table '" + tableName + "': " + e.getMessage(), e);
             throw e;
         }
     }

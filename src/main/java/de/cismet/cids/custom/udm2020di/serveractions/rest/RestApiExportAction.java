@@ -13,6 +13,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -20,13 +21,22 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import java.sql.ResultSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import de.cismet.cids.custom.udm2020di.dataexport.OracleExport;
@@ -52,6 +62,10 @@ import de.cismet.cidsx.server.api.types.ActionParameterInfo;
 import de.cismet.cidsx.server.api.types.GenericResourceWithContentType;
 
 import static de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction.PARAM_EXPORTFORMAT;
+import static de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction.PARAM_EXPORTFORMAT_CSV;
+import static de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction.PARAM_EXPORTFORMAT_SHP;
+import static de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction.PARAM_EXPORTFORMAT_XLSX;
+import static de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction.PARAM_INTERNAL;
 import static de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction.PARAM_NAME;
 import static de.cismet.cids.custom.udm2020di.serveractions.AbstractExportAction.PARAM_PARAMETER;
 
@@ -72,11 +86,14 @@ public class RestApiExportAction implements RestApiCidsServerAction {
 
     public static final String TASK_NAME = "restApiExportAction";
 
+    public static final int GEOJSON_CRS = 4326;
+
     public static final String PARAM_EXPORT_OPTIONS = "exportOptions";
     // public static final String PARAM_MERGE_DATASOURCE = "isMergeExternalDatasource";
 
     public static final HashMap<String, String> EXPORT_FORMATS = new HashMap<String, String>();
     public static final HashMap<String, String> CONTENT_TYPES = new HashMap<String, String>();
+    public static final HashMap<String, Integer> EXPORT_CRS = new HashMap<String, Integer>();
 
     static {
         EXPORT_FORMATS.put("csv", AbstractExportAction.PARAM_EXPORTFORMAT_CSV);
@@ -90,6 +107,12 @@ public class RestApiExportAction implements RestApiCidsServerAction {
             AbstractExportAction.PARAM_EXPORTFORMAT_XLSX,
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         CONTENT_TYPES.put(AbstractExportAction.PARAM_EXPORTFORMAT_SHP, MediaTypes.APPLICATION_ZIP);
+
+        EXPORT_CRS.put("BORIS_SITE", 31287);
+        EXPORT_CRS.put("WAGW_STATION", 31287);
+        EXPORT_CRS.put("WAOW_STATION", 31287);
+        EXPORT_CRS.put("EPRTR_INSTALLATION", 4326);
+        EXPORT_CRS.put("MOSS", 4326);
     }
 
     //~ Instance fields --------------------------------------------------------
@@ -97,6 +120,8 @@ public class RestApiExportAction implements RestApiCidsServerAction {
     private final ActionInfo actionInfo;
 
     private final HashMap<String, AbstractExportAction> exportActions = new HashMap<String, AbstractExportAction>();
+
+    private final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
     //~ Constructors -----------------------------------------------------------
 
@@ -119,18 +144,13 @@ public class RestApiExportAction implements RestApiCidsServerAction {
         parameterDescription.setMediaType("application/json");
         parameterDescription.setArray(true);
         parameterDescriptions.add(parameterDescription);
-
-//        parameterDescription.setKey(PARAM_MERGE_DATASOURCE);
-//        parameterDescription.setType(Type.BOOLEAN);
-//        parameterDescription.setDescription("merge with extermal datasource");
-//        parameterDescriptions.add(parameterDescription);
-//        actionInfo.setParameterDescription(parameterDescriptions);
+        actionInfo.setParameterDescription(parameterDescriptions);
 
         final ActionParameterInfo bodyDescription = new ActionParameterInfo();
         bodyDescription.setKey("datasource");
         bodyDescription.setType(Type.STRING);
-        bodyDescription.setMediaType("application/json");
-        bodyDescription.setDescription("Optional Datasource");
+        bodyDescription.setMediaType(MediaTypes.APPLICATION_ZIP);
+        bodyDescription.setDescription("Optional Datasource (zipped GeoJson Data)");
         actionInfo.setBodyDescription(bodyDescription);
 
         final ActionParameterInfo returnDescription = new ActionParameterInfo();
@@ -160,11 +180,11 @@ public class RestApiExportAction implements RestApiCidsServerAction {
             if (this.exportActions.isEmpty()) {
                 LOGGER.info("bootstrapping export actions ...");
                 try {
-                    exportActions.put("BORIS_SITE", new BorisExportAction());
-                    exportActions.put("WAGW_STATION", new WagwExportAction());
-                    exportActions.put("WAOW_STATION", new WaowExportAction());
-                    exportActions.put("EPRTR_INSTALLATION", new EprtrExportAction());
-                    exportActions.put("MOSS", new MossExportAction());
+                    this.exportActions.put("BORIS_SITE", new BorisExportAction());
+                    this.exportActions.put("WAGW_STATION", new WagwExportAction());
+                    this.exportActions.put("WAOW_STATION", new WaowExportAction());
+                    this.exportActions.put("EPRTR_INSTALLATION", new EprtrExportAction());
+                    this.exportActions.put("MOSS", new MossExportAction());
                 } catch (Throwable ex) {
                     final String message = "could not execute '" + this.getTaskName()
                                 + "': could not instantiate Leagcy Export Action: " + ex.getMessage();
@@ -178,7 +198,9 @@ public class RestApiExportAction implements RestApiCidsServerAction {
         final ServerActionParameter exportOptionsParameter;
         final String exportOptionsJson;
         final ExportOptions exportOptions;
-        final HashMap<ExportTheme, Object> exportResults = new HashMap<ExportTheme, Object>();
+        final LinkedHashMap<ExportTheme, Future<Object>> exportResults =
+            new LinkedHashMap<ExportTheme, Future<Object>>();
+        final GenericResourceWithContentType actionResult;
 
         if (params.length == 0) {
             final String message = "could not execute '" + this.getTaskName()
@@ -216,8 +238,9 @@ public class RestApiExportAction implements RestApiCidsServerAction {
 
         // deserialize EXPORT OPTIONS
         exportOptionsJson = (String)exportOptionsParameter.getValue();
-        /*if (LOGGER.isDebugEnabled()) {
-         *  LOGGER.debug(exportOptionsJson);}*/
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(exportOptionsJson);
+        }
         try {
             exportOptions = (ExportOptions)EXPORT_OPTIONS_READER.readValue(exportOptionsJson);
         } catch (IOException ex) {
@@ -242,7 +265,14 @@ public class RestApiExportAction implements RestApiCidsServerAction {
         // FIXME: if server-side global datasources are used, the body parameter can be null!
         if ((exportOptions.isMergeExternalDatasource() == true) && (body == null)) {
             final String message = "could not execute '" + this.getTaskName()
-                        + "': merge datasource is true but body parameter (SHP FILE) is empty!";
+                        + "': merge datasource is true but body parameter (ZIPPED GeoJson FILE) is empty!";
+            LOGGER.error(message);
+            throw new RuntimeException(message);
+        }
+
+        if ((exportOptions.isMergeExternalDatasource() == true) && !(body instanceof byte[])) {
+            final String message = "could not execute '" + this.getTaskName()
+                        + "': merge datasource is true but body parameter (ZIPPED GeoJson FILE) is not of type byte[]!";
             LOGGER.error(message);
             throw new RuntimeException(message);
         }
@@ -267,10 +297,44 @@ public class RestApiExportAction implements RestApiCidsServerAction {
                         + exportOptions.isMergeExternalDatasource());
         }
 
-        // TODO: use thread to parallelise multiple exports
-        for (final ExportTheme exportTheme : exportOptions.getExportThemes()) {
-            final AbstractExportAction exportAction = this.exportActions.get(exportTheme.getClassName());
+        if (exportOptions.isMergeExternalDatasource() == true) {
+            final ByteArrayInputStream bodyInputStream = new ByteArrayInputStream((byte[])body);
+            try(final ZipInputStream zipInputStream = new ZipInputStream(bodyInputStream)) {
+                final ZipEntry zipEntry = zipInputStream.getNextEntry();
+                LOGGER.info("reading zip entry: " + zipEntry.getName());
+            } catch (IOException ex) {
+                final String message = "could not execute '" + this.getTaskName()
+                            + "': could process zip file from body parameter: "
+                            + ex.getMessage();
+                LOGGER.error(message);
+                throw new RuntimeException(message);
+            }
+        }
 
+        int i = 1;
+        for (final ExportTheme exportTheme : exportOptions.getExportThemes()) {
+            if (exportOptions.isMergeExternalDatasource() == true) {
+                if (exportTheme.getExportDatasource() == null) {
+                    final String message = "could not execute '" + this.getTaskName()
+                                + "': export data source of '" + exportTheme.getTitle() + "' is null!";
+                    LOGGER.error(message);
+                }
+
+                if (exportTheme.getExportDatasource().getParameters().isEmpty()) {
+                    final String message = "could not execute '" + this.getTaskName()
+                                + "': parameter list of export data source ("
+                                + exportTheme.getExportDatasource().getFilename()
+                                + ") of '" + exportTheme.getTitle() + "' is null!";
+                    LOGGER.error(message);
+                }
+            }
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("executing parallel export '" + exportTheme.getTitle() + "' #"
+                            + i + "/" + exportOptions.getExportThemes().size());
+            }
+
+            final AbstractExportAction exportAction = this.exportActions.get(exportTheme.getClassName());
             if (exportAction == null) {
                 final String message = "could not execute '" + this.getTaskName()
                             + "': legacy ExportAction not found: unsupported export theme '"
@@ -294,9 +358,18 @@ public class RestApiExportAction implements RestApiCidsServerAction {
                 throw new RuntimeException(message);
             }
 
-            // execute the legacy export .........
-            final Object exportResult = exportAction.execute(null, serverActionParameters);
-            exportResults.put(exportTheme, exportResult);
+            final Future<Object> exportResultFuture = executorService.submit(new Callable<Object>() {
+
+                        @Override
+                        public Object call() {
+                            // execute the legacy export .........
+                            final Object exportResult = exportAction.execute(null, serverActionParameters);
+                            return exportResult;
+                        }
+                    });
+
+            exportResults.put(exportTheme, exportResultFuture);
+            i++;
         }
 
         if (exportResults.isEmpty()) {
@@ -312,48 +385,172 @@ public class RestApiExportAction implements RestApiCidsServerAction {
             throw new RuntimeException(message);
         }
 
-        /*if(exportOptions.isMergeExternalDatasource()) {
-         *      //TODO: implement merging with external datasource } else {*/
-        // one already zipped SHP File exported
-        if ((exportResults.size() == 1)) {
-            final Object exportResult = exportResults.values().iterator().next();
-            final String contentType;
+        if (exportOptions.isMergeExternalDatasource()) {
+            final LinkedHashMap<ExportTheme, Future<Object>> mergedExportResults =
+                new LinkedHashMap<ExportTheme, Future<Object>>();
+            int j = 1;
+            for (final ExportTheme exportTheme : exportResults.keySet()) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("executing parallel merging of '" + exportTheme.getTitle()
+                                + " ' with '" + exportTheme.getExportDatasource().getName()
+                                + "' #" + j + "/" + exportOptions.getExportThemes().size());
+                }
 
-            if ("csv".equalsIgnoreCase(exportOptions.getExportFormat())) {
-                if (!(exportResult instanceof String)) {
+                try {
+                    final Object exportResult = exportResults.get(exportTheme).get();
+                    if (!(exportResult instanceof byte[])) {
+                        final String message = "could not execute '" + getTaskName()
+                                    + "': result of SHP Export of '" + exportTheme.getTitle()
+                                    + "' is not a byte array (zipped SHP file)";
+                        LOGGER.error(message);
+                        throw new RuntimeException(message);
+                    }
+
+                    final Future<Object> mergedExportResultFuture = executorService.submit(new Callable<Object>() {
+
+                                @Override
+                                public Object call() {
+                                    final Object mergedExportResult = mergeWithExternalDatasource(
+                                            exportTheme,
+                                            (byte[])exportResult,
+                                            (byte[])body);
+                                    return mergedExportResult;
+                                }
+                            });
+                    mergedExportResults.put(exportTheme, mergedExportResultFuture);
+                } catch (final InterruptedException | ExecutionException ex) {
+                    final String message = "could not execute '" + this.getTaskName()
+                                + "': error during thread execution: " + ex.getMessage();
+                    LOGGER.error(message, ex);
+                    throw new RuntimeException(message, ex);
+                }
+                j++;
+            }
+            actionResult = this.processExportResults(exportOptions, mergedExportResults);
+        } else {
+            actionResult = this.processExportResults(exportOptions, exportResults);
+        }
+
+        LOGGER.info("Export successfully performed for " + exportOptions.getExportThemes().size()
+                    + " themes to '" + MediaTypes.APPLICATION_ZIP
+                    + "' in " + ((System.currentTimeMillis() - current) / 1000) + "s.");
+        return actionResult;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   exportTheme         DOCUMENT ME!
+     * @param   exportResult        DOCUMENT ME!
+     * @param   externalDatasource  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  RuntimeException  DOCUMENT ME!
+     */
+    private Object mergeWithExternalDatasource(
+            final ExportTheme exportTheme,
+            final byte[] exportResult,
+            final byte[] externalDatasource) throws RuntimeException {
+        H2GeoJsonJoiner geoJsonJoiner = null;
+        try {
+            final int exportSrs = EXPORT_CRS.get(exportTheme.getClassName());
+            final AbstractExportAction exportAction = this.exportActions.get(exportTheme.getClassName());
+            final String exportFormat = EXPORT_FORMATS.get(exportTheme.getExportFormat());
+            geoJsonJoiner = new H2GeoJsonJoiner(
+                    exportResult,
+                    externalDatasource,
+                    exportTheme.getExportDatasource().getParameters(),
+                    exportSrs,
+                    GEOJSON_CRS);
+
+            final ResultSet mergedResultSet = geoJsonJoiner.getResultSet();
+            final Object result;
+            if (exportTheme.getExportFormat().equalsIgnoreCase(PARAM_EXPORTFORMAT_CSV)) {
+                result = exportAction.createCsv(mergedResultSet, exportTheme.getTitle(), false);
+            } else if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_XLSX)) {
+                result = exportAction.createXlsx(mergedResultSet, exportTheme.getTitle());
+            } else if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_SHP)) {
+                result = exportAction.createShapeFile(mergedResultSet, exportTheme.getTitle());
+            } else {
+                final String message = "could not execute '" + this.getTaskName()
+                            + "': error during thread execution: unsupported export format '"
+                            + exportFormat + "'";
+                LOGGER.error(message);
+                throw new RuntimeException(message);
+            }
+
+            return result;
+        } catch (final RuntimeException re) {
+            throw re;
+        } catch (final Exception e) {
+            final String message = "could not execute '" + this.getTaskName()
+                        + "': error during merging external datasource with '"
+                        + exportTheme.getTitle() + "': " + e.getMessage();
+            LOGGER.error(message, e);
+            throw new RuntimeException(message, e);
+        } finally {
+            if (geoJsonJoiner != null) {
+                geoJsonJoiner.close();
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   exportOptions  DOCUMENT ME!
+     * @param   exportResults  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  RuntimeException  DOCUMENT ME!
+     */
+    private GenericResourceWithContentType processExportResults(final ExportOptions exportOptions,
+            final LinkedHashMap<ExportTheme, Future<Object>> exportResults) throws RuntimeException {
+        if ((exportResults.size() == 1)) {
+            try {
+                final Object exportResult = exportResults.values().iterator().next().get();
+                final String contentType;
+
+                if ("csv".equalsIgnoreCase(exportOptions.getExportFormat())) {
+                    if (!(exportResult instanceof String)) {
+                        final String message = "could not execute '" + this.getTaskName()
+                                    + "': expected result (" + exportOptions.getExportFormat() + ") of '"
+                                    + exportResults.keySet().iterator().next().getClassName()
+                                    + "' is not of type String: " + exportResult.getClass().getSimpleName();
+                        LOGGER.error(message);
+                        throw new RuntimeException(message);
+                    }
+                } else if (!(exportResult instanceof byte[])) {
                     final String message = "could not execute '" + this.getTaskName()
                                 + "': expected result (" + exportOptions.getExportFormat() + ") of '"
                                 + exportResults.keySet().iterator().next().getClassName()
-                                + "' is not of type String: " + exportResult.getClass().getSimpleName();
+                                + "' is not of type byte[]: " + exportResult.getClass().getSimpleName();
                     LOGGER.error(message);
                     throw new RuntimeException(message);
                 }
-            } else if (!(exportResult instanceof byte[])) {
-                final String message = "could not execute '" + this.getTaskName()
-                            + "': expected result (" + exportOptions.getExportFormat() + ") of '"
-                            + exportResults.keySet().iterator().next().getClassName()
-                            + "' is not of type byte[]: " + exportResult.getClass().getSimpleName();
-                LOGGER.error(message);
-                throw new RuntimeException(message);
-            }
 
-            contentType = CONTENT_TYPES.get(EXPORT_FORMATS.get(exportOptions.getExportFormat()));
-            if (contentType == null) {
-                final String message = "could not execute '" + this.getTaskName()
-                            + "': contant type of result (" + exportOptions.getExportFormat() + ") not found!";
-                LOGGER.error(message);
-                throw new RuntimeException(message);
-            }
+                contentType = CONTENT_TYPES.get(EXPORT_FORMATS.get(exportOptions.getExportFormat()));
+                if (contentType == null) {
+                    final String message = "could not execute '" + this.getTaskName()
+                                + "': content type of result (" + exportOptions.getExportFormat() + ") not found!";
+                    LOGGER.error(message);
+                    throw new RuntimeException(message);
+                }
 
-            LOGGER.info("Export successfully performed for " + exportOptions.getExportThemes()
-                        + " themes to '" + MediaTypes.APPLICATION_ZIP
-                        + "' in " + ((System.currentTimeMillis() - current) / 1000) + "s.");
-            return new GenericResourceWithContentType(contentType, exportResult);
+                return new GenericResourceWithContentType(contentType, exportResult);
+            } catch (final InterruptedException | ExecutionException ex) {
+                final String message = "could not execute '" + this.getTaskName()
+                            + "': error during thread execution: " + ex.getMessage();
+                LOGGER.error(message, ex);
+                throw new RuntimeException(message, ex);
+            }
         } else {
             final ByteArrayOutputStream combinedExportResults = new ByteArrayOutputStream();
             try(final ZipOutputStream zipStream = new ZipOutputStream(combinedExportResults)) {
                 for (final ExportTheme exportTheme : exportResults.keySet()) {
-                    final Object exportResult = exportResults.get(exportTheme);
+                    final Object exportResult = exportResults.get(exportTheme).get();
                     final String extension =
                         AbstractExportAction.PARAM_EXPORTFORMAT_SHP.equals(EXPORT_FORMATS.get(
                                 exportTheme.getExportFormat())) ? "zip" : exportTheme.getExportFormat();
@@ -382,13 +579,14 @@ public class RestApiExportAction implements RestApiCidsServerAction {
                             + "': error during zipping combined results: " + ioex.getMessage();
                 LOGGER.error(message, ioex);
                 throw new RuntimeException(message, ioex);
+            } catch (final InterruptedException | ExecutionException ex) {
+                final String message = "could not execute '" + this.getTaskName()
+                            + "': error during thread execution: " + ex.getMessage();
+                LOGGER.error(message, ex);
+                throw new RuntimeException(message, ex);
             }
 
             final byte[] result = combinedExportResults.toByteArray();
-
-            LOGGER.info("Export successfully performed for " + exportOptions.getExportThemes().size()
-                        + " themes in " + ((System.currentTimeMillis() - current) / 1000) + "s.");
-
             return new GenericResourceWithContentType(MediaTypes.APPLICATION_ZIP, result);
         }
     }
@@ -424,6 +622,10 @@ public class RestApiExportAction implements RestApiCidsServerAction {
 
         // export format
         serverActionParameter = new ServerActionParameter<String>(PARAM_EXPORTFORMAT, exportFormat);
+        sapList.add(serverActionParameter);
+
+        // internal export
+        serverActionParameter = new ServerActionParameter<Boolean>(PARAM_INTERNAL, true);
         sapList.add(serverActionParameter);
 
         // parameters
@@ -517,6 +719,8 @@ public class RestApiExportAction implements RestApiCidsServerAction {
             final String exportOptionsJson = IOUtils.toString(RestApiExportAction.class.getResourceAsStream(
                         "/de/cismet/cids/custom/udm2020di/dataexport/rest/exportOptions.json"),
                     "UTF-8");
+            final byte[] geoJson = IOUtils.toByteArray(RestApiExportAction.class.getResourceAsStream(
+                        "/de/cismet/cids/custom/udm2020di/dataexport/rest/FAO_Bodentypen.zip"));
 
             final ServerActionParameter[] serverActionParameters = new ServerActionParameter[] {
                     new ServerActionParameter<String>(PARAM_EXPORT_OPTIONS, exportOptionsJson)
@@ -524,14 +728,14 @@ public class RestApiExportAction implements RestApiCidsServerAction {
 
             final RestApiExportAction exportAction = new RestApiExportAction();
 
-            final GenericResourceWithContentType result = exportAction.execute("DUMMY OBJECT", serverActionParameters);
-            final Path file = Files.write(Paths.get("restApiExport.zip"), (byte[])result.getRes());
+            final GenericResourceWithContentType result = exportAction.execute(geoJson, serverActionParameters);
+            final Path file = Files.write(Paths.get("restApiExport.xlsx"), (byte[])result.getRes());
 
-            System.out.println("Export File written to "
+            System.out.println("Export File (" + result.getContentType() + ") written to "
                         + file.toAbsolutePath().toString());
             System.exit(0);
         } catch (Throwable ex) {
-            Logger.getLogger(RestApiExportAction.class).fatal(ex.getMessage(), ex);
+            RestApiExportAction.LOGGER.fatal(ex.getMessage(), ex);
             System.exit(1);
         }
     }

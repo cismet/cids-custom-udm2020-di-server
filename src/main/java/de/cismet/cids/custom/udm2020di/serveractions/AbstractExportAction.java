@@ -46,6 +46,7 @@ public abstract class AbstractExportAction extends OracleExport implements Serve
     public static final String PARAM_EXPORTFORMAT_SHP = "ESRI Shape Datei";
     public static final String PARAM_NAME = "name";
     public static final String PARAM_PARAMETER = "parameter";
+    public static final String PARAM_INTERNAL = "internal";
 
     //~ Constructors -----------------------------------------------------------
 
@@ -99,7 +100,7 @@ public abstract class AbstractExportAction extends OracleExport implements Serve
      * @throws  SQLException  DOCUMENT ME!
      * @throws  IOException   DOCUMENT ME!
      */
-    protected byte[] createXlsx(final ResultSet resultSet, final String name) throws SQLException, IOException {
+    public byte[] createXlsx(final ResultSet resultSet, final String name) throws SQLException, IOException {
         final ResultSetMetaData metaData = resultSet.getMetaData();
         final Workbook workbook = new XSSFWorkbook();
         final Sheet exportSheet = workbook.createSheet(name);
@@ -146,7 +147,7 @@ public abstract class AbstractExportAction extends OracleExport implements Serve
      * @throws  SQLException  DOCUMENT ME!
      * @throws  IOException   DOCUMENT ME!
      */
-    protected Object createCsv(final ResultSet resultSet, final String name, final boolean zip) throws SQLException,
+    public Object createCsv(final ResultSet resultSet, final String name, final boolean zip) throws SQLException,
         IOException {
         final ResultSetMetaData metaData = resultSet.getMetaData();
         final StringBuilder csvBuilder = new StringBuilder();
@@ -204,4 +205,16 @@ public abstract class AbstractExportAction extends OracleExport implements Serve
             return csvBuilder.toString();
         }
     }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   resultSet  DOCUMENT ME!
+     * @param   name       DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public abstract byte[] createShapeFile(final ResultSet resultSet, final String name) throws Exception;
 }

@@ -12,8 +12,6 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-import oracle.jdbc.OracleConnection;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
@@ -79,6 +77,13 @@ public class BorisExportAction extends AbstractExportAction {
 
     protected final String decodeSampleValuesStatementTpl;
     protected final String exportBorisMesswerteStatementTpl;
+    /**
+     * Standard BORIS Export does not contain coordinates (data protection restriction), therfore also common ShapeFile
+     * Support is disabled. However for merging BORIS Exports with External Data (Shapefiles trasferred as GeoJson), a
+     * ShapeFile is required anyway. The export Boris Messwerte To Shapefile Statement is therfore used in an INTERNAL
+     * export initiated by the RestApiExportAction!
+     */
+    protected final String exportBorisMesswerteToShapefileStatementTpl;
     protected final String projectionFile;
 
     //~ Constructors -----------------------------------------------------------
@@ -103,6 +108,10 @@ public class BorisExportAction extends AbstractExportAction {
                     "/de/cismet/cids/custom/udm2020di/dataexport/boris/export-boris-messwerte.tpl.sql"),
                 "UTF-8");
 
+        this.exportBorisMesswerteToShapefileStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                    "/de/cismet/cids/custom/udm2020di/dataexport/boris/export-boris-messwerte-to-shapefile.tpl.sql"),
+                "UTF-8");
+
         this.projectionFile = IOUtils.toString(this.getClass().getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/dataexport/MGI_Austria_Lambert.prj"),
                 "UTF-8");
@@ -113,12 +122,14 @@ public class BorisExportAction extends AbstractExportAction {
     /**
      * DOCUMENT ME!
      *
+     * @param   exportTpl    DOCUMENT ME!
      * @param   standortPks  DOCUMENT ME!
      * @param   parameters   DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
     protected String createExportBorisMesswerteStatement(
+            final String exportTpl,
             final Collection<String> standortPks,
             final Collection<Parameter> parameters) {
         if (log.isDebugEnabled()) {
@@ -159,7 +170,7 @@ public class BorisExportAction extends AbstractExportAction {
             }
         }
 
-        String exportBorisMesswerteStatement = exportBorisMesswerteStatementTpl.replace(
+        String exportBorisMesswerteStatement = exportTpl.replace(
                 "%MESSWERT_DECODE_STATEMENTS%",
                 decodeBuilder);
         exportBorisMesswerteStatement = exportBorisMesswerteStatement.replace(
@@ -185,6 +196,7 @@ public class BorisExportAction extends AbstractExportAction {
             Collection<Parameter> parameters = null;
             String exportFormat = PARAM_EXPORTFORMAT_CSV;
             String name = "export";
+            boolean isInternal = false;
 
             for (final ServerActionParameter param : params) {
                 if (param.getKey().equalsIgnoreCase(PARAM_STANDORTE)) {
@@ -195,6 +207,8 @@ public class BorisExportAction extends AbstractExportAction {
                     exportFormat = param.getValue().toString();
                 } else if (param.getKey().equalsIgnoreCase(PARAM_NAME)) {
                     name = param.getValue().toString();
+                } else if (param.getKey().equalsIgnoreCase(PARAM_INTERNAL)) {
+                    isInternal = (boolean)param.getValue();
                 } else {
                     log.warn("ignoring unsupported server action parameter: '"
                                 + param.getKey() + "' = '" + param.getValue() + "'!");
@@ -202,11 +216,17 @@ public class BorisExportAction extends AbstractExportAction {
             }
 
             if ((standortPks != null) && (parameters != null)) {
-                log.info("performing '" + TASK_NAME + "' for " + standortPks.size()
+                log.info("performing " + ((isInternal == true) ? "INTERNAL '" : "'") + TASK_NAME + "' for "
+                            + standortPks.size()
                             + " BORIS STANDORTE and " + parameters.size() + " parameters to '"
                             + name + "' (" + exportFormat + ")");
 
-                final String exportBorisMesswerte = this.createExportBorisMesswerteStatement(standortPks, parameters);
+                final String exportTpl = exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_SHP)
+                    ? this.exportBorisMesswerteToShapefileStatementTpl : this.exportBorisMesswerteStatementTpl;
+                final String exportBorisMesswerte = this.createExportBorisMesswerteStatement(
+                        exportTpl,
+                        standortPks,
+                        parameters);
 
                 exportBorisMesswerteStatement = this.sourceConnection.createStatement();
                 exportBorisMesswerteResult = exportBorisMesswerteStatement.executeQuery(exportBorisMesswerte);
@@ -216,9 +236,14 @@ public class BorisExportAction extends AbstractExportAction {
                 } else if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_XLSX)) {
                     result = this.createXlsx(exportBorisMesswerteResult, name);
                 } else if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_SHP)) {
-                    final String message = "SHP Export of BORIS Stations not permitted!";
-                    log.error(message);
-                    throw new Exception(message);
+                    if (isInternal == true) {
+                        log.warn("performing INTERNAL SHP Export of BORIS Stations!");
+                        result = this.createShapeFile(exportBorisMesswerteResult, name);
+                    } else {
+                        final String message = "SHP Export of BORIS Stations not permitted!";
+                        log.error(message);
+                        throw new Exception(message);
+                    }
                 } else {
                     final String message = "unsupported export format '" + exportFormat + "'";
                     log.error(message);
@@ -269,7 +294,8 @@ public class BorisExportAction extends AbstractExportAction {
      * @throws  UnknownTypeException  org.deegree.datatypes.UnknownTypeException
      * @throws  Exception             DOCUMENT ME!
      */
-    protected byte[] createShapeFile(final ResultSet resultSet, final String name) throws SQLException,
+    @Override
+    public byte[] createShapeFile(final ResultSet resultSet, final String name) throws SQLException,
         DBaseException,
         GeometryException,
         IOException,

@@ -69,8 +69,8 @@ public class H2GeoJsonJoiner {
         EXCLUDED_COLUMN_NAMES.add("THE_GEOM");
         EXCLUDED_COLUMN_NAMES.add("XKOORDINATE"); // WAGW_STATION
         EXCLUDED_COLUMN_NAMES.add("YKOORDINATE"); // WAGW_STATION
-        EXCLUDED_COLUMN_NAMES.add("RECHTSWERT"); // BORIS_SITE
-        EXCLUDED_COLUMN_NAMES.add("HOCHWERT");  // BORIS_SITE        
+        EXCLUDED_COLUMN_NAMES.add("RECHTSWERT");  // BORIS_SITE
+        EXCLUDED_COLUMN_NAMES.add("HOCHWERT");    // BORIS_SITE
     }
 
     //~ Instance fields --------------------------------------------------------
@@ -135,7 +135,7 @@ public class H2GeoJsonJoiner {
             LOG.error(message);
             throw new RuntimeException(message);
         }
-        
+
         this.initDatabase(exportConnection);
 
         LOG.info("merging " + this.exportParameters.size()

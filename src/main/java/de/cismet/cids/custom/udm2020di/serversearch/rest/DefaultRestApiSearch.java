@@ -46,7 +46,7 @@ import de.cismet.cidsx.server.search.RestApiCidsServerSearch;
 /**
  * DOCUMENT ME!
  *
- * @author   Pascal Dihé <pascrow.dihe@cismet.de>
+ * @author   Pascal Dihé <pascal.dihe@cismet.de>
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = RestApiCidsServerSearch.class)
@@ -92,6 +92,20 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
         searchParameterInfo.setDescription("WKT Search Geometry (e.g. POLYGON(....)");
         parameterDescription.add(searchParameterInfo);
 
+        searchParameterInfo = new SearchParameterInfo();
+        searchParameterInfo.setKey("limit");
+        searchParameterInfo.setType(Type.INTEGER);
+        searchParameterInfo.setArray(false);
+        searchParameterInfo.setDescription("Limit Search results ...");
+        parameterDescription.add(searchParameterInfo);
+
+        searchParameterInfo = new SearchParameterInfo();
+        searchParameterInfo.setKey("offset");
+        searchParameterInfo.setType(Type.INTEGER);
+        searchParameterInfo.setArray(false);
+        searchParameterInfo.setDescription("Offeset for paged search results");
+        parameterDescription.add(searchParameterInfo);
+
         SEARCH_INFO.setParameterDescription(parameterDescription);
 
         final SearchParameterInfo resultParameterInfo = new SearchParameterInfo();
@@ -111,6 +125,10 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
 
     @Getter @Setter private String geometry;
 
+    @Getter @Setter private int limit = 100;
+
+    @Getter @Setter private int offset = 0;
+
     //~ Constructors -----------------------------------------------------------
 
     /**
@@ -121,7 +139,7 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
     public DefaultRestApiSearch() throws IOException {
         this.defaultSearchStatementTpl = IOUtils.toString(
                 DefaultRestApiSearch.class.getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/serversearch/default-search-statement.tpl.sql"),
+                    "/de/cismet/cids/custom/udm2020di/serversearch/rest/default-search-statement.tpl.sql"),
                 "UTF-8");
     }
 
@@ -138,7 +156,7 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
                     && (this.themes.length != 0)) {
             LOGGER.info("performing default search for " + themes.length + " themes and "
                         + this.pollutants.length + " pollutants with geometry (length: " + this.geometry.length()
-                        + ")");
+                        + ") with offset=" + this.offset + " and limit=" + this.limit);
         } else {
             final String message = "cannot perform default search, missing parameters: "
                         + "geometry = " + ((this.geometry != null) ? this.geometry.length() : "null")
@@ -247,9 +265,10 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
                 LOGGER.warn(filteredNodes.size() + " Objects filtered due to insufficient permissions");
             }
 
-            LOGGER.info(resultNodes.size() + " object found during default search for " + themes.length + " themes and "
+            LOGGER.info(resultNodes.size() + " objects found during default search for " + themes.length
+                        + " themes and "
                         + this.pollutants.length + " pollutants with geometry (length: " + this.geometry.length()
-                        + ")");
+                        + ") in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
 
             return resultNodes;
         } catch (final Throwable t) {
@@ -259,34 +278,6 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
             LOGGER.error(message, t);              // NOI18N
             throw new SearchException(message, t); // NOI18N
         }
-
-//        int i = 0;
-//        for (final int classId : themes) {
-//            final Policy policy = CidsClassFactory.getFactory().createPolicy("STANDARD");
-//
-//            final MetaObjectNode node = new MetaObjectNode(
-//                    themes[0],
-//                    "TEST NODE #"
-//                            + i,
-//                    "Description of TEST NODE #"
-//                            + i,
-//                    "UDM2020-DI",
-//                    i,
-//                    classId,
-//                    false,
-//                    policy,
-//                    0,
-//                    null,
-//                    true,
-//                    null,
-//                    geometry,
-//                    lightweightJson);
-//
-//            nodes.add(node);
-//            i++;
-//        }
-//
-//        return nodes;
     }
 
     @Override
@@ -295,16 +286,17 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
     }
 
     /**
-     * Many think that ; is statement terminator in SQL on Oracle. It isn't. The ; at an end of statement is used by the
-     * client (for example SQLPlus) to tell where the statement ends and then sends the statement but not the ';' to the
-     * Oracle server.
+     * Many think that ; is a statement terminator in SQL on Oracle. It isn't. The ; at an end of statement is used by
+     * the client (for example SQLPlus) to tell where the statement ends and then sends the statement but not the ';' to
+     * the Oracle server!
      *
      * @return  DOCUMENT ME!
      */
     protected PreparableStatement createDefaultSearchStatement() {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("building default search sql statement for " + this.themes.length
-                        + " themes and " + this.pollutants.length + " pollutants");
+                        + " themes and " + this.pollutants.length + " pollutants with offset="
+                        + this.offset + " and limit=" + this.limit);
         }
 
         final StringBuilder classNamesBuilder = new StringBuilder();
@@ -332,8 +324,10 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
 
         final PreparableStatement preparableStatement = new PreparableStatement(
                 defaultSearchStatement,
-                Types.CLOB);
-        preparableStatement.setObjects(this.geometry);
+                Types.CLOB,
+                Types.INTEGER,
+                Types.INTEGER);
+        preparableStatement.setObjects(this.geometry, (this.offset + this.limit), this.offset);
 
         return preparableStatement;
     }

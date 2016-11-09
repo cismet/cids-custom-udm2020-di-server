@@ -135,20 +135,34 @@ public class OracleExport {
 
     protected Properties properties = null;
     @Getter protected OracleConnection sourceConnection;
+    @Getter protected final boolean standalone;
+    @Getter protected boolean initialised = false;
 
     //~ Constructors -----------------------------------------------------------
 
     /**
-     * Creates a new OracleImport object.
+     * Creates a new OracleExport object.
+     *
+     * @param  standalone  DOCUMENT ME!
+     */
+    public OracleExport(final boolean standalone) {
+        this.standalone = standalone;
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * Lazy initialisation function!
      *
      * @param   propertyFile  DOCUMENT ME!
-     * @param   standalone    DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      *
      * @throws  IOException             DOCUMENT ME!
      * @throws  ClassNotFoundException  DOCUMENT ME!
      * @throws  SQLException            DOCUMENT ME!
      */
-    public OracleExport(final InputStream propertyFile, final boolean standalone) throws IOException,
+    protected boolean init(final InputStream propertyFile) throws IOException,
         ClassNotFoundException,
         SQLException // throws IOException
     {
@@ -164,7 +178,7 @@ public class OracleExport {
             throw ioex;
         }
 
-        if (standalone) {
+        if (this.standalone) {
             PropertyConfigurator.configure(properties);
         }
 
@@ -190,9 +204,9 @@ public class OracleExport {
         } else {
             log.warn("no source connection specified!");
         }
-    }
 
-    //~ Methods ----------------------------------------------------------------
+        return true;
+    }
 
     /**
      * DOCUMENT ME!

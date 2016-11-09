@@ -75,49 +75,67 @@ public class BorisExportAction extends AbstractExportAction {
 
     //~ Instance fields --------------------------------------------------------
 
-    protected final String decodeSampleValuesStatementTpl;
-    protected final String exportBorisMesswerteStatementTpl;
+    protected String decodeSampleValuesStatementTpl;
+    protected String exportBorisMesswerteStatementTpl;
     /**
      * Standard BORIS Export does not contain coordinates (data protection restriction), therfore also common ShapeFile
      * Support is disabled. However for merging BORIS Exports with External Data (Shapefiles trasferred as GeoJson), a
      * ShapeFile is required anyway. The export Boris Messwerte To Shapefile Statement is therfore used in an INTERNAL
      * export initiated by the RestApiExportAction!
      */
-    protected final String exportBorisMesswerteToShapefileStatementTpl;
-    protected final String projectionFile;
+    protected String exportBorisMesswerteToShapefileStatementTpl;
+    protected String projectionFile;
 
     //~ Constructors -----------------------------------------------------------
 
     /**
+     * Creates a new BorisExportAction object.
+     */
+    public BorisExportAction() {
+        super();
+        this.log = Logger.getLogger(BorisExportAction.class);
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
      * Creates a new CsvExportAction object.
+     *
+     * @return  DOCUMENT ME!
      *
      * @throws  IOException             DOCUMENT ME!
      * @throws  ClassNotFoundException  DOCUMENT ME!
      * @throws  SQLException            DOCUMENT ME!
      */
-    public BorisExportAction() throws IOException, ClassNotFoundException, SQLException {
-        super(BorisImport.class.getResourceAsStream("boris.properties"));
-        this.log = Logger.getLogger(BorisExportAction.class);
-        log.info("new BorisExportAction created");
+    private boolean init() throws IOException, ClassNotFoundException, SQLException {
+        if (this.isInitialised()) {
+            log.error(this.getClass().getSimpleName() + " is already initialised!");
+            return this.isInitialised();
+        }
 
-        this.decodeSampleValuesStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/dataexport/boris/decode-boris-messwerte.tpl.sql"),
-                "UTF-8");
+        final boolean isInitialised = super.init(BorisImport.class.getResourceAsStream("boris.properties"));
+        if (isInitialised) {
+            this.decodeSampleValuesStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                        "/de/cismet/cids/custom/udm2020di/dataexport/boris/decode-boris-messwerte.tpl.sql"),
+                    "UTF-8");
 
-        this.exportBorisMesswerteStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/dataexport/boris/export-boris-messwerte.tpl.sql"),
-                "UTF-8");
+            this.exportBorisMesswerteStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                        "/de/cismet/cids/custom/udm2020di/dataexport/boris/export-boris-messwerte.tpl.sql"),
+                    "UTF-8");
 
-        this.exportBorisMesswerteToShapefileStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/dataexport/boris/export-boris-messwerte-to-shapefile.tpl.sql"),
-                "UTF-8");
+            this.exportBorisMesswerteToShapefileStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                        "/de/cismet/cids/custom/udm2020di/dataexport/boris/export-boris-messwerte-to-shapefile.tpl.sql"),
+                    "UTF-8");
 
-        this.projectionFile = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/dataexport/MGI_Austria_Lambert.prj"),
-                "UTF-8");
+            this.projectionFile = IOUtils.toString(this.getClass().getResourceAsStream(
+                        "/de/cismet/cids/custom/udm2020di/dataexport/MGI_Austria_Lambert.prj"),
+                    "UTF-8");
+
+            log.info(this.getClass().getSimpleName() + " initialised");
+        }
+
+        return isInitialised;
     }
-
-    //~ Methods ----------------------------------------------------------------
 
     /**
      * DOCUMENT ME!
@@ -188,6 +206,11 @@ public class BorisExportAction extends AbstractExportAction {
         Statement exportBorisMesswerteStatement = null;
         ResultSet exportBorisMesswerteResult = null;
         try {
+            if (!this.isInitialised()) {
+                log.info("performing lazy initilaisation of " + this.getClass().getSimpleName());
+                this.initialised = this.init();
+            }
+
             this.checkConnection();
 
             Object result = null;

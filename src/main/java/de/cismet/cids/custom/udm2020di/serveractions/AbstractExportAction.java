@@ -52,20 +52,17 @@ public abstract class AbstractExportAction extends OracleExport implements Serve
 
     /**
      * Creates a new AbstractExportAction object.
-     *
-     * @param   propertyFile  DOCUMENT ME!
-     *
-     * @throws  IOException             DOCUMENT ME!
-     * @throws  ClassNotFoundException  DOCUMENT ME!
-     * @throws  SQLException            DOCUMENT ME!
      */
-    public AbstractExportAction(final InputStream propertyFile) throws IOException,
-        ClassNotFoundException,
-        SQLException {
-        super(propertyFile, false);
+    public AbstractExportAction() {
+        super(false);
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    @Override
+    protected boolean init(final InputStream propertyFile) throws IOException, ClassNotFoundException, SQLException {
+        return super.init(propertyFile);
+    }
 
     /**
      * DOCUMENT ME!

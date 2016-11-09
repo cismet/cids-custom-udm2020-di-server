@@ -91,39 +91,58 @@ public class MossExportAction extends AbstractExportAction {
 
     //~ Instance fields --------------------------------------------------------
 
-    protected final String decodeSampleValuesStatementTpl;
-    protected final String exportMossStatementTpl;
-    protected final String projectionFile;
+    protected String decodeSampleValuesStatementTpl;
+    protected String exportMossStatementTpl;
+    protected String projectionFile;
 
     //~ Constructors -----------------------------------------------------------
 
     /**
+     * Creates a new MossExportAction object.
+     */
+    public MossExportAction() {
+        super();
+        this.log = Logger.getLogger(MossExportAction.class);
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
      * Creates a new CsvExportAction object.
+     *
+     * @return  DOCUMENT ME!
      *
      * @throws  IOException             DOCUMENT ME!
      * @throws  ClassNotFoundException  DOCUMENT ME!
      * @throws  SQLException            DOCUMENT ME!
      */
-    public MossExportAction() throws IOException, ClassNotFoundException, SQLException {
-        super(MossExportAction.class.getResourceAsStream(
-                "/de/cismet/cids/custom/udm2020di/indeximport/moss/moss.properties"));
-        this.log = Logger.getLogger(MossExportAction.class);
-        log.info("new MossExportAction created");
+    private synchronized boolean init() throws IOException, ClassNotFoundException, SQLException {
+        if (this.isInitialised()) {
+            log.error(this.getClass().getSimpleName() + " is already initialised!");
+            return this.isInitialised();
+        }
 
-        this.decodeSampleValuesStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/dataexport/moss/decode-moss-samples.tpl.sql"),
-                "UTF-8");
+        final boolean isInitialised = super.init(MossExportAction.class.getResourceAsStream(
+                    "/de/cismet/cids/custom/udm2020di/indeximport/moss/moss.properties"));
 
-        this.exportMossStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/dataexport/moss/export-moss-samples.tpl.sql"),
-                "UTF-8");
+        if (isInitialised) {
+            this.decodeSampleValuesStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                        "/de/cismet/cids/custom/udm2020di/dataexport/moss/decode-moss-samples.tpl.sql"),
+                    "UTF-8");
 
-        this.projectionFile = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/dataexport/GCS_WGS_1984.prj"),
-                "UTF-8");
+            this.exportMossStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                        "/de/cismet/cids/custom/udm2020di/dataexport/moss/export-moss-samples.tpl.sql"),
+                    "UTF-8");
+
+            this.projectionFile = IOUtils.toString(this.getClass().getResourceAsStream(
+                        "/de/cismet/cids/custom/udm2020di/dataexport/GCS_WGS_1984.prj"),
+                    "UTF-8");
+
+            log.info(this.getClass().getSimpleName() + " initialised");
+        }
+
+        return isInitialised;
     }
-
-    //~ Methods ----------------------------------------------------------------
 
     /**
      * DOCUMENT ME!
@@ -192,6 +211,11 @@ public class MossExportAction extends AbstractExportAction {
         Statement exportMossStatement = null;
         ResultSet exportMossResult = null;
         try {
+            if (!this.isInitialised()) {
+                log.info("performing lazy initilaisation of " + this.getClass().getSimpleName());
+                this.initialised = this.init();
+            }
+
             this.checkConnection();
 
             Object result = null;

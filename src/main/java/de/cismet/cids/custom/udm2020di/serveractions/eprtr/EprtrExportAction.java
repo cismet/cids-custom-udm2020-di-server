@@ -75,38 +75,57 @@ public class EprtrExportAction extends AbstractExportAction {
 
     //~ Instance fields --------------------------------------------------------
 
-    protected final String decodeSampleValuesStatementTpl;
-    protected final String exportEprtrReleaseStatementTpl;
-    protected final String projectionFile;
+    protected String decodeSampleValuesStatementTpl;
+    protected String exportEprtrReleaseStatementTpl;
+    protected String projectionFile;
 
     //~ Constructors -----------------------------------------------------------
 
     /**
+     * Creates a new EprtrExportAction object.
+     */
+    public EprtrExportAction() {
+        super();
+        this.log = Logger.getLogger(EprtrExportAction.class);
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
      * Creates a new CsvExportAction object.
+     *
+     * @return  DOCUMENT ME!
      *
      * @throws  IOException             DOCUMENT ME!
      * @throws  ClassNotFoundException  DOCUMENT ME!
      * @throws  SQLException            DOCUMENT ME!
      */
-    public EprtrExportAction() throws IOException, ClassNotFoundException, SQLException {
-        super(EprtrImport.class.getResourceAsStream("eprtr.properties"));
-        this.log = Logger.getLogger(EprtrExportAction.class);
-        log.info("new EprtrExportAction created");
+    private synchronized boolean init() throws IOException, ClassNotFoundException, SQLException {
+        if (this.isInitialised()) {
+            log.error(this.getClass().getSimpleName() + " is already initialised!");
+            return this.isInitialised();
+        }
 
-        this.decodeSampleValuesStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/dataexport/eprtr/decode-eprtr-releases.tpl.sql"),
-                "UTF-8");
+        final boolean isInitialised = super.init(EprtrImport.class.getResourceAsStream("eprtr.properties"));
 
-        this.exportEprtrReleaseStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/dataexport/eprtr/export-eprtr-releases.tpl.sql"),
-                "UTF-8");
+        if (isInitialised) {
+            this.decodeSampleValuesStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                        "/de/cismet/cids/custom/udm2020di/dataexport/eprtr/decode-eprtr-releases.tpl.sql"),
+                    "UTF-8");
 
-        this.projectionFile = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/dataexport/GCS_WGS_1984.prj"),
-                "UTF-8");
+            this.exportEprtrReleaseStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                        "/de/cismet/cids/custom/udm2020di/dataexport/eprtr/export-eprtr-releases.tpl.sql"),
+                    "UTF-8");
+
+            this.projectionFile = IOUtils.toString(this.getClass().getResourceAsStream(
+                        "/de/cismet/cids/custom/udm2020di/dataexport/GCS_WGS_1984.prj"),
+                    "UTF-8");
+
+            log.info(this.getClass().getSimpleName() + " initialised");
+        }
+
+        return isInitialised;
     }
-
-    //~ Methods ----------------------------------------------------------------
 
     /**
      * DOCUMENT ME!
@@ -177,6 +196,11 @@ public class EprtrExportAction extends AbstractExportAction {
         Statement exportEprtrReleaseStatement = null;
         ResultSet exportEprtrReleaseResult = null;
         try {
+            if (!this.isInitialised()) {
+                log.info("performing lazy initilaisation of " + this.getClass().getSimpleName());
+                this.initialised = this.init();
+            }
+
             this.checkConnection();
 
             Object result = null;

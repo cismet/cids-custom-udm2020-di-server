@@ -70,57 +70,76 @@ public abstract class WaExportAction extends AbstractExportAction {
 
     //~ Instance fields --------------------------------------------------------
 
-    protected final String decodeSampleValuesStatementTpl;
-    protected final String exportWaMesswerteStatementTpl;
-    protected final String exportWaMesswerteStatementToShapefileTpl;
-    protected final String projectionFile;
-    protected final String waSource;
+    protected String decodeSampleValuesStatementTpl;
+    protected String exportWaMesswerteStatementTpl;
+    protected String exportWaMesswerteStatementToShapefileTpl;
+    protected String projectionFile;
+    protected String waSource;
 
     //~ Constructors -----------------------------------------------------------
 
     /**
+     * Creates a new WaExportAction object.
+     *
+     * @param  waSource  DOCUMENT ME!
+     */
+    public WaExportAction(final String waSource) {
+        super();
+        this.waSource = waSource;
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
      * Creates a new CsvExportAction object.
      *
-     * @param   waSource  DOCUMENT ME!
+     * @return  DOCUMENT ME!
      *
      * @throws  IOException             DOCUMENT ME!
      * @throws  ClassNotFoundException  DOCUMENT ME!
      * @throws  SQLException            DOCUMENT ME!
      */
-    public WaExportAction(final String waSource) throws IOException, ClassNotFoundException, SQLException {
-        super(WaImport.class.getResourceAsStream(waSource + ".properties"));
-        this.waSource = waSource;
+    private synchronized boolean init() throws IOException, ClassNotFoundException, SQLException {
+        if (this.isInitialised()) {
+            log.error(this.getClass().getSimpleName() + " is already initialised!");
+            return this.isInitialised();
+        }
 
-        this.decodeSampleValuesStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/dataexport/"
-                            + waSource
-                            + "/decode-"
-                            + waSource
-                            + "-messwerte.tpl.sql"),
-                "UTF-8");
+        final boolean isInitialised = super.init(WaImport.class.getResourceAsStream(waSource + ".properties"));
 
-        this.exportWaMesswerteStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/dataexport/"
-                            + waSource
-                            + "/export-"
-                            + waSource
-                            + "-messwerte.tpl.sql"),
-                "UTF-8");
+        if (isInitialised) {
+            this.decodeSampleValuesStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                        "/de/cismet/cids/custom/udm2020di/dataexport/"
+                                + waSource
+                                + "/decode-"
+                                + waSource
+                                + "-messwerte.tpl.sql"),
+                    "UTF-8");
 
-        this.exportWaMesswerteStatementToShapefileTpl = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/dataexport/"
-                            + waSource
-                            + "/export-"
-                            + waSource
-                            + "-messwerte-to-shapefile.tpl.sql"),
-                "UTF-8");
+            this.exportWaMesswerteStatementTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                        "/de/cismet/cids/custom/udm2020di/dataexport/"
+                                + waSource
+                                + "/export-"
+                                + waSource
+                                + "-messwerte.tpl.sql"),
+                    "UTF-8");
 
-        this.projectionFile = IOUtils.toString(this.getClass().getResourceAsStream(
-                    "/de/cismet/cids/custom/udm2020di/dataexport/MGI_Austria_Lambert.prj"),
-                "UTF-8");
+            this.exportWaMesswerteStatementToShapefileTpl = IOUtils.toString(this.getClass().getResourceAsStream(
+                        "/de/cismet/cids/custom/udm2020di/dataexport/"
+                                + waSource
+                                + "/export-"
+                                + waSource
+                                + "-messwerte-to-shapefile.tpl.sql"),
+                    "UTF-8");
+
+            this.projectionFile = IOUtils.toString(this.getClass().getResourceAsStream(
+                        "/de/cismet/cids/custom/udm2020di/dataexport/MGI_Austria_Lambert.prj"),
+                    "UTF-8");
+            log.info(this.getClass().getSimpleName() + " initialised");
+        }
+
+        return isInitialised;
     }
-
-    //~ Methods ----------------------------------------------------------------
 
     /**
      * DOCUMENT ME!
@@ -192,6 +211,11 @@ public abstract class WaExportAction extends AbstractExportAction {
         Statement exportWaMesswerteStatement = null;
         ResultSet exportWaMesswerteResult = null;
         try {
+            if (!this.isInitialised()) {
+                log.info("performing lazy initilaisation of " + this.getClass().getSimpleName());
+                this.initialised = this.init();
+            }
+
             this.checkConnection();
 
             Object result = null;

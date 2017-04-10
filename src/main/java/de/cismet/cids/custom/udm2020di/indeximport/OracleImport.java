@@ -62,7 +62,8 @@ public class OracleImport extends OracleExport {
         ClassNotFoundException,
         SQLException // throws IOException
     {
-        super(propertyFile, true);
+        super(true);
+        this.initialised = super.init(propertyFile);
         this.log = Logger.getLogger(OracleImport.class);
 
         final ScriptEngineManager manager = new ScriptEngineManager();

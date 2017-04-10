@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -11,7 +10,7 @@
 
     <groupId>de.cismet.cids.custom.udm2020</groupId>
     <artifactId>cids-custom-udm2020-di-server</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>4.0</version>
     <packaging>jar</packaging>
 
     <name>cids Custom UDM 2020 - DI - Server</name>
@@ -32,7 +31,8 @@
         <connection>scm:git:https://github.com/cismet/cids-custom-udm2020-di-server.git</connection>
         <developerConnection>scm:git:git@github.com:cismet/cids-custom-udm2020-di-server.git</developerConnection>
         <url>https://github.com/cismet/cids-custom-udm2020-di-server</url>
-    </scm>
+      <tag>v4.0</tag>
+  </scm>
     <issueManagement>
         <system>GitHub</system>
         <url>https://github.com/cismet/cids-custom-udm2020-di-server/issues</url>
@@ -85,7 +85,7 @@
         <dependency>
             <groupId>de.cismet.cids</groupId>
             <artifactId>cids-server</artifactId>
-            <version>2.0-SNAPSHOT</version>
+            <version>2.0-UBA</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -115,7 +115,7 @@
         <dependency>
             <groupId>de.cismet</groupId>
             <artifactId>jcommander</artifactId>
-            <version>1.36-SNAPSHOT</version>
+            <version>4.0</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
@@ -215,7 +215,7 @@
         <dependency>
             <groupId>de.cismet.commons</groupId>
             <artifactId>cismap-commons</artifactId>
-            <version>2.0-SNAPSHOT</version>
+            <version>4.0</version>
             <type>jar</type>
             <exclusions>
                 <exclusion>
@@ -255,7 +255,7 @@
         <dependency>
             <groupId>de.cismet.cids</groupId>
             <artifactId>cids-server-rest-types</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0-UBA</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -363,7 +363,7 @@
         <dependency>
             <groupId>de.cismet.commons</groupId>
             <artifactId>cismet-commons</artifactId>
-            <version>2.0-20161010.075354-98</version>
+            <version>4.0</version>
         </dependency>
     </dependencies>
 

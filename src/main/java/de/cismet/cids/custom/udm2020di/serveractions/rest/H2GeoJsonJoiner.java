@@ -9,6 +9,7 @@ package de.cismet.cids.custom.udm2020di.serveractions.rest;
 
 import org.apache.log4j.Logger;
 
+import org.h2gis.h2spatialext.CreateSpatialExtension;
 import org.h2gis.utilities.SFSUtilities;
 import org.h2gis.utilities.wrapper.ConnectionWrapper;
 import org.h2gis.utilities.wrapper.StatementWrapper;
@@ -49,8 +50,8 @@ public class H2GeoJsonJoiner {
 
     private static final Logger LOG = Logger.getLogger(H2GeoJsonJoiner.class);
     private static final String SPATIAL_INIT = "CALL SPATIAL_INIT();";
-    private static final String CREATE_SPATIAL_INIT_ALIAS =
-        "CREATE ALIAS IF NOT EXISTS SPATIAL_INIT FOR  \"org.h2gis.h2spatialext.CreateSpatialExtension.initSpatialExtension\";";
+    private static final String CREATE_SPATIAL_INIT_ALIAS = "CREATE ALIAS IF NOT EXISTS SPATIAL_INIT FOR  \""
+                + CreateSpatialExtension.class.getCanonicalName() + ".initSpatialExtension\";";
     private static final String TRANSFORM =
         "update %TABLE_NAME% set the_geom = st_transform(st_setsrid(the_geom, %MERGE_SRID%), %EXPORT_SRID%)";
     private static final String SET_SRID = "update %TABLE_NAME% set the_geom = st_setsrid(the_geom, %EXPORT_SRID%)";

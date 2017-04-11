@@ -48,7 +48,7 @@
     
     <dependencyManagement>  
         <dependencies>
-             <!-- 
+            <!-- 
                  Override Jackson Dependencies managed in ext-bom
                  with newer version!
             -->   
@@ -82,11 +82,6 @@
                 <version>5.0.3</version>
             </dependency>
             <dependency>
-                <groupId>de.cismet.custom</groupId>
-                <artifactId>beansbinding</artifactId>
-                <version>5.0</version>
-            </dependency>
-            <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server-rest-types</artifactId>
                 <version>5.0-UBA</version>
@@ -95,11 +90,6 @@
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
                 <version>5.0-UBA</version>
-            </dependency>
-            <dependency>
-                <groupId>de.cismet</groupId>
-                <artifactId>jcommander</artifactId>
-                <version>5.0</version>
             </dependency>
             <dependency>
                 <groupId>de.cismet.commons</groupId>
@@ -128,24 +118,12 @@
             <artifactId>cismap-commons</artifactId>
         </dependency>
         <dependency>
-            <groupId>de.cismet.custom</groupId>
-            <artifactId>beansbinding</artifactId>
-        </dependency>
-        <dependency>
             <groupId>de.cismet.cids</groupId>
             <artifactId>cids-server-rest-types</artifactId>
         </dependency>
         <dependency>
             <groupId>de.cismet.cids</groupId>
             <artifactId>cids-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>de.cismet</groupId>
-            <artifactId>jcommander</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>de.cismet.commons</groupId>
-            <artifactId>oracle-11g-geometry-factory</artifactId>
         </dependency>
         <dependency>
             <groupId>de.cismet.custom</groupId>
@@ -195,30 +173,6 @@
             <artifactId>jackson-annotations</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.jaxrs</groupId>
-            <artifactId>jackson-jaxrs-base</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.jaxrs</groupId>
-            <artifactId>jackson-jaxrs-json-provider</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-jaxb-annotations</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-openide-util</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-openide-util-lookup</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.vividsolutions</groupId>
             <artifactId>jts</artifactId>
         </dependency>
@@ -226,8 +180,32 @@
         
         <!-- BEGIN: runtime dependencies -->
         <dependency>
+            <groupId>de.cismet.commons</groupId>
+            <artifactId>oracle-11g-geometry-factory</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml-schemas</artifactId>
+            <version>3.12</version>
+            <scope>runtime</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>stax</groupId>
+                    <artifactId>stax-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.188</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
             <artifactId>slf4j-log4j12</artifactId>
             <groupId>org.slf4j</groupId>     
+            <scope>runtime</scope>
         </dependency>
         <!-- END: runtime dependencies -->
 
@@ -235,6 +213,11 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-util-lookup</artifactId>
             <scope>provided</scope>
         </dependency>
         <!-- END: provided dependencies -->
@@ -250,45 +233,9 @@
             <version>3.12</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml-schemas</artifactId>
-            <version>3.12</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>stax</groupId>
-                    <artifactId>stax-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>com.oracle.jdbc</groupId>
             <artifactId>ojdbc7</artifactId>
             <version>12.1.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.4.188</version>
-        </dependency>
-        <dependency>
-            <groupId>org.orbisgis</groupId>
-            <artifactId>h2drivers</artifactId>
-            <version>1.2.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.orbisgis</groupId>
-            <artifactId>h2network</artifactId>
-            <version>1.2.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.orbisgis</groupId>
-            <artifactId>h2spatial</artifactId>
-            <version>1.2.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.orbisgis</groupId>
-            <artifactId>h2spatial-api</artifactId>
-            <version>1.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.orbisgis</groupId>

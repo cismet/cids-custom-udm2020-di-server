@@ -10,7 +10,7 @@
 
     <groupId>de.cismet.cids.custom.udm2020</groupId>
     <artifactId>cids-custom-udm2020-di-server</artifactId>
-    <version>4.1-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>cids Custom UiM 2020 - DI - Server</name>
@@ -94,7 +94,7 @@
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>oracle-11g-geometry-factory</artifactId>
-                <version>5.0.1</version>
+                <version>5.0</version>
             </dependency>
             <dependency>
                 <groupId>de.cismet.custom</groupId>
@@ -179,6 +179,10 @@
         <!-- END: managed dependencies -->
         
         <!-- BEGIN: runtime dependencies -->
+        <!--
+            Why 5.0 and not 5.0.1?
+            -> https://cismet.slack.com/files/pascal.dihe/F4XGNFLLA/Oracle_JDBC_Treiber
+        -->
         <dependency>
             <groupId>de.cismet.commons</groupId>
             <artifactId>oracle-11g-geometry-factory</artifactId>
@@ -215,11 +219,6 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-openide-util-lookup</artifactId>
-            <scope>provided</scope>
-        </dependency>
         <!-- END: provided dependencies -->
           
         <dependency>
@@ -233,11 +232,6 @@
             <version>3.12</version>
         </dependency>
         <dependency>
-            <groupId>com.oracle.jdbc</groupId>
-            <artifactId>ojdbc7</artifactId>
-            <version>12.1.0.2</version>
-        </dependency>
-        <dependency>
             <groupId>org.orbisgis</groupId>
             <artifactId>h2spatial-ext</artifactId>
             <version>1.2.3</version>
@@ -246,6 +240,14 @@
             <groupId>org.orbisgis</groupId>
             <artifactId>spatial-utilities</artifactId>
             <version>1.2.3</version>
+        </dependency>
+        <!--
+            See https://cismet.slack.com/files/pascal.dihe/F4XGNFLLA/Oracle_JDBC_Treiber
+        -->
+        <dependency>
+            <groupId>oracle.jdbc</groupId>
+            <artifactId>ojdbc7_g</artifactId>
+            <version>1.0</version>
         </dependency>
     </dependencies>
 

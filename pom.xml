@@ -94,7 +94,7 @@
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>oracle-11g-geometry-factory</artifactId>
-                <version>5.0</version>
+                <version>5.0.2</version>
             </dependency>
             <dependency>
                 <groupId>de.cismet.custom</groupId>
@@ -112,10 +112,22 @@
         <dependency>
             <groupId>de.cismet.commons</groupId>
             <artifactId>cismet-commons</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.vividsolutions</groupId>
+                    <artifactId>jts</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>de.cismet.commons</groupId>
             <artifactId>cismap-commons</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.vividsolutions</groupId>
+                    <artifactId>jts</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>de.cismet.cids</groupId>
@@ -124,10 +136,22 @@
         <dependency>
             <groupId>de.cismet.cids</groupId>
             <artifactId>cids-server</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.vividsolutions</groupId>
+                    <artifactId>jts</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>de.cismet.custom</groupId>
             <artifactId>cismet-deegree</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.vividsolutions</groupId>
+                    <artifactId>jts</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- END: cids-dependencies -->
         
@@ -171,10 +195,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.vividsolutions</groupId>
-            <artifactId>jts</artifactId>
         </dependency>
         <!-- END: managed dependencies -->
         
@@ -235,19 +255,33 @@
             <groupId>org.orbisgis</groupId>
             <artifactId>h2spatial-ext</artifactId>
             <version>1.2.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.vividsolutions</groupId>
+                    <artifactId>jts</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.orbisgis</groupId>
             <artifactId>spatial-utilities</artifactId>
             <version>1.2.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.vividsolutions</groupId>
+                    <artifactId>jts</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-        <!--
-            See https://cismet.slack.com/files/pascal.dihe/F4XGNFLLA/Oracle_JDBC_Treiber
-        -->
         <dependency>
-            <groupId>oracle.jdbc</groupId>
-            <artifactId>ojdbc7_g</artifactId>
-            <version>1.0</version>
+            <groupId>com.vividsolutions</groupId>
+            <artifactId>jts-core</artifactId>
+            <version>1.14.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle.jdbc</groupId>
+            <artifactId>ojdbc7</artifactId>
+            <version>12.1.0.2</version>
         </dependency>
     </dependencies>
 

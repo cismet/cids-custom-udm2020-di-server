@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>de.cismet.cids</groupId>
-        <artifactId>cids-parent</artifactId>
+        <groupId>de.cismet</groupId>
+        <artifactId>cismet-parent</artifactId>
         <version>5.0.1</version>
     </parent>
 
@@ -199,10 +199,6 @@
         <!-- END: managed dependencies -->
         
         <!-- BEGIN: runtime dependencies -->
-        <!--
-            Why 5.0 and not 5.0.1?
-            -> https://cismet.slack.com/files/pascal.dihe/F4XGNFLLA/Oracle_JDBC_Treiber
-        -->
         <dependency>
             <groupId>de.cismet.commons</groupId>
             <artifactId>oracle-11g-geometry-factory</artifactId>

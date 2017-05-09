@@ -174,7 +174,10 @@ public class H2GeoJsonJoiner {
         while (mergeParameterIterator.hasNext()) {
             final Parameter parameter = mergeParameterIterator.next();
 
-            mergeParameterBuilder.append("merge.").append('\"').append(parameter.getParameterName()).append('\"');
+            mergeParameterBuilder.append("merge.")
+                    .append('\"')
+                    .append(parameter.getParameterName().toUpperCase())
+                    .append('\"');
             // mergeParameterBuilder.append(" AS \'").append(parameter.getParameterName()).append('\'');
             if (mergeParameterIterator.hasNext()) {
                 mergeParameterBuilder.append(',');
@@ -197,12 +200,12 @@ public class H2GeoJsonJoiner {
     public void close() {
         try {
             exportConnection.close();
-            deleteDirectory(new File(dbPath));
+            // deleteDirectory(new File(dbPath));
         } catch (SQLException e) {
             LOG.error("Error while closing db connection: " + e.getMessage(), e);
         }
-        deleteDirectory(exportDataShape.getParentFile());
-        deleteDirectory(mergeGeoJson.getParentFile());
+        // deleteDirectory(exportDataShape.getParentFile());
+        // deleteDirectory(mergeGeoJson.getParentFile());
     }
 
     /**
@@ -270,7 +273,7 @@ public class H2GeoJsonJoiner {
         final String update = SET_SRID.replace("%TABLE_NAME%", table)
                     .replace("%EXPORT_SRID%", String.valueOf(exportSrid));
         try(final StatementWrapper statementWrapper = createStatement(connectionWrapper)) {
-            statementWrapper.execute("CALL SHPREAD('" + shpFile + "', '" + table + "');");
+            statementWrapper.execute("CALL SHPREAD('" + shpFile + "', '" + table + "', 'ISO-8859-1');");
             statementWrapper.execute(update);
         }
 

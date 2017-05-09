@@ -73,16 +73,19 @@ public class WagwExportAction extends WaExportAction {
 
             final Collection<Parameter> parameter = Arrays.asList(
                     new Parameter[] {
-                        new Parameter("G146", "Param 1"),
-                        new Parameter("G145", "Wasweissisch"),
-                        new Parameter("G142", "SchadstoffX"),
+                        new Parameter("G146", "PPPP µg/l"),
+                        new Parameter("G145", "Was.WEIissisch"),
+                        new Parameter("G142", "Schadstof. X"),
+                        new Parameter("G142", "G142  X x"),
+                        new Parameter("F833", "ZINK GES. µg/l")
                     });
 
             final ServerActionParameter[] serverActionParameters = new ServerActionParameter[] {
                     new ServerActionParameter<Collection<String>>(PARAM_MESSSTELLEN, messstellePks),
                     new ServerActionParameter<Collection<Parameter>>(PARAM_PARAMETER, parameter),
-                    new ServerActionParameter<String>(PARAM_EXPORTFORMAT, PARAM_EXPORTFORMAT_XLSX),
-                    new ServerActionParameter<String>(PARAM_NAME, "wagw-shape-export")
+                    new ServerActionParameter<String>(PARAM_EXPORTFORMAT, PARAM_EXPORTFORMAT_SHP),
+                    new ServerActionParameter<String>(PARAM_NAME, "wagw-shape-export"),
+                    new ServerActionParameter<Boolean>(PARAM_INTERNAL, true),
                 };
 
             BasicConfigurator.configure();
@@ -90,8 +93,8 @@ public class WagwExportAction extends WaExportAction {
 
             final Object result = exportAction.execute(null, serverActionParameters);
             // final Path file = Files.write(Paths.get("wagw-export.csv"), result.toString().getBytes("UTF-8"));
-            final Path file = Files.write(Paths.get("wagw-export.XLSX"), (byte[])result);
-            // final Path file = Files.write(Paths.get("wagw-export.zip"), (byte[])result);
+            // final Path file = Files.write(Paths.get("wagw-export.XLSX"), (byte[])result);
+            final Path file = Files.write(Paths.get("wagw-export.zip"), (byte[])result);
             System.out.println("Export File written to "
                         + file.toAbsolutePath().toString());
         } catch (Throwable ex) {

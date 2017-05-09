@@ -9,6 +9,8 @@ package de.cismet.cids.custom.udm2020di.serveractions;
 
 import oracle.jdbc.OracleConnection;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -22,6 +24,9 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
+import java.text.NumberFormat;
+
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -114,9 +119,22 @@ public abstract class AbstractExportAction extends OracleExport implements Serve
         while (resultSet.next()) {
             row = exportSheet.createRow(rowIndex++);
             for (int i = 1; i <= columnCount; i++) {
-                final String value = resultSet.getString(i);
-                if ((value != null) && (!value.isEmpty())) {
-                    row.createCell(i - 1).setCellValue(value);
+//                if (log.isDebugEnabled()) {
+//                    log.debug("column #" + i + " type = " + resultSet.getMetaData().getColumnTypeName(i));
+//                }
+                if ((resultSet.getMetaData().getScale(i) > 0)
+                            || resultSet.getMetaData().getColumnTypeName(i).equals("NUMBER")) {
+                    final double value = resultSet.getDouble(i);
+                    final Cell cell = row.createCell(i - 1);
+                    // final CellStyle style = workbook.createCellStyle();
+                    // style.setDataFormat(workbook.createDataFormat().getFormat("#,############"));
+                    // cell.setCellStyle(style);
+                    cell.setCellValue(value);
+                } else {
+                    final String value = resultSet.getString(i);
+                    if ((value != null) && (!value.isEmpty())) {
+                        row.createCell(i - 1).setCellValue(value);
+                    }
                 }
             }
         }
@@ -169,7 +187,14 @@ public abstract class AbstractExportAction extends OracleExport implements Serve
         int numResults = 0;
         while (resultSet.next()) {
             for (int i = 1; i <= columnCount; i++) {
-                final String value = resultSet.getString(i);
+                final String value;
+                if ((resultSet.getMetaData().getScale(i) > 0)
+                            || resultSet.getMetaData().getColumnTypeName(i).equals("NUMBER")) {
+                    value = NumberFormat.getNumberInstance(Locale.GERMANY).format(resultSet.getDouble(i));
+                } else {
+                    value = resultSet.getString(i);
+                }
+
                 if ((value != null) && (value.length() > 0)) {
                     csvBuilder.append('\"');
                     csvBuilder.append(value.replace('\"', '\'').replace('\n', ' '));

@@ -29,11 +29,14 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import java.text.NumberFormat;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.zip.ZipOutputStream;
 
@@ -345,14 +348,20 @@ public abstract class WaExportAction extends AbstractExportAction {
         for (int columnNum = 1; columnNum <= columnCount; columnNum++) {
             aliasAttributeList.add(
                 new String[] {
-                    metaData.getColumnLabel(columnNum),
-                    metaData.getColumnName(columnNum)
+                    metaData.getColumnName(columnNum).replaceAll("\\.", new String()).replace(
+                        ' ',
+                        '_').trim(),
+                    metaData.getColumnName(columnNum).replaceAll("\\.", new String()).replace(
+                        ' ',
+                        '_').trim()
                 });
 
             propertyTypesMap.put(
                 metaData.getColumnName(columnNum),
                 new FeatureServiceAttribute(
-                    metaData.getColumnName(columnNum),
+                    metaData.getColumnName(columnNum).replaceAll("\\.", new String()).replace(
+                        ' ',
+                        '_').trim(),
                     String.valueOf(Types.getTypeNameForSQLTypeCode(metaData.getColumnType(columnNum))),
                     true));
         }
@@ -390,7 +399,27 @@ public abstract class WaExportAction extends AbstractExportAction {
                     new DefaultLayerProperties());
 
             for (int columnNum = 1; columnNum <= columnCount; columnNum++) {
-                feature.addProperty(metaData.getColumnName(columnNum), resultSet.getString(columnNum));
+                final Object value;
+                if ((resultSet.getMetaData().getScale(columnNum) > 0)
+                            || resultSet.getMetaData().getColumnTypeName(columnNum).equals("NUMBER")) {
+                    // FIXME:
+                    // invalid data type at field: 3
+                    // at org.deegree.io.dbaseapi.DBFDataSection.setRecord(DBFDataSection.java:133)
+                    // when using other types than String!
+                    value = NumberFormat.getNumberInstance(Locale.GERMANY).format(resultSet.getDouble(columnNum));
+                } else {
+                    value = resultSet.getString(columnNum);
+                }
+                // value = resultSet.getObject(columnNum);
+                if (value != null) {
+                    System.out.println(metaData.getColumnName(columnNum).replaceAll("\\.", new String()).replace(
+                            ' ',
+                            '_').trim());
+                    feature.addProperty(metaData.getColumnName(columnNum).replaceAll("\\.", new String()).replace(
+                            ' ',
+                            '_').trim(),
+                        value);
+                }
             }
 
             feature.addProperty("geom", geometry);

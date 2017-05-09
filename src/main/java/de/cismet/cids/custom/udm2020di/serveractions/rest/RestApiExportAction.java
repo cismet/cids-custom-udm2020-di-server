@@ -432,7 +432,7 @@ public class RestApiExportAction implements RestApiCidsServerAction {
         }
 
         LOGGER.info("Export successfully performed for " + exportOptions.getExportThemes().size()
-                    + " themes to '" + MediaTypes.APPLICATION_ZIP
+                    + " themes to '" + actionResult.getContentType()
                     + "' in " + ((System.currentTimeMillis() - current) / 1000) + "s.");
         return actionResult;
     }

@@ -35,12 +35,15 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import java.text.NumberFormat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.zip.ZipOutputStream;
 
@@ -333,28 +336,7 @@ public class BorisExportAction extends AbstractExportAction {
         final Map<String, FeatureServiceAttribute> propertyTypesMap =
             new LinkedHashMap<String, FeatureServiceAttribute>();
 
-        for (int columnNum = 1; columnNum <= columnCount; columnNum++) {
-            aliasAttributeList.add(
-                new String[] {
-                    metaData.getColumnLabel(columnNum),
-                    metaData.getColumnName(columnNum)
-                });
-
-            propertyTypesMap.put(
-                metaData.getColumnName(columnNum),
-                new FeatureServiceAttribute(
-                    metaData.getColumnName(columnNum),
-                    String.valueOf(Types.getTypeNameForSQLTypeCode(metaData.getColumnType(columnNum))),
-                    true));
-        }
-
-        aliasAttributeList.add(new String[] { "geom", "geom" });
-        propertyTypesMap.put(
-            "geom",
-            new FeatureServiceAttribute(
-                "geom",
-                String.valueOf(Types.GEOMETRY),
-                true));
+        this.fillPropertyTypesMap(metaData, columnCount, aliasAttributeList, propertyTypesMap);
 
         final List<FeatureServiceFeature> featureList = new ArrayList<FeatureServiceFeature>();
         int rowNum = 0;
@@ -375,16 +357,12 @@ public class BorisExportAction extends AbstractExportAction {
             }
 
             final Geometry geometry = geometryFactory.createPoint(new Coordinate(RECHTSWERT, HOCHWERT));
-            final FeatureServiceFeature feature = new DefaultFeatureServiceFeature(
+            final FeatureServiceFeature feature = this.createFeatureServiceFeature(
                     id,
                     geometry,
-                    new DefaultLayerProperties());
-
-            for (int columnNum = 1; columnNum <= columnCount; columnNum++) {
-                feature.addProperty(metaData.getColumnName(columnNum), resultSet.getString(columnNum));
-            }
-
-            feature.addProperty("geom", geometry);
+                    resultSet,
+                    metaData,
+                    columnCount);
             featureList.add(feature);
         }
 

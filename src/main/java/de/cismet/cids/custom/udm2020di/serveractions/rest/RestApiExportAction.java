@@ -466,7 +466,7 @@ public class RestApiExportAction implements RestApiCidsServerAction {
 
             final ResultSet mergedResultSet = geoJsonJoiner.getResultSet();
             final Object result;
-            if (exportTheme.getExportFormat().equalsIgnoreCase(PARAM_EXPORTFORMAT_CSV)) {
+            if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_CSV)) {
                 result = exportAction.createCsv(mergedResultSet, exportTheme.getTitle(), false);
             } else if (exportFormat.equalsIgnoreCase(PARAM_EXPORTFORMAT_XLSX)) {
                 result = exportAction.createXlsx(mergedResultSet, exportTheme.getTitle());

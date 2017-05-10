@@ -38,7 +38,10 @@ import de.cismet.cids.custom.udm2020di.types.Parameter;
 import de.cismet.tools.FileUtils;
 
 /**
- * DOCUMENT ME!
+ * Merge Data Export (as SHP File) with external SHP Files (as GeoJSON!).
+ *
+ * <p>Known Limitations: - During SHP Export, information about column types is lost. All DBF Columns are varchar(127)!
+ * - DBF Column names lengt limitation! Export may fail with duplicate column name</p>
  *
  * @author   therter, Pascal Dihé <pascal@cismet.de>
  * @version  $Revision$, $Date$
@@ -200,12 +203,12 @@ public class H2GeoJsonJoiner {
     public void close() {
         try {
             exportConnection.close();
-            // deleteDirectory(new File(dbPath));
+            deleteDirectory(new File(dbPath));
         } catch (SQLException e) {
             LOG.error("Error while closing db connection: " + e.getMessage(), e);
         }
-        // deleteDirectory(exportDataShape.getParentFile());
-        // deleteDirectory(mergeGeoJson.getParentFile());
+        deleteDirectory(exportDataShape.getParentFile());
+        deleteDirectory(mergeGeoJson.getParentFile());
     }
 
     /**

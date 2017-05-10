@@ -345,34 +345,7 @@ public abstract class WaExportAction extends AbstractExportAction {
         final Map<String, FeatureServiceAttribute> propertyTypesMap =
             new LinkedHashMap<String, FeatureServiceAttribute>();
 
-        for (int columnNum = 1; columnNum <= columnCount; columnNum++) {
-            aliasAttributeList.add(
-                new String[] {
-                    metaData.getColumnName(columnNum).replaceAll("\\.", new String()).replace(
-                        ' ',
-                        '_').trim(),
-                    metaData.getColumnName(columnNum).replaceAll("\\.", new String()).replace(
-                        ' ',
-                        '_').trim()
-                });
-
-            propertyTypesMap.put(
-                metaData.getColumnName(columnNum),
-                new FeatureServiceAttribute(
-                    metaData.getColumnName(columnNum).replaceAll("\\.", new String()).replace(
-                        ' ',
-                        '_').trim(),
-                    String.valueOf(Types.getTypeNameForSQLTypeCode(metaData.getColumnType(columnNum))),
-                    true));
-        }
-
-        aliasAttributeList.add(new String[] { "geom", "geom" });
-        propertyTypesMap.put(
-            "geom",
-            new FeatureServiceAttribute(
-                "geom",
-                String.valueOf(Types.GEOMETRY),
-                true));
+        this.fillPropertyTypesMap(metaData, columnCount, aliasAttributeList, propertyTypesMap);
 
         final List<FeatureServiceFeature> featureList = new ArrayList<FeatureServiceFeature>();
         int rowNum = 0;
@@ -393,36 +366,12 @@ public abstract class WaExportAction extends AbstractExportAction {
             }
 
             final Geometry geometry = geometryFactory.createPoint(new Coordinate(RECHTSWERT, HOCHWERT));
-            final FeatureServiceFeature feature = new DefaultFeatureServiceFeature(
+            final FeatureServiceFeature feature = this.createFeatureServiceFeature(
                     id,
                     geometry,
-                    new DefaultLayerProperties());
-
-            for (int columnNum = 1; columnNum <= columnCount; columnNum++) {
-                final Object value;
-                if ((resultSet.getMetaData().getScale(columnNum) > 0)
-                            || resultSet.getMetaData().getColumnTypeName(columnNum).equals("NUMBER")) {
-                    // FIXME:
-                    // invalid data type at field: 3
-                    // at org.deegree.io.dbaseapi.DBFDataSection.setRecord(DBFDataSection.java:133)
-                    // when using other types than String!
-                    value = NumberFormat.getNumberInstance(Locale.GERMANY).format(resultSet.getDouble(columnNum));
-                } else {
-                    value = resultSet.getString(columnNum);
-                }
-                // value = resultSet.getObject(columnNum);
-                if (value != null) {
-                    System.out.println(metaData.getColumnName(columnNum).replaceAll("\\.", new String()).replace(
-                            ' ',
-                            '_').trim());
-                    feature.addProperty(metaData.getColumnName(columnNum).replaceAll("\\.", new String()).replace(
-                            ' ',
-                            '_').trim(),
-                        value);
-                }
-            }
-
-            feature.addProperty("geom", geometry);
+                    resultSet,
+                    metaData,
+                    columnCount);
             featureList.add(feature);
         }
 

@@ -9,7 +9,6 @@ package de.cismet.cids.custom.udm2020di.serveractions.rest;
 
 import org.apache.log4j.Logger;
 
-import org.h2gis.h2spatialext.CreateSpatialExtension;
 import org.h2gis.utilities.SFSUtilities;
 import org.h2gis.utilities.wrapper.ConnectionWrapper;
 import org.h2gis.utilities.wrapper.StatementWrapper;
@@ -39,7 +38,10 @@ import de.cismet.cids.custom.udm2020di.types.Parameter;
 import de.cismet.tools.FileUtils;
 
 /**
- * DOCUMENT ME!
+ * Merge Data Export (as SHP File) with external SHP Files (as GeoJSON!).
+ *
+ * <p>Known Limitations: - During SHP Export, information about column types is lost. All DBF Columns are varchar(127)!
+ * - DBF Column names lengt limitation! Export may fail with duplicate column name</p>
  *
  * @author   therter, Pascal Dihé <pascal@cismet.de>
  * @version  $Revision$, $Date$
@@ -49,9 +51,9 @@ public class H2GeoJsonJoiner {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final Logger LOG = Logger.getLogger(H2GeoJsonJoiner.class);
-    private static final String SPATIAL_INIT = "CALL SPATIAL_INIT();";
-    private static final String CREATE_SPATIAL_INIT_ALIAS = "CREATE ALIAS IF NOT EXISTS SPATIAL_INIT FOR  \""
-                + CreateSpatialExtension.class.getCanonicalName() + ".initSpatialExtension\";";
+    private static final String SPATIAL_INIT = "CALL H2GIS_SPATIAL();";
+    private static final String CREATE_SPATIAL_INIT_ALIAS =
+        "CREATE ALIAS IF NOT EXISTS H2GIS_SPATIAL FOR \"org.h2gis.functions.factory.H2GISFunctions.load\";";
     private static final String TRANSFORM =
         "update %TABLE_NAME% set the_geom = st_transform(st_setsrid(the_geom, %MERGE_SRID%), %EXPORT_SRID%)";
     private static final String SET_SRID = "update %TABLE_NAME% set the_geom = st_setsrid(the_geom, %EXPORT_SRID%)";
@@ -175,7 +177,10 @@ public class H2GeoJsonJoiner {
         while (mergeParameterIterator.hasNext()) {
             final Parameter parameter = mergeParameterIterator.next();
 
-            mergeParameterBuilder.append("merge.").append('\"').append(parameter.getParameterName()).append('\"');
+            mergeParameterBuilder.append("merge.")
+                    .append('\"')
+                    .append(parameter.getParameterName().toUpperCase())
+                    .append('\"');
             // mergeParameterBuilder.append(" AS \'").append(parameter.getParameterName()).append('\'');
             if (mergeParameterIterator.hasNext()) {
                 mergeParameterBuilder.append(',');
@@ -271,7 +276,7 @@ public class H2GeoJsonJoiner {
         final String update = SET_SRID.replace("%TABLE_NAME%", table)
                     .replace("%EXPORT_SRID%", String.valueOf(exportSrid));
         try(final StatementWrapper statementWrapper = createStatement(connectionWrapper)) {
-            statementWrapper.execute("CALL SHPREAD('" + shpFile + "', '" + table + "');");
+            statementWrapper.execute("CALL SHPREAD('" + shpFile + "', '" + table + "', 'ISO-8859-1');");
             statementWrapper.execute(update);
         }
 

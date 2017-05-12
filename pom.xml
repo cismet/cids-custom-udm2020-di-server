@@ -44,6 +44,8 @@
 
     <properties>
         <jackson.version>2.6.7</jackson.version>
+        <poi.version>3.12</poi.version>
+        <h2gis.version>1.3.1</h2gis.version>
     </properties>
     
     <dependencyManagement>  
@@ -79,7 +81,7 @@
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismap-commons</artifactId>
-                <version>5.0.7</version>
+                <version>5.0.8</version>
             </dependency>
             <dependency>
                 <groupId>de.cismet.cids</groupId>
@@ -89,7 +91,7 @@
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>5.0-UBA</version>
+                <version>5.0.1-UBA</version>
             </dependency>
             <dependency>
                 <groupId>de.cismet.commons</groupId>
@@ -102,8 +104,6 @@
                 <version>2.3.8</version>
             </dependency>
             <!-- END: managed cids-dependencies -->
-         
-           
         </dependencies>
     </dependencyManagement>
 
@@ -211,7 +211,7 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml-schemas</artifactId>
-            <version>3.12</version>
+            <version>${poi.version}</version>
             <scope>runtime</scope>
             <exclusions>
                 <exclusion>
@@ -234,7 +234,7 @@
         <dependency>
             <groupId>org.orbisgis</groupId>
             <artifactId>h2gis-functions</artifactId>
-            <version>1.3.1</version>
+            <version>${h2gis.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.vividsolutions</groupId>
@@ -256,17 +256,17 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>3.12</version>
+            <version>${poi.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>3.12</version>
+            <version>${poi.version}</version>
         </dependency>
         <dependency>
             <groupId>org.orbisgis</groupId>
             <artifactId>h2gis-utilities</artifactId>
-            <version>1.3.1</version>
+            <version>${h2gis.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.vividsolutions</groupId>
@@ -285,17 +285,4 @@
             <version>12.1.0.2</version>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.9</version>
-                <configuration>
-                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

@@ -98,6 +98,20 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
         searchParameterInfo.setArray(false);
         searchParameterInfo.setDescription("Limit Search results ...");
         parameterDescription.add(searchParameterInfo);
+        
+        searchParameterInfo = new SearchParameterInfo();
+        searchParameterInfo.setKey("mindate");
+        searchParameterInfo.setType(Type.DATE);
+        searchParameterInfo.setArray(false);
+        searchParameterInfo.setDescription("min date of timeperiod (optional)");
+        parameterDescription.add(searchParameterInfo);
+        
+        searchParameterInfo = new SearchParameterInfo();
+        searchParameterInfo.setKey("maxdate");
+        searchParameterInfo.setType(Type.DATE);
+        searchParameterInfo.setArray(false);
+        searchParameterInfo.setDescription("max date of timeperiod (optional)");
+        parameterDescription.add(searchParameterInfo);
 
         searchParameterInfo = new SearchParameterInfo();
         searchParameterInfo.setKey("offset");

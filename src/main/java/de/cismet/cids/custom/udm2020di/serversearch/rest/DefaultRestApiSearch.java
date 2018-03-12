@@ -349,8 +349,8 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
             // hacketyhack: 2018-02-28T23:00:00.000Z -> 2017-02-28
             searchStatement = this.timeperiodSearchStatementTpl.replace("%CLASS_NAMES%", classNamesBuilder.toString())
                         .replace("%TAG_KEYS%", tagKeysBuilder.toString())
-                        .replace("%MIN_DATE%", this.mindate.substring(0, 10))
-                        .replace("%MAX_DATE%", this.maxdate.substring(0, 10));
+                        .replace("%MIN_DATE%", this.mindate)
+                        .replace("%MAX_DATE%", this.maxdate);
         } else {
             // #24
             searchStatement = this.searchStatementTpl.replace(

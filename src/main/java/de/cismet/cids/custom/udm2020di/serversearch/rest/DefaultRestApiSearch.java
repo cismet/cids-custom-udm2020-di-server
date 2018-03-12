@@ -100,6 +100,20 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
         parameterDescription.add(searchParameterInfo);
 
         searchParameterInfo = new SearchParameterInfo();
+        searchParameterInfo.setKey("mindate");
+        searchParameterInfo.setType(Type.STRING);
+        searchParameterInfo.setArray(false);
+        searchParameterInfo.setDescription("min date of timeperiod (optional)");
+        parameterDescription.add(searchParameterInfo);
+
+        searchParameterInfo = new SearchParameterInfo();
+        searchParameterInfo.setKey("maxdate");
+        searchParameterInfo.setType(Type.STRING);
+        searchParameterInfo.setArray(false);
+        searchParameterInfo.setDescription("max date of timeperiod (optional)");
+        parameterDescription.add(searchParameterInfo);
+
+        searchParameterInfo = new SearchParameterInfo();
         searchParameterInfo.setKey("offset");
         searchParameterInfo.setType(Type.INTEGER);
         searchParameterInfo.setArray(false);
@@ -118,7 +132,8 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
 
     //~ Instance fields --------------------------------------------------------
 
-    protected final String defaultSearchStatementTpl;
+    protected final String searchStatementTpl;
+    protected final String timeperiodSearchStatementTpl;
     @Getter @Setter private String[] themes;
 
     @Getter @Setter private String[] pollutants;
@@ -129,6 +144,10 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
 
     @Getter @Setter private int offset = 0;
 
+    @Getter @Setter private String mindate;
+
+    @Getter @Setter private String maxdate;
+
     //~ Constructors -----------------------------------------------------------
 
     /**
@@ -137,9 +156,14 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
      * @throws  IOException  DOCUMENT ME!
      */
     public DefaultRestApiSearch() throws IOException {
-        this.defaultSearchStatementTpl = IOUtils.toString(
+        this.searchStatementTpl = IOUtils.toString(
                 DefaultRestApiSearch.class.getResourceAsStream(
                     "/de/cismet/cids/custom/udm2020di/serversearch/rest/default-search-statement.tpl.sql"),
+                "UTF-8");
+
+        this.timeperiodSearchStatementTpl = IOUtils.toString(
+                DefaultRestApiSearch.class.getResourceAsStream(
+                    "/de/cismet/cids/custom/udm2020di/serversearch/rest/timeperiod-search-statement.tpl.sql"),
                 "UTF-8");
     }
 
@@ -156,7 +180,8 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
                     && (this.themes.length != 0)) {
             LOGGER.info("performing default search for " + themes.length + " themes and "
                         + this.pollutants.length + " pollutants with geometry (length: " + this.geometry.length()
-                        + ") with offset=" + this.offset + " and limit=" + this.limit);
+                        + "), minDate='" + this.mindate + "' and maxDate='" + this.maxdate
+                        + "' with offset=" + this.offset + " and limit=" + this.limit);
         } else {
             final String message = "cannot perform default search, missing parameters: "
                         + "geometry = " + ((this.geometry != null) ? this.geometry.length() : "null")
@@ -175,16 +200,16 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
         }
 
         try {
-            final PreparableStatement defaultSearchStatement = this.createDefaultSearchStatement();
+            final PreparableStatement searchStatement = this.createSearchStatement();
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(defaultSearchStatement);
+                LOGGER.debug(searchStatement);
             }
 
             final ArrayList<MetaObjectNode> resultNodes = new ArrayList<MetaObjectNode>();
             final ArrayList<MetaObjectNode> filteredNodes = new ArrayList<MetaObjectNode>();
 
             final ArrayList<ArrayList> resultSet = metaService.performCustomSearch(
-                    defaultSearchStatement,
+                    searchStatement,
                     new QueryPostProcessor() {
 
                         @Override
@@ -292,10 +317,11 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
      *
      * @return  DOCUMENT ME!
      */
-    protected PreparableStatement createDefaultSearchStatement() {
+    protected PreparableStatement createSearchStatement() {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("building default search sql statement for " + this.themes.length
-                        + " themes and " + this.pollutants.length + " pollutants with offset="
+                        + " themes and " + this.pollutants.length + " pollutants, minDate='"
+                        + this.mindate + "' and maxDate='" + this.maxdate + "' with offset="
                         + this.offset + " and limit=" + this.limit);
         }
 
@@ -316,14 +342,24 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
             }
         }
 
-        // #24
-        final String defaultSearchStatement = this.defaultSearchStatementTpl.replace(
-                    "%CLASS_NAMES%",
-                    classNamesBuilder.toString())
-                    .replace("%TAG_KEYS%", tagKeysBuilder.toString());
+        // #33
+        final String searchStatement;
+        if ((this.mindate != null) && !this.mindate.isEmpty()
+                    && (this.maxdate != null) && !this.maxdate.isEmpty()) {
+            // hacketyhack: 2018-02-28T23:00:00.000Z -> 2017-02-28
+            searchStatement = this.timeperiodSearchStatementTpl.replace("%CLASS_NAMES%", classNamesBuilder.toString())
+                        .replace("%TAG_KEYS%", tagKeysBuilder.toString())
+                        .replace("%MIN_DATE%", this.mindate)
+                        .replace("%MAX_DATE%", this.maxdate);
+        } else {
+            // #24
+            searchStatement = this.searchStatementTpl.replace(
+                        "%CLASS_NAMES%",
+                        classNamesBuilder.toString()).replace("%TAG_KEYS%", tagKeysBuilder.toString());
+        }
 
         final PreparableStatement preparableStatement = new PreparableStatement(
-                defaultSearchStatement,
+                searchStatement,
                 Types.CLOB,
                 Types.INTEGER,
                 Types.INTEGER);

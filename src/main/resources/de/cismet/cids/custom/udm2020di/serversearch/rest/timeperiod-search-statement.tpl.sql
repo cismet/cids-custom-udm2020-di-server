@@ -24,6 +24,11 @@ FROM
       AND CSX_OBJECT_TAG_TIMESTAMP.OBJECT_ID = cs_attr_object_derived.object_id
       AND CSX_OBJECT_TAG_TIMESTAMP.TAG_ID IN
         (SELECT ID FROM TAG WHERE TAG.key IN (%TAG_KEYS%))
+      AND (
+        CSX_OBJECT_TAG_TIMESTAMP.MIN_DATE BETWEEN (TO_DATE('%MIN_DATE%', 'DD.MM.YYYY')) AND (TO_DATE('%MAX_DATE%', 'DD.MM.YYYY'))
+        OR CSX_OBJECT_TAG_TIMESTAMP.MAX_DATE BETWEEN (TO_DATE('%MIN_DATE%', 'DD.MM.YYYY')) AND (TO_DATE('%MAX_DATE%', 'DD.MM.YYYY'))
+        OR ( CSX_OBJECT_TAG_TIMESTAMP.MIN_DATE < (TO_DATE('%MIN_DATE%', 'DD.MM.YYYY')) AND (TO_DATE('%MAX_DATE%', 'DD.MM.YYYY')) < CSX_OBJECT_TAG_TIMESTAMP.MAX_DATE )
+        )
       AND cs_attr_object_derived.attr_class_id =
         (SELECT cs_class.id FROM cs_class WHERE cs_class.table_name = 'GEOM')
       AND cs_attr_object_derived.attr_object_id = geom.id

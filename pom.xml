@@ -10,7 +10,7 @@
 
     <groupId>de.cismet.cids.custom.udm2020</groupId>
     <artifactId>cids-custom-udm2020-di-server</artifactId>
-    <version>5.2-SNAPSHOT</version>
+    <version>5.2</version>
     <packaging>jar</packaging>
 
     <name>cids Custom UiM 2020 - DI - Server</name>
@@ -20,7 +20,7 @@
         <connection>scm:git:https://github.com/cismet/cids-custom-udm2020-di-server.git</connection>
         <developerConnection>scm:git:git@github.com:cismet/cids-custom-udm2020-di-server.git</developerConnection>
         <url>https://github.com/cismet/cids-custom-udm2020-di-server</url>
-        <tag>HEAD</tag>
+        <tag>v5.2</tag>
     </scm>
     
     <issueManagement>

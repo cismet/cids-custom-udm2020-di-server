@@ -1,22 +1,19 @@
 SELECT ocid,
-  oid,
-  stringrep,
-  geometry,
-  lightweight_json
-    FROM    
-    (SELECT ocid,
       oid,
       stringrep,
       geometry,
-      lightweight_json,
-      ROWNUM rnum
-    FROM
+      lightweight_json
+FROM
       (SELECT cs_attr_object_derived.class_id ocid,
         cs_attr_object_derived.object_id oid,
         CSX_CACHE.stringrep,
         CSX_CACHE.geometry,
         CSX_CACHE.lightweight_json,
-        row_number() over (partition BY cs_attr_object_derived.class_id, cs_attr_object_derived.object_id order by rownum) part
+        row_number() 
+        OVER (partition BY cs_attr_object_derived.class_id, cs_attr_object_derived.object_id 
+        ORDER BY
+                cs_attr_object_derived.class_id,
+                cs_attr_object_derived.object_id) part      
       FROM geom,
         CSX_OBJECT_TAG_TIMESTAMP,
         cs_attr_object_derived
@@ -37,9 +34,7 @@ SELECT ocid,
       AND cs_attr_object_derived.attr_object_id = geom.id
       AND cs_attr_object_derived.class_id      IN
         (SELECT ID FROM CS_CLASS WHERE CS_CLASS.NAME IN (%CLASS_NAMES%))
-      AND sdo_relate(geom.geo_field, sdo_geometry(?, 4326), 'mask=anyinteract') = 'TRUE'
-      ORDER BY ocid, oid)
-    WHERE part = 1
-    AND ROWNUM <= ?)
-WHERE
-    rnum  >= ?
+      AND st_contains(GeomFromEWKT(?),geom.geo_field)
+      ORDER BY ocid, oid) AS foo
+WHERE part = 1
+LIMIT ?

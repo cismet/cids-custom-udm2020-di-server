@@ -360,11 +360,16 @@ public class DefaultRestApiSearch extends AbstractCidsServerSearch implements Re
 
         final PreparableStatement preparableStatement = new PreparableStatement(
                 searchStatement,
-                Types.CLOB,
-                Types.INTEGER,
+                Types.VARCHAR,
                 Types.INTEGER);
-        preparableStatement.setObjects(this.geometry, (this.offset + this.limit), this.offset);
 
+        if (this.geometry.indexOf("SRID=4326;") == 0) {
+            // LOGGER.warn("EWKT with SRID=4326 found");
+            preparableStatement.setObjects(this.geometry, this.limit);
+        } else {
+            LOGGER.warn("adding missing SRID=4326 to EWKT");
+            preparableStatement.setObjects("SRID=4326;" + this.geometry, this.limit);
+        }
         return preparableStatement;
     }
 }
